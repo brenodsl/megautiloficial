@@ -1,5 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Star, Play, Image as ImageIcon } from "lucide-react";
+import useEmblaCarousel from "embla-carousel-react";
+import Autoplay from "embla-carousel-autoplay";
 import tenisMain from "@/assets/tenis-main.webp";
 import tenis2 from "@/assets/tenis-2.webp";
 import tenis3 from "@/assets/tenis-3.webp";
@@ -26,21 +28,42 @@ const colorImages: Record<string, string> = {
   main: tenisMain,
 };
 
-const thumbnails = [
-  { id: 1, src: tenis2, alt: "Max Runner - Vista Lateral" },
-  { id: 2, src: tenis3, alt: "Max Runner - Vista Traseira" },
-  { id: 3, src: tenis4, alt: "Max Runner - Detalhe" },
-  { id: 4, src: tenis5, alt: "Max Runner - Sola" },
-  { id: 5, src: tenis7, alt: "Max Runner - Vista Superior" },
+const allImages = [
+  { id: 1, src: colorGradient, alt: "Max Runner - Gradient" },
+  { id: 2, src: tenis2, alt: "Max Runner - Vista Lateral" },
+  { id: 3, src: tenis3, alt: "Max Runner - Vista Traseira" },
+  { id: 4, src: tenis4, alt: "Max Runner - Detalhe" },
+  { id: 5, src: tenis5, alt: "Max Runner - Sola" },
+  { id: 6, src: tenis7, alt: "Max Runner - Vista Superior" },
 ];
 
 const ProductGallery = ({ selectedColor }: ProductGalleryProps) => {
-  const [selectedThumb, setSelectedThumb] = useState<number | null>(null);
   const [showVideo, setShowVideo] = useState(false);
+  const [currentSlide, setCurrentSlide] = useState(0);
+  
+  const [emblaRef, emblaApi] = useEmblaCarousel(
+    { loop: true, dragFree: false },
+    [Autoplay({ delay: 3000, stopOnInteraction: false, stopOnMouseEnter: true })]
+  );
 
-  const mainImage = selectedThumb !== null 
-    ? thumbnails[selectedThumb].src 
-    : colorImages[selectedColor] || colorGradient;
+  // Update images based on selected color
+  const images = [
+    { id: 0, src: colorImages[selectedColor] || colorGradient, alt: `Max Runner - ${selectedColor}` },
+    ...allImages.slice(1),
+  ];
+
+  const onSelect = useCallback(() => {
+    if (!emblaApi) return;
+    setCurrentSlide(emblaApi.selectedScrollSnap());
+  }, [emblaApi]);
+
+  useEffect(() => {
+    if (!emblaApi) return;
+    emblaApi.on("select", onSelect);
+    return () => {
+      emblaApi.off("select", onSelect);
+    };
+  }, [emblaApi, onSelect]);
 
   return (
     <div id="produto" className="space-y-3">
@@ -56,7 +79,7 @@ const ProductGallery = ({ selectedColor }: ProductGalleryProps) => {
         <span className="underline">(578 avaliações)</span>
       </a>
 
-      {/* Main Image/Video */}
+      {/* Main Image/Video Carousel */}
       <div className="relative aspect-square overflow-hidden rounded-lg bg-white border border-border">
         {showVideo ? (
           <video
@@ -68,26 +91,48 @@ const ProductGallery = ({ selectedColor }: ProductGalleryProps) => {
             className="h-full w-full object-cover"
           />
         ) : (
-          <img
-            src={mainImage}
-            alt="Max Runner - Tênis Premium"
-            className="h-full w-full object-cover"
-          />
+          <div ref={emblaRef} className="overflow-hidden h-full">
+            <div className="flex h-full">
+              {images.map((image) => (
+                <div key={image.id} className="flex-[0_0_100%] min-w-0 h-full">
+                  <img
+                    src={image.src}
+                    alt={image.alt}
+                    className="h-full w-full object-cover"
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
         )}
         
         {/* Badge */}
-        <div className="absolute top-3 left-3 bg-destructive text-white text-xs font-bold px-3 py-1.5 rounded flex items-center gap-1">
+        <div className="absolute top-3 left-3 bg-destructive text-white text-xs font-bold px-3 py-1.5 rounded flex items-center gap-1 z-10">
           <span className="animate-pulse">⚡</span>
           ÚLTIMAS UNIDADES
         </div>
 
+        {/* Slide Indicators */}
+        {!showVideo && (
+          <div className="absolute bottom-14 left-1/2 -translate-x-1/2 flex gap-1.5 z-10">
+            {images.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => emblaApi?.scrollTo(index)}
+                className={`w-2 h-2 rounded-full transition-all ${
+                  currentSlide === index
+                    ? "bg-foreground w-4"
+                    : "bg-foreground/40"
+                }`}
+              />
+            ))}
+          </div>
+        )}
+
         {/* Toggle Button */}
         <button
-          onClick={() => {
-            setShowVideo(!showVideo);
-            if (!showVideo) setSelectedThumb(null);
-          }}
-          className="absolute bottom-3 right-3 flex items-center gap-2 bg-white/95 backdrop-blur-sm px-3 py-2 rounded-lg text-sm font-medium text-foreground border border-border hover:bg-white transition-colors shadow-sm"
+          onClick={() => setShowVideo(!showVideo)}
+          className="absolute bottom-3 right-3 flex items-center gap-2 bg-white/95 backdrop-blur-sm px-3 py-2 rounded-lg text-sm font-medium text-foreground border border-border hover:bg-white transition-colors shadow-sm z-10"
         >
           {showVideo ? (
             <>
@@ -100,45 +145,6 @@ const ProductGallery = ({ selectedColor }: ProductGalleryProps) => {
               Ver Vídeo
             </>
           )}
-        </button>
-      </div>
-
-      {/* Thumbnails */}
-      <div className="flex gap-2 overflow-x-auto pb-1">
-        {thumbnails.map((thumb, index) => (
-          <button
-            key={thumb.id}
-            onClick={() => {
-              setSelectedThumb(index);
-              setShowVideo(false);
-            }}
-            className={`relative flex-shrink-0 aspect-square w-14 rounded-lg overflow-hidden border-2 transition-all ${
-              selectedThumb === index && !showVideo
-                ? "border-foreground"
-                : "border-border hover:border-muted-foreground"
-            }`}
-          >
-            <img
-              src={thumb.src}
-              alt={thumb.alt}
-              className="h-full w-full object-cover"
-            />
-          </button>
-        ))}
-        
-        {/* Video Thumbnail */}
-        <button
-          onClick={() => setShowVideo(true)}
-          className={`relative flex-shrink-0 aspect-square w-14 rounded-lg overflow-hidden border-2 transition-all ${
-            showVideo
-              ? "border-foreground"
-              : "border-border hover:border-muted-foreground"
-          }`}
-        >
-          <video src={tenisVideo} className="h-full w-full object-cover" muted />
-          <div className="absolute inset-0 flex items-center justify-center bg-black/30">
-            <Play className="h-5 w-5 text-white fill-white" />
-          </div>
         </button>
       </div>
     </div>

@@ -6,6 +6,7 @@ import Breadcrumb from "@/components/Breadcrumb";
 import ProductGallery from "@/components/ProductGallery";
 import ColorSelector from "@/components/ColorSelector";
 import SizeSelector from "@/components/SizeSelector";
+import ShippingCalculator from "@/components/ShippingCalculator";
 import ScarcityBanner from "@/components/ScarcityBanner";
 import Reviews from "@/components/Reviews";
 import Benefits from "@/components/Benefits";
@@ -99,6 +100,9 @@ const Index = () => {
               <span>Estoque disponível</span>
             </div>
           </div>
+
+          {/* Shipping Calculator */}
+          <ShippingCalculator />
 
           {/* CTA Button */}
           <Button
