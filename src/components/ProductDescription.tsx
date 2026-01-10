@@ -1,4 +1,5 @@
 import { CheckCircle } from "lucide-react";
+import tamanhosImg from "@/assets/tamanhos.png";
 
 const features = [
   "Placa de carbono para máximo retorno de energia",
@@ -38,6 +39,15 @@ const ProductDescription = () => {
             </li>
           ))}
         </ul>
+      </div>
+
+      <div className="mt-6">
+        <h4 className="font-semibold text-foreground mb-3">Tabela de Tamanhos:</h4>
+        <img 
+          src={tamanhosImg} 
+          alt="Tabela de tamanhos do tênis" 
+          className="w-full rounded-lg"
+        />
       </div>
     </section>
   );
