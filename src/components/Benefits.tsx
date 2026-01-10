@@ -1,56 +1,54 @@
-import { Zap, Feather, Shield, Wind, Award, Heart } from "lucide-react";
+import { Zap, Wind, Footprints, Scale, Activity, Trophy } from "lucide-react";
 
 const benefits = [
   {
-    icon: Feather,
-    title: "Ultra Leve",
-    description: "Apenas 280g para máximo conforto",
-  },
-  {
     icon: Zap,
-    title: "Amortecimento",
-    description: "Tecnologia de absorção de impacto",
+    title: "Placa de Carbono",
+    description: "Retorno de energia excepcional e propulsão otimizada",
   },
   {
     icon: Wind,
-    title: "Respirável",
-    description: "Malha que permite ventilação",
+    title: "Malha Respirável",
+    description: "Mantém seus pés frescos e secos durante toda a corrida",
   },
   {
-    icon: Shield,
-    title: "Durável",
-    description: "Sola resistente ao desgaste",
+    icon: Footprints,
+    title: "Amortecimento Premium",
+    description: "Espuma de alta densidade que absorve impactos",
   },
   {
-    icon: Award,
-    title: "Design Premium",
-    description: "Estilo moderno e versátil",
+    icon: Scale,
+    title: "Ultra Leve",
+    description: "Apenas 220g para máximo conforto e agilidade",
   },
   {
-    icon: Heart,
-    title: "Conforto Total",
-    description: "Palmilha ergonômica anatômica",
+    icon: Activity,
+    title: "Antiderrapante",
+    description: "Solado de borracha para maior aderência",
+  },
+  {
+    icon: Trophy,
+    title: "Design Ergonômico",
+    description: "Ideal para corridas longas e treinos intensos",
   },
 ];
 
 const Benefits = () => {
   return (
     <section className="space-y-6">
-      <h2 className="text-2xl font-bold text-center text-foreground">
-        Por que escolher o <span className="text-primary">Max Runner</span>?
+      <h2 className="text-xl font-bold text-foreground">
+        Características do Produto
       </h2>
-
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+      
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
         {benefits.map((benefit, index) => (
           <div
             key={index}
-            className="group p-4 rounded-xl bg-card border border-border shadow-sm hover:border-primary/50 hover:shadow-md transition-all text-center space-y-2"
+            className="bg-white rounded-lg border border-border p-4"
           >
-            <div className="mx-auto h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-all">
-              <benefit.icon className="h-6 w-6 text-primary" />
-            </div>
-            <h3 className="font-semibold text-foreground">{benefit.title}</h3>
-            <p className="text-xs text-muted-foreground">{benefit.description}</p>
+            <benefit.icon className="h-6 w-6 text-primary mb-2" />
+            <h3 className="font-semibold text-foreground text-sm">{benefit.title}</h3>
+            <p className="text-xs text-muted-foreground mt-1">{benefit.description}</p>
           </div>
         ))}
       </div>

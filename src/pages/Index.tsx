@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ShoppingBag, ArrowRight, Star } from "lucide-react";
+import { ShoppingBag, Truck, Shield, CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Header from "@/components/Header";
 import ProductGallery from "@/components/ProductGallery";
@@ -27,61 +27,36 @@ const Index = () => {
     <div className="min-h-screen bg-background pb-24 lg:pb-0">
       <Header />
 
-      <main className="container mx-auto px-4 py-6 space-y-10">
-        {/* Hero Section */}
+      <main className="max-w-6xl mx-auto px-4 py-6">
+        {/* Product Section */}
         <section className="grid lg:grid-cols-2 gap-8">
           {/* Product Gallery */}
           <ProductGallery />
 
           {/* Product Info */}
-          <div className="space-y-6">
-            {/* Badges */}
-            <div className="flex flex-wrap gap-2">
-              <span className="px-3 py-1 text-xs font-semibold rounded-full bg-success/20 text-success">
-                FRETE GRÁTIS
-              </span>
-              <span className="px-3 py-1 text-xs font-semibold rounded-full bg-destructive/20 text-destructive animate-pulse">
-                ÚLTIMAS UNIDADES
-              </span>
-              <span className="px-3 py-1 text-xs font-semibold rounded-full bg-primary/20 text-primary">
-                MAIS VENDIDO
-              </span>
-            </div>
-
+          <div className="space-y-5">
             {/* Title */}
-            <div className="space-y-2">
-              <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
+            <div>
+              <h1 className="text-2xl font-bold text-foreground">
                 Tênis Max Runner Premium
               </h1>
-              <p className="text-muted-foreground">
-                O tênis perfeito para corrida, academia e dia a dia. Ultra confortável com tecnologia de amortecimento avançada.
+              <p className="text-muted-foreground mt-1">
+                Tênis de Corrida com Tecnologia de Amortecimento Avançada
               </p>
             </div>
 
-            {/* Rating */}
-            <div className="flex items-center gap-2">
-              <div className="flex">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <Star key={star} className="h-5 w-5 fill-warning text-warning" />
-                ))}
-              </div>
-              <span className="font-semibold text-foreground">4.9</span>
-              <span className="text-muted-foreground">(578 avaliações)</span>
-              <span className="text-success text-sm">• +2.500 vendidos</span>
-            </div>
-
-            {/* Price */}
-            <div className="p-4 rounded-xl bg-card border border-border shadow-sm space-y-2">
-              <div className="flex items-baseline gap-3">
-                <span className="text-lg text-muted-foreground line-through">
+            {/* Price Card */}
+            <div className="bg-white rounded-lg border border-border p-4 space-y-3">
+              <div className="flex items-center gap-3">
+                <span className="text-muted-foreground line-through text-lg">
                   R$ 239,80
                 </span>
-                <span className="px-2 py-0.5 text-xs font-bold rounded-full bg-orange-500 text-white">
+                <span className="bg-destructive text-white text-xs font-bold px-2 py-1 rounded">
                   -76%
                 </span>
               </div>
               <div className="flex items-baseline gap-2">
-                <span className="text-4xl font-bold text-primary">R$ 57,90</span>
+                <span className="text-3xl font-bold text-foreground">R$ 57,90</span>
                 <span className="text-sm text-muted-foreground">à vista no PIX</span>
               </div>
               <p className="text-sm text-muted-foreground">
@@ -94,56 +69,77 @@ const Index = () => {
               <SizeSelector selectedSize={selectedSize} onSizeSelect={setSelectedSize} />
             </div>
 
-            {/* CTA Button (Desktop) */}
+            {/* CTA Button */}
             <Button
               onClick={handleBuyClick}
               size="lg"
-              className="hidden lg:flex w-full h-14 gradient-cta hover:opacity-90 text-white font-bold text-lg gap-3 shadow-lg"
+              className="w-full h-14 gradient-cta glow-cta hover:opacity-95 text-white font-bold text-base gap-2"
             >
-              <ShoppingBag className="h-6 w-6" />
+              <ShoppingBag className="h-5 w-5" />
               {selectedSize ? "COMPRAR AGORA" : "SELECIONE O TAMANHO"}
-              <ArrowRight className="h-5 w-5" />
             </Button>
+
+            {/* Quick Info */}
+            <div className="grid grid-cols-3 gap-2 text-center">
+              <div className="bg-white rounded-lg border border-border p-3">
+                <Truck className="h-5 w-5 mx-auto text-success mb-1" />
+                <p className="text-xs font-medium text-foreground">Frete Grátis</p>
+              </div>
+              <div className="bg-white rounded-lg border border-border p-3">
+                <Shield className="h-5 w-5 mx-auto text-primary mb-1" />
+                <p className="text-xs font-medium text-foreground">Garantia 90 dias</p>
+              </div>
+              <div className="bg-white rounded-lg border border-border p-3">
+                <CreditCard className="h-5 w-5 mx-auto text-primary mb-1" />
+                <p className="text-xs font-medium text-foreground">12x sem juros</p>
+              </div>
+            </div>
 
             {/* Scarcity */}
             <ScarcityBanner />
           </div>
         </section>
 
+        {/* Divider */}
+        <div className="border-t border-border my-8" />
+
         {/* Guarantees */}
         <Guarantees />
 
+        {/* Divider */}
+        <div className="border-t border-border my-8" />
+
         {/* Benefits */}
         <Benefits />
+
+        {/* Divider */}
+        <div className="border-t border-border my-8" />
 
         {/* Reviews */}
         <Reviews />
 
         {/* Final CTA */}
-        <section className="text-center space-y-4 py-8">
-          <h2 className="text-2xl font-bold text-foreground">
-            Garanta já o seu <span className="text-primary">Max Runner</span>!
+        <section className="text-center py-10">
+          <h2 className="text-xl font-bold text-foreground mb-2">
+            Garanta já o seu Max Runner!
           </h2>
-          <p className="text-muted-foreground">
+          <p className="text-muted-foreground mb-4">
             Aproveite a promoção enquanto durarem os estoques
           </p>
           <Button
             onClick={handleBuyClick}
             size="lg"
-            className="gradient-cta hover:opacity-90 text-white font-bold text-lg px-12 h-14 gap-3 shadow-lg"
+            className="gradient-cta glow-cta hover:opacity-95 text-white font-bold text-base px-10 h-14 gap-2"
           >
-            <ShoppingBag className="h-6 w-6" />
+            <ShoppingBag className="h-5 w-5" />
             {selectedSize ? "COMPRAR AGORA" : "SELECIONE O TAMANHO"}
-            <ArrowRight className="h-5 w-5" />
           </Button>
         </section>
 
         {/* Footer */}
         <footer className="text-center text-sm text-muted-foreground py-8 border-t border-border">
           <p>© 2024 Max Runner. Todos os direitos reservados.</p>
-          <p className="mt-2">
-            Atendimento: contato@maxrunner.com.br
-          </p>
+          <p className="mt-1">contato@maxrunner.com.br</p>
         </footer>
       </main>
 
