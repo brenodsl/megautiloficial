@@ -19,18 +19,16 @@ const Header = () => {
   return (
     <header className="sticky top-0 z-40">
       {/* Top Promo Bar */}
-      <div className="bg-orange-500 py-2">
+      <div className="bg-success py-2">
         <div className="container mx-auto px-4">
-          <p className="text-center text-xs sm:text-sm font-semibold text-white flex items-center justify-center gap-2">
-            🔥 SUPER DESCONTO
-            <span className="hidden sm:inline">•</span>
-            <span className="hidden sm:inline">76% OFF + FRETE GRÁTIS</span>
+          <p className="text-center text-xs font-semibold text-white flex items-center justify-center gap-2">
+            🔥 SUPER DESCONTO • 67% OFF + FRETE GRÁTIS
           </p>
         </div>
       </div>
 
-      {/* Main Header - Dark */}
-      <div className="header-dark">
+      {/* Main Header - Black */}
+      <div className="bg-black">
         <div className="container mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
             {/* Menu Button */}
@@ -47,7 +45,7 @@ const Header = () => {
                     <img
                       src={logo}
                       alt="Max Runner"
-                      className="h-12 w-12 rounded-full object-cover"
+                      className="h-10 w-auto object-contain"
                     />
                     <div>
                       <span className="text-lg font-bold text-foreground">
@@ -90,16 +88,13 @@ const Header = () => {
               </SheetContent>
             </Sheet>
 
-            {/* Logo - Centered */}
-            <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-2">
+            {/* Logo - Centered without circle */}
+            <div className="absolute left-1/2 -translate-x-1/2">
               <img
                 src={logo}
                 alt="Max Runner"
-                className="h-9 w-9 rounded-full object-cover border-2 border-white/20"
+                className="h-10 w-auto object-contain"
               />
-              <span className="text-lg font-bold text-white hidden sm:block">
-                Max Runner
-              </span>
             </div>
 
             {/* Cart Button */}
@@ -110,7 +105,7 @@ const Header = () => {
               onClick={() => window.open(CHECKOUT_URL, "_blank")}
             >
               <ShoppingCart className="h-5 w-5" />
-              <span className="absolute -top-0.5 -right-0.5 h-4 w-4 rounded-full bg-orange-500 text-white text-[10px] flex items-center justify-center font-bold">
+              <span className="absolute -top-0.5 -right-0.5 h-4 w-4 rounded-full bg-success text-white text-[10px] flex items-center justify-center font-bold">
                 1
               </span>
             </Button>
