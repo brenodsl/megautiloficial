@@ -22,10 +22,6 @@ const Index = () => {
   const [selectedColor, setSelectedColor] = useState<string>("gradient");
 
   const handleBuyClick = () => {
-    if (!selectedSize) {
-      document.getElementById("size-selector")?.scrollIntoView({ behavior: "smooth" });
-      return;
-    }
     window.open(CHECKOUT_URL, "_blank");
   };
 
