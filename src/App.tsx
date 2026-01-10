@@ -10,6 +10,7 @@ import TermsOfUse from "./pages/TermsOfUse";
 import ShippingPolicy from "./pages/ShippingPolicy";
 import RefundPolicy from "./pages/RefundPolicy";
 import ExchangePolicy from "./pages/ExchangePolicy";
+import Upsell from "./pages/Upsell";
 
 const queryClient = new QueryClient();
 
@@ -21,6 +22,7 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/upsell" element={<Upsell />} />
           <Route path="/politica-de-privacidade" element={<PrivacyPolicy />} />
           <Route path="/termos-de-uso" element={<TermsOfUse />} />
           <Route path="/politica-de-envio" element={<ShippingPolicy />} />
