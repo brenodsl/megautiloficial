@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Star, CheckCircle, ThumbsUp } from "lucide-react";
 import review1 from "@/assets/review-1.webp";
 import review2 from "@/assets/review-2.webp";
@@ -61,6 +62,9 @@ const ratingDistribution = [
 const Reviews = () => {
   const averageRating = 4.9;
   const totalReviews = 578;
+  const [showAll, setShowAll] = useState(false);
+  
+  const visibleReviews = showAll ? reviews : reviews.slice(0, 3);
 
   return (
     <section id="avaliacoes" className="space-y-6">
@@ -103,7 +107,7 @@ const Reviews = () => {
 
       {/* Review Cards */}
       <div className="space-y-4">
-        {reviews.map((review) => (
+        {visibleReviews.map((review) => (
           <div
             key={review.id}
             className="bg-white rounded-lg border border-border p-4 space-y-3"
@@ -158,6 +162,25 @@ const Reviews = () => {
           </div>
         ))}
       </div>
+
+      {/* Ver Mais Button */}
+      {!showAll && reviews.length > 3 && (
+        <button
+          onClick={() => setShowAll(true)}
+          className="w-full py-3 text-center text-sm font-medium text-foreground bg-white border border-border rounded-lg hover:bg-muted/50 transition-colors"
+        >
+          Ver mais avaliações ({reviews.length - 3} restantes)
+        </button>
+      )}
+
+      {showAll && (
+        <button
+          onClick={() => setShowAll(false)}
+          className="w-full py-3 text-center text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+        >
+          Ver menos
+        </button>
+      )}
     </section>
   );
 };
