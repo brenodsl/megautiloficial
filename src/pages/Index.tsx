@@ -1,6 +1,12 @@
-import { useState } from "react";
-import { ShoppingBag, Truck, Shield, CreditCard, CheckCircle, Award } from "lucide-react";
+import { useState, useEffect } from "react";
+import { ShoppingBag, Truck, Shield, CreditCard, CheckCircle, Award, X, Gift } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import Header from "@/components/Header";
 import Breadcrumb from "@/components/Breadcrumb";
 import ProductGallery from "@/components/ProductGallery";
@@ -16,13 +22,39 @@ import Footer from "@/components/Footer";
 import FixedCTA from "@/components/FixedCTA";
 
 const CHECKOUT_URL = "https://pay.maxrunnerpay.shop/69618e8fc4b1fc0d57ae958d";
+const PROMO_CHECKOUT_URL = "https://pay.maxrunnerpay.shop/6961c264c4b1fc0d57af6648";
 
 const Index = () => {
   const [selectedSize, setSelectedSize] = useState<number | null>(null);
   const [selectedColor, setSelectedColor] = useState<string>("gradient");
+  const [showPromoPopup, setShowPromoPopup] = useState(false);
+
+  useEffect(() => {
+    // Check if user is coming back from checkout (backredirect)
+    const urlParams = new URLSearchParams(window.location.search);
+    const isBackRedirect = urlParams.get('backredirect') === 'true' || 
+                           document.referrer.includes('maxrunnerpay.shop') ||
+                           document.referrer.includes('pay.');
+    
+    // Also check sessionStorage to not show popup multiple times
+    const hasSeenPromo = sessionStorage.getItem('hasSeenBackPromo');
+    
+    if (isBackRedirect && !hasSeenPromo) {
+      // Small delay for better UX
+      setTimeout(() => {
+        setShowPromoPopup(true);
+        sessionStorage.setItem('hasSeenBackPromo', 'true');
+      }, 500);
+    }
+  }, []);
 
   const handleBuyClick = () => {
     window.open(CHECKOUT_URL, "_blank");
+  };
+
+  const handlePromoClick = () => {
+    window.open(PROMO_CHECKOUT_URL, "_blank");
+    setShowPromoPopup(false);
   };
 
   return (
@@ -169,6 +201,61 @@ const Index = () => {
 
       {/* Fixed CTA Mobile */}
       <FixedCTA selectedSize={selectedSize} />
+
+      {/* Promo Popup for Back Redirect */}
+      <Dialog open={showPromoPopup} onOpenChange={setShowPromoPopup}>
+        <DialogContent className="sm:max-w-md border-2 border-destructive/50 bg-gradient-to-b from-background to-destructive/5">
+          <DialogHeader>
+            <div className="flex items-center justify-center gap-2 text-destructive mb-2">
+              <Gift className="h-6 w-6 animate-pulse" />
+              <span className="text-xs font-bold uppercase tracking-wider">Oferta Exclusiva</span>
+            </div>
+            <DialogTitle className="text-center text-xl font-bold">
+              🎁 ESPERA! Temos uma oferta imperdível para você!
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <div className="text-center">
+              <p className="text-muted-foreground text-sm mb-3">
+                Sabemos que você estava interessado no nosso tênis. Que tal um desconto especial?
+              </p>
+              
+              <div className="bg-success/10 border border-success/30 rounded-lg p-4 mb-4">
+                <p className="text-xs text-muted-foreground line-through mb-1">
+                  De R$ 78,90
+                </p>
+                <p className="text-3xl font-bold text-success">
+                  R$ 47,20
+                </p>
+                <p className="text-xs text-success font-medium mt-1">
+                  Economia de R$ 31,70!
+                </p>
+              </div>
+              
+              <p className="text-xs text-destructive font-semibold animate-pulse">
+                ⏰ Oferta válida apenas agora!
+              </p>
+            </div>
+            
+            <Button
+              onClick={handlePromoClick}
+              size="lg"
+              className="w-full h-14 bg-success hover:bg-success/90 text-white font-bold text-base gap-2"
+            >
+              <ShoppingBag className="h-5 w-5" />
+              QUERO ESSA OFERTA!
+            </Button>
+            
+            <button
+              onClick={() => setShowPromoPopup(false)}
+              className="w-full text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Não, obrigado. Prefiro pagar mais caro.
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
