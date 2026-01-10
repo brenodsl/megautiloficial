@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { ShoppingBag, Truck, Shield, CreditCard, CheckCircle } from "lucide-react";
+import { ShoppingBag, Truck, Shield, CreditCard, CheckCircle, Award } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Header from "@/components/Header";
+import Breadcrumb from "@/components/Breadcrumb";
 import ProductGallery from "@/components/ProductGallery";
 import ColorSelector from "@/components/ColorSelector";
 import SizeSelector from "@/components/SizeSelector";
@@ -9,6 +10,8 @@ import ScarcityBanner from "@/components/ScarcityBanner";
 import Reviews from "@/components/Reviews";
 import Benefits from "@/components/Benefits";
 import Guarantees from "@/components/Guarantees";
+import ProductDescription from "@/components/ProductDescription";
+import Footer from "@/components/Footer";
 import FixedCTA from "@/components/FixedCTA";
 
 const CHECKOUT_URL = "https://pay.maxrunnerpay.shop/69618e8fc4b1fc0d57ae958d";
@@ -28,6 +31,17 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background pb-24 lg:pb-0">
       <Header />
+      <Breadcrumb />
+
+      {/* 1º Lugar Badge */}
+      <div className="bg-warning/10 border-b border-warning/20">
+        <div className="max-w-lg mx-auto px-4 py-2">
+          <div className="flex items-center justify-center gap-2 text-xs font-semibold text-warning">
+            <Award className="h-4 w-4" />
+            <span>1º Lugar em Tênis de Corrida</span>
+          </div>
+        </div>
+      </div>
 
       <main className="max-w-lg mx-auto px-4 py-4">
         {/* Product Gallery */}
@@ -68,9 +82,9 @@ const Index = () => {
 
           {/* Quick Info */}
           <div className="space-y-2">
-            <div className="flex items-center gap-2 text-sm text-foreground">
-              <Truck className="h-4 w-4 text-muted-foreground" />
-              <span>Frete grátis para todo o Brasil</span>
+            <div className="flex items-center gap-2 text-sm text-success font-medium">
+              <Truck className="h-4 w-4" />
+              <span>FRETE GRÁTIS para todo o Brasil</span>
             </div>
             <div className="flex items-center gap-2 text-sm text-foreground">
               <Shield className="h-4 w-4 text-muted-foreground" />
@@ -90,7 +104,7 @@ const Index = () => {
           <Button
             onClick={handleBuyClick}
             size="lg"
-            className="w-full h-14 gradient-cta glow-cta hover:opacity-95 text-white font-bold text-base gap-2"
+            className="w-full h-14 bg-black hover:bg-black/90 text-white font-bold text-base gap-2"
           >
             <ShoppingBag className="h-5 w-5" />
             COMPRAR AGORA
@@ -99,6 +113,12 @@ const Index = () => {
           {/* Scarcity */}
           <ScarcityBanner />
         </div>
+
+        {/* Divider */}
+        <div className="border-t border-border my-6" />
+
+        {/* Product Description */}
+        <ProductDescription />
 
         {/* Divider */}
         <div className="border-t border-border my-6" />
@@ -129,19 +149,16 @@ const Index = () => {
           <Button
             onClick={handleBuyClick}
             size="lg"
-            className="w-full gradient-cta glow-cta hover:opacity-95 text-white font-bold text-base h-14 gap-2"
+            className="w-full bg-black hover:bg-black/90 text-white font-bold text-base h-14 gap-2"
           >
             <ShoppingBag className="h-5 w-5" />
             COMPRAR AGORA
           </Button>
         </section>
-
-        {/* Footer */}
-        <footer className="text-center text-xs text-muted-foreground py-6 border-t border-border">
-          <p>© 2024 Max Runner. Todos os direitos reservados.</p>
-          <p className="mt-1">contato@maxrunner.com.br</p>
-        </footer>
       </main>
+
+      {/* Footer */}
+      <Footer />
 
       {/* Fixed CTA Mobile */}
       <FixedCTA selectedSize={selectedSize} />

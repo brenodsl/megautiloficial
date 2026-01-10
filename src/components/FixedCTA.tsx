@@ -31,7 +31,7 @@ const FixedCTA = ({ selectedSize }: FixedCTAProps) => {
         
         <Button
           onClick={handleClick}
-          className="gradient-cta glow-cta hover:opacity-95 text-white font-bold px-6 h-12"
+          className="bg-black hover:bg-black/90 text-white font-bold px-6 h-12"
         >
           <ShoppingBag className="h-5 w-5 mr-2" />
           COMPRAR AGORA
