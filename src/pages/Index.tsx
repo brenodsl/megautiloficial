@@ -8,7 +8,6 @@ import ScarcityBanner from "@/components/ScarcityBanner";
 import Reviews from "@/components/Reviews";
 import Benefits from "@/components/Benefits";
 import Guarantees from "@/components/Guarantees";
-import FAQ from "@/components/FAQ";
 import FixedCTA from "@/components/FixedCTA";
 
 const CHECKOUT_URL = "https://pay.maxrunnerpay.shop/69618e8fc4b1fc0d57ae958d";
@@ -67,22 +66,22 @@ const Index = () => {
                 ))}
               </div>
               <span className="font-semibold text-foreground">4.9</span>
-              <span className="text-muted-foreground">(2.847 avaliações)</span>
+              <span className="text-muted-foreground">(578 avaliações)</span>
               <span className="text-success text-sm">• +2.500 vendidos</span>
             </div>
 
             {/* Price */}
-            <div className="p-4 rounded-xl gradient-card border border-border space-y-2">
+            <div className="p-4 rounded-xl bg-card border border-border shadow-sm space-y-2">
               <div className="flex items-baseline gap-3">
                 <span className="text-lg text-muted-foreground line-through">
                   R$ 239,80
                 </span>
-                <span className="px-2 py-0.5 text-xs font-bold rounded-full bg-destructive text-destructive-foreground">
+                <span className="px-2 py-0.5 text-xs font-bold rounded-full bg-orange-500 text-white">
                   -76%
                 </span>
               </div>
               <div className="flex items-baseline gap-2">
-                <span className="text-4xl font-bold text-gradient">R$ 57,90</span>
+                <span className="text-4xl font-bold text-primary">R$ 57,90</span>
                 <span className="text-sm text-muted-foreground">à vista no PIX</span>
               </div>
               <p className="text-sm text-muted-foreground">
@@ -99,7 +98,7 @@ const Index = () => {
             <Button
               onClick={handleBuyClick}
               size="lg"
-              className="hidden lg:flex w-full h-14 gradient-cta hover:opacity-90 glow-primary text-primary-foreground font-bold text-lg gap-3"
+              className="hidden lg:flex w-full h-14 gradient-cta hover:opacity-90 text-white font-bold text-lg gap-3 shadow-lg"
             >
               <ShoppingBag className="h-6 w-6" />
               {selectedSize ? "COMPRAR AGORA" : "SELECIONE O TAMANHO"}
@@ -120,13 +119,10 @@ const Index = () => {
         {/* Reviews */}
         <Reviews />
 
-        {/* FAQ */}
-        <FAQ />
-
         {/* Final CTA */}
         <section className="text-center space-y-4 py-8">
           <h2 className="text-2xl font-bold text-foreground">
-            Garanta já o seu <span className="text-gradient">Max Runner</span>!
+            Garanta já o seu <span className="text-primary">Max Runner</span>!
           </h2>
           <p className="text-muted-foreground">
             Aproveite a promoção enquanto durarem os estoques
@@ -134,7 +130,7 @@ const Index = () => {
           <Button
             onClick={handleBuyClick}
             size="lg"
-            className="gradient-cta hover:opacity-90 glow-primary text-primary-foreground font-bold text-lg px-12 h-14 gap-3"
+            className="gradient-cta hover:opacity-90 text-white font-bold text-lg px-12 h-14 gap-3 shadow-lg"
           >
             <ShoppingBag className="h-6 w-6" />
             {selectedSize ? "COMPRAR AGORA" : "SELECIONE O TAMANHO"}

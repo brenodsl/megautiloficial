@@ -25,13 +25,13 @@ const guarantees = [
 
 const Guarantees = () => {
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+    <div id="garantias" className="grid grid-cols-2 sm:grid-cols-4 gap-3">
       {guarantees.map((item, index) => (
         <div
           key={index}
-          className="flex flex-col items-center gap-2 p-3 rounded-xl gradient-card border border-border text-center"
+          className="flex flex-col items-center gap-2 p-3 rounded-xl bg-card border border-border shadow-sm text-center"
         >
-          <div className="h-10 w-10 rounded-full bg-success/20 flex items-center justify-center">
+          <div className="h-10 w-10 rounded-full bg-success/10 flex items-center justify-center">
             <item.icon className="h-5 w-5 text-success" />
           </div>
           <div>

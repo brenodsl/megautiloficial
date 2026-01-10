@@ -2,82 +2,85 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Max Runner Design System - Modern Gradient Theme */
+/* Max Runner Design System - Clean Light Theme */
 
 @layer base {
   :root {
-    --background: 240 15% 9%;
-    --foreground: 0 0% 98%;
+    --background: 220 14% 96%;
+    --foreground: 220 20% 15%;
 
-    --card: 240 15% 12%;
-    --card-foreground: 0 0% 98%;
+    --card: 0 0% 100%;
+    --card-foreground: 220 20% 15%;
 
-    --popover: 240 15% 12%;
-    --popover-foreground: 0 0% 98%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 20% 15%;
 
-    --primary: 280 100% 65%;
+    --primary: 220 70% 45%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 190 100% 50%;
-    --secondary-foreground: 0 0% 100%;
+    --secondary: 220 14% 90%;
+    --secondary-foreground: 220 20% 25%;
 
-    --muted: 240 10% 20%;
-    --muted-foreground: 240 5% 65%;
+    --muted: 220 14% 92%;
+    --muted-foreground: 220 10% 45%;
 
-    --accent: 280 80% 55%;
+    --accent: 220 70% 45%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 240 10% 20%;
-    --input: 240 10% 20%;
-    --ring: 280 100% 65%;
+    --border: 220 13% 88%;
+    --input: 220 13% 88%;
+    --ring: 220 70% 45%;
 
     --radius: 0.75rem;
 
     /* Custom Max Runner tokens */
-    --gradient-primary: linear-gradient(135deg, hsl(280 100% 65%) 0%, hsl(200 100% 50%) 50%, hsl(320 100% 60%) 100%);
-    --gradient-cta: linear-gradient(135deg, hsl(280 100% 60%) 0%, hsl(320 100% 55%) 100%);
-    --gradient-card: linear-gradient(180deg, hsl(240 15% 14%) 0%, hsl(240 15% 10%) 100%);
-    --glow-primary: 0 0 30px hsl(280 100% 65% / 0.4);
-    --glow-secondary: 0 0 30px hsl(200 100% 50% / 0.4);
+    --gradient-primary: linear-gradient(135deg, hsl(220 70% 45%) 0%, hsl(200 80% 50%) 100%);
+    --gradient-cta: linear-gradient(135deg, hsl(25 95% 55%) 0%, hsl(15 90% 50%) 100%);
+    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(220 14% 98%) 100%);
+    --glow-primary: 0 4px 20px hsl(25 95% 55% / 0.35);
+    --glow-secondary: 0 4px 15px hsl(220 70% 45% / 0.25);
     
-    --success: 142 76% 45%;
+    --success: 142 76% 36%;
     --success-foreground: 0 0% 100%;
     
     --warning: 38 92% 50%;
     --warning-foreground: 0 0% 0%;
+    
+    --header-bg: 220 20% 15%;
+    --header-foreground: 0 0% 98%;
   }
 
   .dark {
-    --background: 240 15% 9%;
-    --foreground: 0 0% 98%;
+    --background: 220 14% 96%;
+    --foreground: 220 20% 15%;
 
-    --card: 240 15% 12%;
-    --card-foreground: 0 0% 98%;
+    --card: 0 0% 100%;
+    --card-foreground: 220 20% 15%;
 
-    --popover: 240 15% 12%;
-    --popover-foreground: 0 0% 98%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 20% 15%;
 
-    --primary: 280 100% 65%;
+    --primary: 220 70% 45%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 190 100% 50%;
-    --secondary-foreground: 0 0% 100%;
+    --secondary: 220 14% 90%;
+    --secondary-foreground: 220 20% 25%;
 
-    --muted: 240 10% 20%;
-    --muted-foreground: 240 5% 65%;
+    --muted: 220 14% 92%;
+    --muted-foreground: 220 10% 45%;
 
-    --accent: 280 80% 55%;
+    --accent: 220 70% 45%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 240 10% 20%;
-    --input: 240 10% 20%;
-    --ring: 280 100% 65%;
+    --border: 220 13% 88%;
+    --input: 220 13% 88%;
+    --ring: 220 70% 45%;
   }
 }
 
@@ -117,5 +120,10 @@
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+  }
+  
+  .header-dark {
+    background-color: hsl(var(--header-bg));
+    color: hsl(var(--header-foreground));
   }
 }
