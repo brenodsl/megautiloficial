@@ -1,4 +1,5 @@
 import { Shield, Lock, Mail, Clock } from "lucide-react";
+import { Link } from "react-router-dom";
 import logo from "@/assets/logo.jpg";
 
 const Footer = () => {
@@ -11,11 +12,11 @@ const Footer = () => {
           <div>
             <h4 className="font-bold text-white mb-3">Institucional</h4>
             <ul className="space-y-2 text-gray-300">
-              <li><a href="#" className="hover:text-white transition-colors">Política de Privacidade</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Termos de Uso</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Política de Envio</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Política de Reembolso</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Trocas e Devoluções</a></li>
+              <li><Link to="/politica-de-privacidade" className="hover:text-white transition-colors">Política de Privacidade</Link></li>
+              <li><Link to="/termos-de-uso" className="hover:text-white transition-colors">Termos de Uso</Link></li>
+              <li><Link to="/politica-de-envio" className="hover:text-white transition-colors">Política de Envio</Link></li>
+              <li><Link to="/politica-de-reembolso" className="hover:text-white transition-colors">Política de Reembolso</Link></li>
+              <li><Link to="/trocas-e-devolucoes" className="hover:text-white transition-colors">Trocas e Devoluções</Link></li>
             </ul>
           </div>
 

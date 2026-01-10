@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Menu, ShoppingCart, Star, Search, X } from "lucide-react";
+import { Menu, ShoppingCart, Star, Search, X, Home, Package, MessageSquare, Shield, FileText, Truck, RefreshCw, ArrowLeftRight } from "lucide-react";
+import { Link } from "react-router-dom";
 import logo from "@/assets/logo.jpg";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -8,10 +9,18 @@ import { Input } from "@/components/ui/input";
 const CHECKOUT_URL = "https://pay.maxrunnerpay.shop/69618e8fc4b1fc0d57ae958d";
 
 const menuItems = [
-  { label: "Início", href: "#" },
-  { label: "Produto", href: "#produto" },
-  { label: "Avaliações", href: "#avaliacoes" },
-  { label: "Garantias", href: "#garantias" },
+  { label: "Início", href: "/", icon: Home, isRoute: true },
+  { label: "Produto", href: "#produto", icon: Package, isRoute: false },
+  { label: "Avaliações", href: "#avaliacoes", icon: MessageSquare, isRoute: false },
+  { label: "Garantias", href: "#garantias", icon: Shield, isRoute: false },
+];
+
+const policyItems = [
+  { label: "Política de Privacidade", href: "/politica-de-privacidade", icon: FileText },
+  { label: "Termos de Uso", href: "/termos-de-uso", icon: FileText },
+  { label: "Política de Envio", href: "/politica-de-envio", icon: Truck },
+  { label: "Política de Reembolso", href: "/politica-de-reembolso", icon: RefreshCw },
+  { label: "Trocas e Devoluções", href: "/trocas-e-devolucoes", icon: ArrowLeftRight },
 ];
 
 const Header = () => {
@@ -82,17 +91,52 @@ const Header = () => {
                     </div>
                     
                     {/* Menu Items */}
-                    <nav className="flex-1 p-2">
-                      <ul className="space-y-1">
+                    <nav className="flex-1 p-2 overflow-y-auto">
+                      {/* Main Navigation */}
+                      <p className="px-4 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                        Navegação
+                      </p>
+                      <ul className="space-y-1 mb-4">
                         {menuItems.map((item) => (
                           <li key={item.label}>
-                            <a
-                              href={item.href}
+                            {item.isRoute ? (
+                              <Link
+                                to={item.href}
+                                onClick={() => setIsOpen(false)}
+                                className="flex items-center gap-3 px-4 py-3 rounded-lg text-foreground hover:bg-muted transition-colors font-medium"
+                              >
+                                <item.icon className="h-4 w-4 text-muted-foreground" />
+                                {item.label}
+                              </Link>
+                            ) : (
+                              <a
+                                href={item.href}
+                                onClick={() => setIsOpen(false)}
+                                className="flex items-center gap-3 px-4 py-3 rounded-lg text-foreground hover:bg-muted transition-colors font-medium"
+                              >
+                                <item.icon className="h-4 w-4 text-muted-foreground" />
+                                {item.label}
+                              </a>
+                            )}
+                          </li>
+                        ))}
+                      </ul>
+
+                      {/* Policy Links */}
+                      <p className="px-4 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                        Institucional
+                      </p>
+                      <ul className="space-y-1">
+                        {policyItems.map((item) => (
+                          <li key={item.label}>
+                            <Link
+                              to={item.href}
                               onClick={() => setIsOpen(false)}
-                              className="block px-4 py-3 rounded-lg text-foreground hover:bg-muted transition-colors font-medium"
+                              className="flex items-center gap-3 px-4 py-3 rounded-lg text-foreground hover:bg-muted transition-colors font-medium text-sm"
                             >
+                              <item.icon className="h-4 w-4 text-muted-foreground" />
                               {item.label}
-                            </a>
+                            </Link>
                           </li>
                         ))}
                       </ul>
@@ -113,11 +157,13 @@ const Header = () => {
 
               {/* Logo - Centered without circle */}
               <div className="absolute left-1/2 -translate-x-1/2">
-                <img
-                  src={logo}
-                  alt="Max Runner"
-                  className="h-10 w-auto object-contain"
-                />
+                <Link to="/">
+                  <img
+                    src={logo}
+                    alt="Max Runner"
+                    className="h-10 w-auto object-contain"
+                  />
+                </Link>
               </div>
 
               {/* Right Actions */}
