@@ -203,84 +203,49 @@ const Index = () => {
 
       {/* Promo Popup for Back Redirect */}
       <Dialog open={showPromoPopup} onOpenChange={setShowPromoPopup}>
-        <DialogContent className="sm:max-w-[380px] p-0 rounded-3xl border-0 overflow-hidden shadow-2xl">
-          {/* Close button */}
-          <button
-            onClick={() => setShowPromoPopup(false)}
-            className="absolute right-4 top-4 z-10 rounded-full bg-black/50 p-1.5 text-white hover:bg-black/70 transition-colors"
-          >
-            <X className="h-4 w-4" />
-          </button>
-          
-          {/* Header with gradient */}
-          <div className="bg-gradient-to-r from-orange-500 via-red-500 to-pink-500 px-6 py-4 text-center">
-            <div className="flex items-center justify-center gap-2 text-white mb-1">
-              <Sparkles className="h-5 w-5" />
-              <span className="text-xs font-bold uppercase tracking-wider">Oferta Exclusiva</span>
-              <Sparkles className="h-5 w-5" />
-            </div>
-            <h2 className="text-white text-lg font-bold">
-              🎁 ESPERA! Última chance!
-            </h2>
-          </div>
-          
+        <DialogContent className="sm:max-w-[320px] p-0 rounded-2xl border border-border bg-background overflow-hidden">
           {/* Product Image */}
-          <div className="bg-gradient-to-b from-gray-100 to-white px-6 py-4">
-            <div className="relative mx-auto w-48 h-32">
+          <div className="bg-muted/30 p-4">
+            <div className="relative mx-auto w-36 h-24">
               <img 
                 src={tenisMain} 
                 alt="Tênis de Corrida Max Runner" 
-                className="w-full h-full object-contain drop-shadow-xl"
+                className="w-full h-full object-contain"
               />
-              {/* Discount badge */}
-              <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full animate-pulse">
-                -40%
-              </div>
             </div>
           </div>
           
           {/* Content */}
-          <div className="px-6 pb-6 space-y-4">
+          <div className="px-5 pb-5 pt-3 space-y-3">
             <div className="text-center">
-              <p className="text-sm text-muted-foreground mb-3">
-                Temos um desconto especial só pra você! 🔥
-              </p>
+              <p className="text-xs text-muted-foreground mb-1">Oferta exclusiva</p>
+              <h3 className="text-base font-bold text-foreground mb-3">
+                Última chance! Desconto especial
+              </h3>
               
-              {/* Price box */}
-              <div className="bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 rounded-2xl p-4 mb-4">
-                <p className="text-sm text-muted-foreground line-through mb-1">
-                  De R$ 78,90
-                </p>
-                <div className="flex items-center justify-center gap-2">
-                  <span className="text-4xl font-black text-green-600">
-                    R$ 47,20
-                  </span>
-                </div>
-                <p className="text-sm text-green-600 font-semibold mt-1">
-                  Você economiza R$ 31,70! 💰
-                </p>
-              </div>
-              
-              <div className="flex items-center justify-center gap-2 text-orange-500 text-sm font-semibold">
-                <span className="animate-pulse">⏰</span>
-                <span>Oferta válida apenas agora!</span>
+              {/* Price */}
+              <div className="mb-3">
+                <span className="text-sm text-muted-foreground line-through mr-2">
+                  R$ 78,90
+                </span>
+                <span className="text-2xl font-bold text-success">
+                  R$ 47,20
+                </span>
               </div>
             </div>
             
             <Button
               onClick={handlePromoClick}
-              size="lg"
-              className="w-full h-14 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold text-base gap-2 rounded-xl shadow-lg shadow-green-500/30 transition-all hover:scale-[1.02]"
+              className="w-full h-11 bg-black hover:bg-black/90 text-white font-semibold text-sm rounded-lg"
             >
-              <ShoppingBag className="h-5 w-5" />
-              QUERO ESSA OFERTA!
+              Quero essa oferta
             </Button>
             
             <button
               onClick={() => setShowPromoPopup(false)}
-              className="w-full text-xs text-muted-foreground hover:text-foreground transition-colors py-2"
+              className="w-full text-xs text-muted-foreground hover:text-foreground transition-colors"
             >
-              Não, obrigado. Prefiro pagar mais caro.
+              Não, obrigado
             </button>
           </div>
         </DialogContent>
