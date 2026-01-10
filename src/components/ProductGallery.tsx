@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Star, Play, Image as ImageIcon } from "lucide-react";
 import tenisMain from "@/assets/tenis-main.webp";
 import tenis2 from "@/assets/tenis-2.webp";
 import tenis3 from "@/assets/tenis-3.webp";
@@ -21,9 +22,21 @@ const ProductGallery = () => {
   const [showVideo, setShowVideo] = useState(false);
 
   return (
-    <div id="produto" className="space-y-4">
+    <div id="produto" className="space-y-3">
+      {/* Rating Link */}
+      <a
+        href="#avaliacoes"
+        className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+      >
+        <div className="flex items-center gap-1 bg-foreground text-white px-2 py-1 rounded font-bold text-xs">
+          <span>4.9</span>
+          <Star className="h-3 w-3 fill-white" />
+        </div>
+        <span className="underline">(578 avaliações)</span>
+      </a>
+
       {/* Main Image/Video */}
-      <div className="relative aspect-square overflow-hidden rounded-2xl bg-card border border-border shadow-sm">
+      <div className="relative aspect-square overflow-hidden rounded-lg bg-white border border-border">
         {showVideo ? (
           <video
             src={tenisVideo}
@@ -37,28 +50,28 @@ const ProductGallery = () => {
           <img
             src={images[selectedImage].src}
             alt={images[selectedImage].alt}
-            className="h-full w-full object-cover transition-transform duration-500 hover:scale-105"
+            className="h-full w-full object-cover"
           />
         )}
         
-        {/* Video Toggle Badge */}
+        {/* Badge */}
+        <div className="absolute top-3 left-3 bg-destructive text-white text-xs font-bold px-3 py-1.5 rounded">
+          ÚLTIMAS UNIDADES
+        </div>
+
+        {/* Toggle Button */}
         <button
           onClick={() => setShowVideo(!showVideo)}
-          className="absolute bottom-4 right-4 flex items-center gap-2 rounded-full bg-card/90 backdrop-blur-sm px-4 py-2 text-sm font-medium text-foreground border border-border hover:bg-card transition-colors shadow-sm"
+          className="absolute bottom-3 right-3 flex items-center gap-2 bg-white/95 backdrop-blur-sm px-3 py-2 rounded-lg text-sm font-medium text-foreground border border-border hover:bg-white transition-colors shadow-sm"
         >
           {showVideo ? (
             <>
-              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
+              <ImageIcon className="h-4 w-4" />
               Ver Fotos
             </>
           ) : (
             <>
-              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
+              <Play className="h-4 w-4" />
               Ver Vídeo
             </>
           )}
@@ -66,7 +79,7 @@ const ProductGallery = () => {
       </div>
 
       {/* Thumbnails */}
-      <div className="flex gap-2 overflow-x-auto pb-2">
+      <div className="flex gap-2 overflow-x-auto pb-1">
         {images.map((image, index) => (
           <button
             key={image.id}
@@ -74,10 +87,10 @@ const ProductGallery = () => {
               setSelectedImage(index);
               setShowVideo(false);
             }}
-            className={`relative flex-shrink-0 aspect-square w-16 sm:w-20 rounded-lg overflow-hidden border-2 transition-all shadow-sm ${
+            className={`relative flex-shrink-0 aspect-square w-16 rounded-lg overflow-hidden border-2 transition-all ${
               selectedImage === index && !showVideo
-                ? "border-primary shadow-md"
-                : "border-border hover:border-primary/50"
+                ? "border-foreground"
+                : "border-border hover:border-muted-foreground"
             }`}
           >
             <img
@@ -91,17 +104,15 @@ const ProductGallery = () => {
         {/* Video Thumbnail */}
         <button
           onClick={() => setShowVideo(true)}
-          className={`relative flex-shrink-0 aspect-square w-16 sm:w-20 rounded-lg overflow-hidden border-2 transition-all shadow-sm ${
+          className={`relative flex-shrink-0 aspect-square w-16 rounded-lg overflow-hidden border-2 transition-all ${
             showVideo
-              ? "border-primary shadow-md"
-              : "border-border hover:border-primary/50"
+              ? "border-foreground"
+              : "border-border hover:border-muted-foreground"
           }`}
         >
           <video src={tenisVideo} className="h-full w-full object-cover" muted />
-          <div className="absolute inset-0 flex items-center justify-center bg-card/40">
-            <svg className="h-6 w-6 text-foreground" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M8 5v14l11-7z" />
-            </svg>
+          <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+            <Play className="h-5 w-5 text-white fill-white" />
           </div>
         </button>
       </div>

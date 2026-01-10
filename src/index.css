@@ -2,11 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Max Runner Design System - Clean Light Theme */
+/* Max Runner Design System - Clean Modern Theme */
 
 @layer base {
   :root {
-    --background: 220 14% 96%;
+    --background: 0 0% 98%;
     --foreground: 220 20% 15%;
 
     --card: 0 0% 100%;
@@ -18,10 +18,10 @@
     --primary: 220 70% 45%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 220 14% 90%;
+    --secondary: 220 10% 94%;
     --secondary-foreground: 220 20% 25%;
 
-    --muted: 220 14% 92%;
+    --muted: 220 10% 95%;
     --muted-foreground: 220 10% 45%;
 
     --accent: 220 70% 45%;
@@ -30,18 +30,15 @@
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 220 13% 88%;
-    --input: 220 13% 88%;
+    --border: 220 10% 90%;
+    --input: 220 10% 90%;
     --ring: 220 70% 45%;
 
-    --radius: 0.75rem;
+    --radius: 0.5rem;
 
     /* Custom Max Runner tokens */
-    --gradient-primary: linear-gradient(135deg, hsl(220 70% 45%) 0%, hsl(200 80% 50%) 100%);
-    --gradient-cta: linear-gradient(135deg, hsl(25 95% 55%) 0%, hsl(15 90% 50%) 100%);
-    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(220 14% 98%) 100%);
-    --glow-primary: 0 4px 20px hsl(25 95% 55% / 0.35);
-    --glow-secondary: 0 4px 15px hsl(220 70% 45% / 0.25);
+    --gradient-cta: linear-gradient(135deg, hsl(25 95% 53%) 0%, hsl(15 90% 48%) 100%);
+    --glow-cta: 0 4px 20px hsl(25 95% 53% / 0.4);
     
     --success: 142 76% 36%;
     --success-foreground: 0 0% 100%;
@@ -49,37 +46,29 @@
     --warning: 38 92% 50%;
     --warning-foreground: 0 0% 0%;
     
-    --header-bg: 220 20% 15%;
+    --header-bg: 220 15% 13%;
     --header-foreground: 0 0% 98%;
   }
 
   .dark {
-    --background: 220 14% 96%;
+    --background: 0 0% 98%;
     --foreground: 220 20% 15%;
-
     --card: 0 0% 100%;
     --card-foreground: 220 20% 15%;
-
     --popover: 0 0% 100%;
     --popover-foreground: 220 20% 15%;
-
     --primary: 220 70% 45%;
     --primary-foreground: 0 0% 100%;
-
-    --secondary: 220 14% 90%;
+    --secondary: 220 10% 94%;
     --secondary-foreground: 220 20% 25%;
-
-    --muted: 220 14% 92%;
+    --muted: 220 10% 95%;
     --muted-foreground: 220 10% 45%;
-
     --accent: 220 70% 45%;
     --accent-foreground: 0 0% 100%;
-
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
-
-    --border: 220 13% 88%;
-    --input: 220 13% 88%;
+    --border: 220 10% 90%;
+    --input: 220 10% 90%;
     --ring: 220 70% 45%;
   }
 }
@@ -95,31 +84,12 @@
 }
 
 @layer utilities {
-  .gradient-primary {
-    background: var(--gradient-primary);
-  }
-  
   .gradient-cta {
     background: var(--gradient-cta);
   }
   
-  .gradient-card {
-    background: var(--gradient-card);
-  }
-  
-  .glow-primary {
-    box-shadow: var(--glow-primary);
-  }
-  
-  .glow-secondary {
-    box-shadow: var(--glow-secondary);
-  }
-  
-  .text-gradient {
-    background: var(--gradient-primary);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+  .glow-cta {
+    box-shadow: var(--glow-cta);
   }
   
   .header-dark {

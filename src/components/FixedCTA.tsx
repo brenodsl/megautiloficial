@@ -18,26 +18,24 @@ const FixedCTA = ({ selectedSize }: FixedCTAProps) => {
   };
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 p-4 bg-card/95 backdrop-blur-lg border-t border-border lg:hidden shadow-lg">
-      <div className="flex items-center justify-between gap-4">
+    <div className="fixed bottom-0 left-0 right-0 z-50 p-3 bg-white border-t border-border lg:hidden shadow-lg">
+      <div className="flex items-center gap-3">
         <div className="flex-1">
           <p className="text-xs text-muted-foreground line-through">R$ 239,80</p>
-          <p className="text-xl font-bold text-foreground">
+          <p className="text-lg font-bold text-foreground">
             R$ 57,90
-            <span className="ml-2 text-xs font-medium text-white bg-orange-500 px-2 py-0.5 rounded-full">
-              76% OFF
+            <span className="ml-2 text-[10px] font-bold text-white bg-destructive px-1.5 py-0.5 rounded">
+              -76%
             </span>
           </p>
         </div>
         
         <Button
           onClick={handleClick}
-          size="lg"
-          className="gradient-cta hover:opacity-90 text-white font-bold px-6 shadow-lg"
+          className="gradient-cta glow-cta hover:opacity-95 text-white font-bold px-6 h-12"
         >
           <ShoppingBag className="h-5 w-5" />
           {selectedSize ? "COMPRAR" : "SELECIONE"}
-          <ArrowRight className="h-4 w-4" />
         </Button>
       </div>
     </div>

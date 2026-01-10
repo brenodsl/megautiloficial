@@ -10,56 +10,52 @@ import reviewSabrina1 from "@/assets/review-sabrina-1.webp";
 const reviews = [
   {
     id: 1,
-    name: "Camila R.",
-    location: "São Paulo, SP",
+    name: "Sabrina Viana",
+    date: "02/01/2025",
     rating: 5,
-    date: "há 3 dias",
-    comment: "Tênis muito confortável! Uso para correr e o amortecimento é incrível. Chegou rápido e bem embalado. Super recomendo!",
+    comment: "Tênis incrível! A placa de carbono realmente faz diferença na corrida. Super leve e confortável, uso para treinos e provas. Chegou rápido e bem embalado!",
     verified: true,
-    helpful: 47,
-    images: [reviewCamila1, reviewCamila2],
-  },
-  {
-    id: 2,
-    name: "Sabrina M.",
-    location: "Rio de Janeiro, RJ",
-    rating: 5,
-    date: "há 5 dias",
-    comment: "Amei as cores! Combina com tudo. Super leve e confortável para o dia a dia. Recomendo demais!",
-    verified: true,
-    helpful: 32,
+    helpful: 34,
     images: [reviewSabrina1],
   },
   {
-    id: 3,
-    name: "Carlos A.",
-    location: "Belo Horizonte, MG",
+    id: 2,
+    name: "Camila Souza",
+    date: "30/12/2024",
     rating: 5,
-    date: "há 1 semana",
-    comment: "Produto de qualidade excelente. Não esperava tanto por esse preço. Já comprei o segundo par!",
+    comment: "Comprei para meu marido e ele amou! O design é lindo e o conforto é impressionante. Ele usa para correr todos os dias e diz que nunca teve um tênis tão bom.",
     verified: true,
     helpful: 28,
-    images: [review1, review2],
+    images: [reviewCamila1, reviewCamila2],
+  },
+  {
+    id: 3,
+    name: "Fernando Costa",
+    date: "28/12/2024",
+    rating: 5,
+    comment: "Excelente custo-benefício! Placa de carbono por esse preço é muito difícil encontrar. O acabamento é de qualidade e o retorno de energia é muito bom.",
+    verified: true,
+    helpful: 22,
+    images: [review1, review2, review3],
   },
   {
     id: 4,
-    name: "Fernanda L.",
-    location: "Curitiba, PR",
+    name: "Ana Paula",
+    date: "25/12/2024",
     rating: 5,
-    date: "há 1 semana",
     comment: "Perfeito para academia! Muito estiloso e super confortável. Todo mundo pergunta onde comprei.",
     verified: true,
     helpful: 19,
-    images: [review3, review4],
+    images: [review4],
   },
 ];
 
 const ratingDistribution = [
-  { stars: 5, percentage: 85 },
-  { stars: 4, percentage: 10 },
-  { stars: 3, percentage: 3 },
-  { stars: 2, percentage: 1 },
-  { stars: 1, percentage: 1 },
+  { stars: 5, count: 492, percentage: 85 },
+  { stars: 4, count: 58, percentage: 10 },
+  { stars: 3, count: 17, percentage: 3 },
+  { stars: 2, count: 6, percentage: 1 },
+  { stars: 1, count: 5, percentage: 1 },
 ];
 
 const Reviews = () => {
@@ -69,63 +65,39 @@ const Reviews = () => {
   return (
     <section id="avaliacoes" className="space-y-6">
       {/* Header */}
-      <div className="text-center space-y-2">
-        <h2 className="text-2xl font-bold text-foreground">
-          O que nossos clientes dizem
-        </h2>
-        <div className="flex items-center justify-center gap-2">
-          <div className="flex">
-            {[1, 2, 3, 4, 5].map((star) => (
-              <Star
-                key={star}
-                className="h-5 w-5 fill-warning text-warning"
-              />
+      <h2 className="text-xl font-bold text-foreground">
+        Avaliações
+      </h2>
+
+      {/* Rating Summary Card */}
+      <div className="bg-white rounded-lg border border-border p-4">
+        <div className="flex items-start gap-6">
+          {/* Average Score */}
+          <div className="text-center">
+            <div className="text-4xl font-bold text-foreground">{averageRating}</div>
+            <div className="flex justify-center mt-1">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <Star key={star} className="h-4 w-4 fill-warning text-warning" />
+              ))}
+            </div>
+            <div className="text-sm text-muted-foreground mt-1">{totalReviews} avaliações</div>
+          </div>
+
+          {/* Rating Distribution */}
+          <div className="flex-1 space-y-1.5">
+            {ratingDistribution.map((item) => (
+              <div key={item.stars} className="flex items-center gap-2 text-sm">
+                <span className="w-16 text-muted-foreground">{item.stars} estrelas</span>
+                <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-warning rounded-full"
+                    style={{ width: `${item.percentage}%` }}
+                  />
+                </div>
+                <span className="w-8 text-muted-foreground text-right">{item.count}</span>
+              </div>
             ))}
           </div>
-          <span className="font-bold text-foreground">{averageRating}</span>
-          <span className="text-muted-foreground">
-            ({totalReviews} avaliações)
-          </span>
-        </div>
-      </div>
-
-      {/* Rating Distribution */}
-      <div className="p-4 rounded-xl bg-card border border-border shadow-sm">
-        <h3 className="font-semibold text-foreground mb-4">Distribuição das avaliações</h3>
-        <div className="space-y-2">
-          {ratingDistribution.map((item) => (
-            <div key={item.stars} className="flex items-center gap-3">
-              <div className="flex items-center gap-1 w-16">
-                <span className="text-sm font-medium text-foreground">{item.stars}</span>
-                <Star className="h-4 w-4 fill-warning text-warning" />
-              </div>
-              <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-warning rounded-full transition-all"
-                  style={{ width: `${item.percentage}%` }}
-                />
-              </div>
-              <span className="text-sm text-muted-foreground w-12 text-right">
-                {item.percentage}%
-              </span>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Stats */}
-      <div className="grid grid-cols-3 gap-4">
-        <div className="text-center p-4 rounded-xl bg-card border border-border shadow-sm">
-          <p className="text-2xl font-bold text-primary">98%</p>
-          <p className="text-xs text-muted-foreground">Recomendam</p>
-        </div>
-        <div className="text-center p-4 rounded-xl bg-card border border-border shadow-sm">
-          <p className="text-2xl font-bold text-primary">+2.5K</p>
-          <p className="text-xs text-muted-foreground">Vendidos</p>
-        </div>
-        <div className="text-center p-4 rounded-xl bg-card border border-border shadow-sm">
-          <p className="text-2xl font-bold text-primary">4.9</p>
-          <p className="text-xs text-muted-foreground">Nota Média</p>
         </div>
       </div>
 
@@ -134,60 +106,54 @@ const Reviews = () => {
         {reviews.map((review) => (
           <div
             key={review.id}
-            className="p-4 rounded-xl bg-card border border-border shadow-sm space-y-3"
+            className="bg-white rounded-lg border border-border p-4 space-y-3"
           >
-            <div className="flex items-start justify-between">
-              <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold">
-                  {review.name.charAt(0)}
-                </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="font-medium text-foreground">
-                      {review.name}
-                    </span>
-                    {review.verified && (
-                      <CheckCircle className="h-4 w-4 text-success" />
-                    )}
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    {review.location} • {review.date}
-                  </p>
-                </div>
-              </div>
-              <div className="flex">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <Star
-                    key={star}
-                    className={`h-4 w-4 ${
-                      star <= review.rating
-                        ? "fill-warning text-warning"
-                        : "text-muted"
-                    }`}
-                  />
-                ))}
-              </div>
+            {/* Date */}
+            <div className="text-sm text-muted-foreground">{review.date}</div>
+
+            {/* Rating Stars */}
+            <div className="flex">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <Star
+                  key={star}
+                  className={`h-4 w-4 ${
+                    star <= review.rating
+                      ? "fill-warning text-warning"
+                      : "text-muted"
+                  }`}
+                />
+              ))}
             </div>
 
-            <p className="text-sm text-muted-foreground">{review.comment}</p>
+            {/* Comment */}
+            <p className="text-sm text-foreground leading-relaxed">{review.comment}</p>
 
             {/* Review Images */}
             {review.images && review.images.length > 0 && (
-              <div className="flex gap-2 overflow-x-auto pb-2">
+              <div className="flex gap-2">
                 {review.images.map((image, index) => (
                   <img
                     key={index}
                     src={image}
                     alt={`Foto do cliente ${review.name}`}
-                    className="h-24 w-24 object-cover rounded-lg flex-shrink-0 border border-border"
+                    className="h-20 w-20 object-cover rounded-lg border border-border"
                   />
                 ))}
               </div>
             )}
 
-            <div className="flex items-center gap-2 text-xs text-muted-foreground">
-              <ThumbsUp className="h-3 w-3" />
-              <span>{review.helpful} pessoas acharam útil</span>
+            {/* Author */}
+            <div className="flex items-center justify-between pt-2">
+              <div className="flex items-center gap-2">
+                <span className="font-medium text-foreground">{review.name}</span>
+                {review.verified && (
+                  <CheckCircle className="h-4 w-4 text-success" />
+                )}
+              </div>
+              <button className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors">
+                <ThumbsUp className="h-3.5 w-3.5" />
+                <span>Útil ({review.helpful})</span>
+              </button>
             </div>
           </div>
         ))}
