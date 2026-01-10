@@ -40,6 +40,13 @@ const Index = () => {
         </div>
       </div>
 
+      {/* Product Title */}
+      <div className="max-w-lg mx-auto px-4 pt-4">
+        <h1 className="text-lg font-bold text-foreground leading-tight">
+          Tênis de Corrida Chunta Carbon 3.0 - Placa de Carbono Ultra Leve
+        </h1>
+      </div>
+
       <main className="max-w-lg mx-auto px-4 py-4">
         {/* Product Gallery */}
         <ProductGallery selectedColor={selectedColor} />

@@ -2,11 +2,11 @@ import { useState } from "react";
 import { Star, CheckCircle, ThumbsUp } from "lucide-react";
 import review1 from "@/assets/review-1.webp";
 import review2 from "@/assets/review-2.webp";
-import review3 from "@/assets/review-3.webp";
 import review4 from "@/assets/review-4.webp";
 import reviewCamila1 from "@/assets/review-camila-1.webp";
 import reviewCamila2 from "@/assets/review-camila-2.webp";
 import reviewSabrina1 from "@/assets/review-sabrina-1.webp";
+import reviewSabrina2 from "@/assets/review-sabrina-2.webp";
 
 const reviews = [
   {
@@ -17,7 +17,7 @@ const reviews = [
     comment: "Tênis incrível! A placa de carbono realmente faz diferença na corrida. Super leve e confortável, uso para treinos e provas. Chegou rápido e bem embalado!",
     verified: true,
     helpful: 34,
-    images: [reviewSabrina1],
+    images: [reviewSabrina1, reviewSabrina2],
   },
   {
     id: 2,
@@ -37,7 +37,7 @@ const reviews = [
     comment: "Excelente custo-benefício! Placa de carbono por esse preço é muito difícil encontrar. O acabamento é de qualidade e o retorno de energia é muito bom.",
     verified: true,
     helpful: 22,
-    images: [review1, review2, review3],
+    images: [review1, review2],
   },
   {
     id: 4,
