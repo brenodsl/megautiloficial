@@ -7,36 +7,26 @@ import tenis2 from "@/assets/tenis-2.webp";
 import tenis3 from "@/assets/tenis-3.webp";
 import tenis4 from "@/assets/tenis-4.webp";
 import tenis5 from "@/assets/tenis-5.webp";
+import tenis6 from "@/assets/tenis-6.webp";
 import tenis7 from "@/assets/tenis-7.webp";
 import tenisVideo from "@/assets/tenis-video.mp4";
-import colorGradient from "@/assets/color-gradient.webp";
-import colorPurple from "@/assets/color-purple.webp";
-import colorOrange from "@/assets/color-orange.webp";
-import colorMint from "@/assets/color-mint.webp";
-import colorPink from "@/assets/color-pink.webp";
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 interface ProductGalleryProps {
   selectedColor: string;
 }
 
-const colorImages: Record<string, string> = {
-  gradient: colorGradient,
-  purple: colorPurple,
-  orange: colorOrange,
-  mint: colorMint,
-  pink: colorPink,
-  main: tenisMain,
-};
-
 const allImages = [
-  { id: 1, src: colorGradient, alt: "Max Runner - Gradient" },
+  { id: 1, src: tenisMain, alt: "Max Runner - Principal" },
   { id: 2, src: tenis2, alt: "Max Runner - Vista Lateral" },
   { id: 3, src: tenis3, alt: "Max Runner - Vista Traseira" },
   { id: 4, src: tenis4, alt: "Max Runner - Detalhe" },
   { id: 5, src: tenis5, alt: "Max Runner - Sola" },
-  { id: 6, src: tenis7, alt: "Max Runner - Vista Superior" },
+  { id: 6, src: tenis6, alt: "Max Runner - Vista Angular" },
+  { id: 7, src: tenis7, alt: "Max Runner - Vista Traseira" },
 ];
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const ProductGallery = ({ selectedColor }: ProductGalleryProps) => {
   const [showVideo, setShowVideo] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -46,11 +36,7 @@ const ProductGallery = ({ selectedColor }: ProductGalleryProps) => {
     [Autoplay({ delay: 3000, stopOnInteraction: false, stopOnMouseEnter: true })]
   );
 
-  // Update images based on selected color
-  const images = [
-    { id: 0, src: colorImages[selectedColor] || colorGradient, alt: `Max Runner - ${selectedColor}` },
-    ...allImages.slice(1),
-  ];
+  const images = allImages;
 
   const onSelect = useCallback(() => {
     if (!emblaApi) return;
