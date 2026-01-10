@@ -41,20 +41,13 @@ const Header = () => {
               <SheetContent side="left" className="w-72 bg-white p-0 border-0">
                 <div className="flex flex-col h-full">
                   {/* Menu Header */}
-                  <div className="p-4 border-b border-border flex items-center gap-3 bg-muted/50">
-                    <img
-                      src={logo}
-                      alt="Max Runner"
-                      className="h-10 w-auto object-contain"
-                    />
-                    <div>
-                      <span className="text-lg font-bold text-foreground">
-                        Max Runner
-                      </span>
-                      <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                        <Star className="h-3 w-3 fill-warning text-warning" />
-                        <span>4.9 (578 avaliações)</span>
-                      </div>
+                  <div className="p-4 border-b border-border bg-muted/50">
+                    <span className="text-lg font-bold text-foreground">
+                      Max Runner
+                    </span>
+                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                      <Star className="h-3 w-3 fill-warning text-warning" />
+                      <span>4.9 (578 avaliações)</span>
                     </div>
                   </div>
                   
@@ -79,7 +72,7 @@ const Header = () => {
                   <div className="p-4 border-t border-border">
                     <Button
                       onClick={() => window.open(CHECKOUT_URL, "_blank")}
-                      className="w-full gradient-cta text-white font-bold h-12"
+                      className="w-full bg-black hover:bg-black/90 text-white font-bold h-12"
                     >
                       Comprar Agora
                     </Button>
