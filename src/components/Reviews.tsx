@@ -49,6 +49,66 @@ const reviews = [
     helpful: 19,
     images: [review4],
   },
+  {
+    id: 5,
+    name: "Ricardo Almeida",
+    date: "22/12/2024",
+    rating: 5,
+    comment: "Melhor tênis de corrida que já tive! A placa de carbono dá uma propulsão incrível. Uso para maratonas e meias maratonas. Superou todas as minhas expectativas!",
+    verified: true,
+    helpful: 45,
+    images: [],
+  },
+  {
+    id: 6,
+    name: "Juliana Martins",
+    date: "20/12/2024",
+    rating: 5,
+    comment: "Tênis muito bonito e confortável. Comprei na cor rosa e ficou lindo! A entrega foi super rápida e veio bem embalado. Recomendo muito!",
+    verified: true,
+    helpful: 31,
+    images: [],
+  },
+  {
+    id: 7,
+    name: "Marcos Silva",
+    date: "18/12/2024",
+    rating: 4,
+    comment: "Ótimo tênis! O único ponto é que poderia ter mais opções de cores. Mas no geral, o conforto e a qualidade são excelentes. Vale muito a pena pelo preço.",
+    verified: true,
+    helpful: 18,
+    images: [],
+  },
+  {
+    id: 8,
+    name: "Patricia Oliveira",
+    date: "15/12/2024",
+    rating: 5,
+    comment: "Comprei para minha filha que é atleta e ela adorou! O tênis é muito leve e o retorno de energia é impressionante. Ela já quer comprar outro de reserva!",
+    verified: true,
+    helpful: 27,
+    images: [],
+  },
+  {
+    id: 9,
+    name: "Bruno Santos",
+    date: "12/12/2024",
+    rating: 5,
+    comment: "Excelente! Uso para treinos diários e o conforto é surpreendente. O amortecimento é perfeito e não sinto mais dores nos joelhos após as corridas.",
+    verified: true,
+    helpful: 36,
+    images: [],
+  },
+  {
+    id: 10,
+    name: "Carla Fernandes",
+    date: "10/12/2024",
+    rating: 5,
+    comment: "Já estou no meu segundo par! O primeiro durou mais de um ano com uso intenso. A qualidade é incomparável e o preço é justo. Super recomendo!",
+    verified: true,
+    helpful: 42,
+    images: [],
+  },
 ];
 
 const ratingDistribution = [
@@ -64,7 +124,7 @@ const Reviews = () => {
   const totalReviews = 578;
   const [showAll, setShowAll] = useState(false);
   
-  const visibleReviews = showAll ? reviews : reviews.slice(0, 3);
+  const visibleReviews = showAll ? reviews : reviews.slice(0, 4);
 
   return (
     <section id="avaliacoes" className="space-y-6">
@@ -164,12 +224,12 @@ const Reviews = () => {
       </div>
 
       {/* Ver Mais Button */}
-      {!showAll && reviews.length > 3 && (
+      {!showAll && reviews.length > 4 && (
         <button
           onClick={() => setShowAll(true)}
           className="w-full py-3 text-center text-sm font-medium text-foreground bg-white border border-border rounded-lg hover:bg-muted/50 transition-colors"
         >
-          Ver mais avaliações ({reviews.length - 3} restantes)
+          Ver mais avaliações ({reviews.length - 4} restantes)
         </button>
       )}
 

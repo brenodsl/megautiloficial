@@ -9,10 +9,6 @@ const CHECKOUT_URL = "https://pay.maxrunnerpay.shop/69618e8fc4b1fc0d57ae958d";
 
 const FixedCTA = ({ selectedSize }: FixedCTAProps) => {
   const handleClick = () => {
-    if (!selectedSize) {
-      document.getElementById("size-selector")?.scrollIntoView({ behavior: "smooth" });
-      return;
-    }
     window.open(CHECKOUT_URL, "_blank");
   };
 
