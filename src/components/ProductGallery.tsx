@@ -7,19 +7,40 @@ import tenis4 from "@/assets/tenis-4.webp";
 import tenis5 from "@/assets/tenis-5.webp";
 import tenis7 from "@/assets/tenis-7.webp";
 import tenisVideo from "@/assets/tenis-video.mp4";
+import colorGradient from "@/assets/color-gradient.webp";
+import colorPurple from "@/assets/color-purple.webp";
+import colorOrange from "@/assets/color-orange.webp";
+import colorMint from "@/assets/color-mint.webp";
+import colorPink from "@/assets/color-pink.webp";
 
-const images = [
-  { id: 1, src: tenisMain, alt: "Max Runner - Vista Principal" },
-  { id: 2, src: tenis2, alt: "Max Runner - Vista Lateral" },
-  { id: 3, src: tenis3, alt: "Max Runner - Vista Traseira" },
-  { id: 4, src: tenis4, alt: "Max Runner - Detalhe" },
-  { id: 5, src: tenis5, alt: "Max Runner - Sola" },
-  { id: 6, src: tenis7, alt: "Max Runner - Vista Superior" },
+interface ProductGalleryProps {
+  selectedColor: string;
+}
+
+const colorImages: Record<string, string> = {
+  gradient: colorGradient,
+  purple: colorPurple,
+  orange: colorOrange,
+  mint: colorMint,
+  pink: colorPink,
+  main: tenisMain,
+};
+
+const thumbnails = [
+  { id: 1, src: tenis2, alt: "Max Runner - Vista Lateral" },
+  { id: 2, src: tenis3, alt: "Max Runner - Vista Traseira" },
+  { id: 3, src: tenis4, alt: "Max Runner - Detalhe" },
+  { id: 4, src: tenis5, alt: "Max Runner - Sola" },
+  { id: 5, src: tenis7, alt: "Max Runner - Vista Superior" },
 ];
 
-const ProductGallery = () => {
-  const [selectedImage, setSelectedImage] = useState(0);
+const ProductGallery = ({ selectedColor }: ProductGalleryProps) => {
+  const [selectedThumb, setSelectedThumb] = useState<number | null>(null);
   const [showVideo, setShowVideo] = useState(false);
+
+  const mainImage = selectedThumb !== null 
+    ? thumbnails[selectedThumb].src 
+    : colorImages[selectedColor] || colorGradient;
 
   return (
     <div id="produto" className="space-y-3">
@@ -48,20 +69,24 @@ const ProductGallery = () => {
           />
         ) : (
           <img
-            src={images[selectedImage].src}
-            alt={images[selectedImage].alt}
+            src={mainImage}
+            alt="Max Runner - Tênis Premium"
             className="h-full w-full object-cover"
           />
         )}
         
         {/* Badge */}
-        <div className="absolute top-3 left-3 bg-destructive text-white text-xs font-bold px-3 py-1.5 rounded">
+        <div className="absolute top-3 left-3 bg-destructive text-white text-xs font-bold px-3 py-1.5 rounded flex items-center gap-1">
+          <span className="animate-pulse">⚡</span>
           ÚLTIMAS UNIDADES
         </div>
 
         {/* Toggle Button */}
         <button
-          onClick={() => setShowVideo(!showVideo)}
+          onClick={() => {
+            setShowVideo(!showVideo);
+            if (!showVideo) setSelectedThumb(null);
+          }}
           className="absolute bottom-3 right-3 flex items-center gap-2 bg-white/95 backdrop-blur-sm px-3 py-2 rounded-lg text-sm font-medium text-foreground border border-border hover:bg-white transition-colors shadow-sm"
         >
           {showVideo ? (
@@ -80,22 +105,22 @@ const ProductGallery = () => {
 
       {/* Thumbnails */}
       <div className="flex gap-2 overflow-x-auto pb-1">
-        {images.map((image, index) => (
+        {thumbnails.map((thumb, index) => (
           <button
-            key={image.id}
+            key={thumb.id}
             onClick={() => {
-              setSelectedImage(index);
+              setSelectedThumb(index);
               setShowVideo(false);
             }}
-            className={`relative flex-shrink-0 aspect-square w-16 rounded-lg overflow-hidden border-2 transition-all ${
-              selectedImage === index && !showVideo
+            className={`relative flex-shrink-0 aspect-square w-14 rounded-lg overflow-hidden border-2 transition-all ${
+              selectedThumb === index && !showVideo
                 ? "border-foreground"
                 : "border-border hover:border-muted-foreground"
             }`}
           >
             <img
-              src={image.src}
-              alt={image.alt}
+              src={thumb.src}
+              alt={thumb.alt}
               className="h-full w-full object-cover"
             />
           </button>
@@ -104,7 +129,7 @@ const ProductGallery = () => {
         {/* Video Thumbnail */}
         <button
           onClick={() => setShowVideo(true)}
-          className={`relative flex-shrink-0 aspect-square w-16 rounded-lg overflow-hidden border-2 transition-all ${
+          className={`relative flex-shrink-0 aspect-square w-14 rounded-lg overflow-hidden border-2 transition-all ${
             showVideo
               ? "border-foreground"
               : "border-border hover:border-muted-foreground"

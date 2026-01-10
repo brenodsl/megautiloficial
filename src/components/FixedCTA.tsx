@@ -1,4 +1,4 @@
-import { ShoppingBag, ArrowRight } from "lucide-react";
+import { ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface FixedCTAProps {
@@ -10,7 +10,6 @@ const CHECKOUT_URL = "https://pay.maxrunnerpay.shop/69618e8fc4b1fc0d57ae958d";
 const FixedCTA = ({ selectedSize }: FixedCTAProps) => {
   const handleClick = () => {
     if (!selectedSize) {
-      // Scroll to size selector
       document.getElementById("size-selector")?.scrollIntoView({ behavior: "smooth" });
       return;
     }
@@ -23,9 +22,9 @@ const FixedCTA = ({ selectedSize }: FixedCTAProps) => {
         <div className="flex-1">
           <p className="text-xs text-muted-foreground line-through">R$ 239,80</p>
           <p className="text-lg font-bold text-foreground">
-            R$ 57,90
+            R$ 78,90
             <span className="ml-2 text-[10px] font-bold text-white bg-destructive px-1.5 py-0.5 rounded">
-              -76%
+              -67%
             </span>
           </p>
         </div>
@@ -34,8 +33,8 @@ const FixedCTA = ({ selectedSize }: FixedCTAProps) => {
           onClick={handleClick}
           className="gradient-cta glow-cta hover:opacity-95 text-white font-bold px-6 h-12"
         >
-          <ShoppingBag className="h-5 w-5" />
-          {selectedSize ? "COMPRAR" : "SELECIONE"}
+          <ShoppingBag className="h-5 w-5 mr-2" />
+          COMPRAR AGORA
         </Button>
       </div>
     </div>
