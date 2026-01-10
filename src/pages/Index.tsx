@@ -1,12 +1,11 @@
 import { useState, useEffect } from "react";
-import { ShoppingBag, Truck, Shield, CreditCard, CheckCircle, Award, X, Gift } from "lucide-react";
+import { ShoppingBag, Truck, Shield, CreditCard, CheckCircle, Award, X, Gift, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
-  DialogTitle,
 } from "@/components/ui/dialog";
+import tenisMain from "@/assets/tenis-main.webp";
 import Header from "@/components/Header";
 import Breadcrumb from "@/components/Breadcrumb";
 import ProductGallery from "@/components/ProductGallery";
@@ -204,44 +203,74 @@ const Index = () => {
 
       {/* Promo Popup for Back Redirect */}
       <Dialog open={showPromoPopup} onOpenChange={setShowPromoPopup}>
-        <DialogContent className="sm:max-w-md border-2 border-destructive/50 bg-gradient-to-b from-background to-destructive/5">
-          <DialogHeader>
-            <div className="flex items-center justify-center gap-2 text-destructive mb-2">
-              <Gift className="h-6 w-6 animate-pulse" />
-              <span className="text-xs font-bold uppercase tracking-wider">Oferta Exclusiva</span>
-            </div>
-            <DialogTitle className="text-center text-xl font-bold">
-              🎁 ESPERA! Temos uma oferta imperdível para você!
-            </DialogTitle>
-          </DialogHeader>
+        <DialogContent className="sm:max-w-[380px] p-0 rounded-3xl border-0 overflow-hidden shadow-2xl">
+          {/* Close button */}
+          <button
+            onClick={() => setShowPromoPopup(false)}
+            className="absolute right-4 top-4 z-10 rounded-full bg-black/50 p-1.5 text-white hover:bg-black/70 transition-colors"
+          >
+            <X className="h-4 w-4" />
+          </button>
           
-          <div className="space-y-4 py-4">
+          {/* Header with gradient */}
+          <div className="bg-gradient-to-r from-orange-500 via-red-500 to-pink-500 px-6 py-4 text-center">
+            <div className="flex items-center justify-center gap-2 text-white mb-1">
+              <Sparkles className="h-5 w-5" />
+              <span className="text-xs font-bold uppercase tracking-wider">Oferta Exclusiva</span>
+              <Sparkles className="h-5 w-5" />
+            </div>
+            <h2 className="text-white text-lg font-bold">
+              🎁 ESPERA! Última chance!
+            </h2>
+          </div>
+          
+          {/* Product Image */}
+          <div className="bg-gradient-to-b from-gray-100 to-white px-6 py-4">
+            <div className="relative mx-auto w-48 h-32">
+              <img 
+                src={tenisMain} 
+                alt="Tênis de Corrida Max Runner" 
+                className="w-full h-full object-contain drop-shadow-xl"
+              />
+              {/* Discount badge */}
+              <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full animate-pulse">
+                -40%
+              </div>
+            </div>
+          </div>
+          
+          {/* Content */}
+          <div className="px-6 pb-6 space-y-4">
             <div className="text-center">
-              <p className="text-muted-foreground text-sm mb-3">
-                Sabemos que você estava interessado no nosso tênis. Que tal um desconto especial?
+              <p className="text-sm text-muted-foreground mb-3">
+                Temos um desconto especial só pra você! 🔥
               </p>
               
-              <div className="bg-success/10 border border-success/30 rounded-lg p-4 mb-4">
-                <p className="text-xs text-muted-foreground line-through mb-1">
+              {/* Price box */}
+              <div className="bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 rounded-2xl p-4 mb-4">
+                <p className="text-sm text-muted-foreground line-through mb-1">
                   De R$ 78,90
                 </p>
-                <p className="text-3xl font-bold text-success">
-                  R$ 47,20
-                </p>
-                <p className="text-xs text-success font-medium mt-1">
-                  Economia de R$ 31,70!
+                <div className="flex items-center justify-center gap-2">
+                  <span className="text-4xl font-black text-green-600">
+                    R$ 47,20
+                  </span>
+                </div>
+                <p className="text-sm text-green-600 font-semibold mt-1">
+                  Você economiza R$ 31,70! 💰
                 </p>
               </div>
               
-              <p className="text-xs text-destructive font-semibold animate-pulse">
-                ⏰ Oferta válida apenas agora!
-              </p>
+              <div className="flex items-center justify-center gap-2 text-orange-500 text-sm font-semibold">
+                <span className="animate-pulse">⏰</span>
+                <span>Oferta válida apenas agora!</span>
+              </div>
             </div>
             
             <Button
               onClick={handlePromoClick}
               size="lg"
-              className="w-full h-14 bg-success hover:bg-success/90 text-white font-bold text-base gap-2"
+              className="w-full h-14 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold text-base gap-2 rounded-xl shadow-lg shadow-green-500/30 transition-all hover:scale-[1.02]"
             >
               <ShoppingBag className="h-5 w-5" />
               QUERO ESSA OFERTA!
@@ -249,7 +278,7 @@ const Index = () => {
             
             <button
               onClick={() => setShowPromoPopup(false)}
-              className="w-full text-sm text-muted-foreground hover:text-foreground transition-colors"
+              className="w-full text-xs text-muted-foreground hover:text-foreground transition-colors py-2"
             >
               Não, obrigado. Prefiro pagar mais caro.
             </button>
