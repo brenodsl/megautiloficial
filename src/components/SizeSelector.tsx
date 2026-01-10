@@ -1,5 +1,3 @@
-import { useState } from "react";
-
 const sizes = [34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44];
 
 interface SizeSelectorProps {
@@ -26,8 +24,8 @@ const SizeSelector = ({ onSizeSelect, selectedSize }: SizeSelectorProps) => {
             onClick={() => onSizeSelect(size)}
             className={`h-11 w-11 rounded-lg border-2 text-sm font-medium transition-all ${
               selectedSize === size
-                ? "border-primary bg-primary text-primary-foreground glow-primary"
-                : "border-border bg-card text-foreground hover:border-primary/50"
+                ? "border-primary bg-primary text-primary-foreground shadow-md"
+                : "border-border bg-card text-foreground hover:border-primary/50 hover:shadow-sm"
             }`}
           >
             {size}

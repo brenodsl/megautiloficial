@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Flame, Clock, AlertTriangle } from "lucide-react";
+import { Flame, AlertTriangle } from "lucide-react";
 
 const ScarcityBanner = () => {
   const [stock, setStock] = useState(23);
@@ -65,9 +65,9 @@ const ScarcityBanner = () => {
       </div>
 
       {/* Promo Badge */}
-      <div className="flex items-center justify-center gap-2 rounded-xl bg-primary/10 border border-primary/30 p-3">
-        <Flame className="h-5 w-5 text-primary animate-pulse" />
-        <p className="text-sm font-medium text-primary">
+      <div className="flex items-center justify-center gap-2 rounded-xl bg-orange-500/10 border border-orange-500/30 p-3">
+        <Flame className="h-5 w-5 text-orange-500 animate-pulse" />
+        <p className="text-sm font-medium text-orange-600">
           Promoção válida até durar o estoque!
         </p>
       </div>
