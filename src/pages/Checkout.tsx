@@ -75,6 +75,11 @@ const Checkout = () => {
   const [copied, setCopied] = useState(false);
   const [expirationTime, setExpirationTime] = useState(30 * 60); // 30 minutes in seconds
 
+  // Scroll to top when component mounts
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   // TikTok Pixel - InitiateCheckout event
   useEffect(() => {
     if (items.length > 0 && typeof window !== 'undefined' && (window as any).ttq) {
