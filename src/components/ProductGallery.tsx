@@ -10,13 +10,13 @@ import tenis5 from "@/assets/tenis-5.webp";
 import tenis6 from "@/assets/tenis-6.webp";
 import tenis7 from "@/assets/tenis-7.webp";
 import tenisVideo from "@/assets/tenis-video.mp4";
+import { colors } from "@/components/ColorSelector";
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 interface ProductGalleryProps {
   selectedColor: string;
 }
 
-const allImages = [
+const baseImages = [
   { id: 1, src: tenisMain, alt: "Max Runner - Principal" },
   { id: 2, src: tenis2, alt: "Max Runner - Vista Lateral" },
   { id: 3, src: tenis3, alt: "Max Runner - Vista Traseira" },
@@ -26,7 +26,6 @@ const allImages = [
   { id: 7, src: tenis7, alt: "Max Runner - Vista Traseira" },
 ];
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const ProductGallery = ({ selectedColor }: ProductGalleryProps) => {
   const [showVideo, setShowVideo] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -36,7 +35,11 @@ const ProductGallery = ({ selectedColor }: ProductGalleryProps) => {
     [Autoplay({ delay: 3000, stopOnInteraction: false, stopOnMouseEnter: true })]
   );
 
-  const images = allImages;
+  // Get selected color image and prepend to carousel
+  const selectedColorData = colors.find(c => c.id === selectedColor);
+  const images = selectedColorData 
+    ? [{ id: 0, src: selectedColorData.image, alt: `Max Runner - ${selectedColorData.name}` }, ...baseImages]
+    : baseImages;
 
   const onSelect = useCallback(() => {
     if (!emblaApi) return;
@@ -50,6 +53,13 @@ const ProductGallery = ({ selectedColor }: ProductGalleryProps) => {
       emblaApi.off("select", onSelect);
     };
   }, [emblaApi, onSelect]);
+
+  // Reset to first slide when color changes
+  useEffect(() => {
+    if (emblaApi) {
+      emblaApi.scrollTo(0);
+    }
+  }, [selectedColor, emblaApi]);
 
   return (
     <div id="produto" className="space-y-3">

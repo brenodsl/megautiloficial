@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
-import { ShoppingBag, Truck, Shield, CreditCard, CheckCircle, Award, X, Gift, Sparkles } from "lucide-react";
+import { ShoppingBag, Truck, Shield, CreditCard, CheckCircle, Award, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
 } from "@/components/ui/dialog";
+import { toast } from "sonner";
 import tenisMain from "@/assets/tenis-main.webp";
 import Header from "@/components/Header";
 import Breadcrumb from "@/components/Breadcrumb";
@@ -23,10 +24,19 @@ import FixedCTA from "@/components/FixedCTA";
 const CHECKOUT_URL = "https://pay.maxrunnerpay.shop/69618e8fc4b1fc0d57ae958d";
 const PROMO_CHECKOUT_URL = "https://pay.maxrunnerpay.shop/6961c264c4b1fc0d57af6648";
 
+// PIX Icon Component
+const PixIcon = () => (
+  <svg viewBox="0 0 512 512" className="h-4 w-4" fill="currentColor">
+    <path d="M112.57 391.19c20.056 0 38.928-7.808 53.12-22l76.693-76.692c5.385-5.404 14.765-5.384 20.15 0l76.989 76.989c14.191 14.191 33.046 22 53.12 22h15.098l-97.138 97.139c-30.326 30.327-79.505 30.327-109.831 0L103.472 391.19zm0-270.38c20.056 0 38.928 7.808 53.12 22l76.693 76.692c5.551 5.57 14.6 5.57 20.15 0l76.989-76.989c14.191-14.191 33.046-22 53.12-22h15.098L310.412 23.384c-30.326-30.327-79.505-30.327-109.831 0l-97.138 97.138zm280.068 180.761l45.882-45.882c30.327-30.327 30.327-79.505 0-109.831l-45.882-45.882c-14.191 14.191-33.046 22-53.12 22h-15.098c-20.056 0-38.928-7.808-53.12-22L193.313 177.97c-5.385 5.404-14.765 5.384-20.15 0l-76.989-76.989c-14.191-14.191-33.046-22-53.12-22H26.356l45.882 45.882c30.327 30.327 30.327 79.505 0 109.831l-45.882 45.882c14.191-14.191 33.046-22 53.12-22h15.098c20.056 0 38.928 7.808 53.12 22l77.989 77.989c5.551 5.57 14.6 5.57 20.15 0l76.989-76.989c14.191-14.191 33.046-22 53.12-22h15.098c20.074 0 38.928-7.808 53.12-22z"/>
+  </svg>
+);
+
 const Index = () => {
   const [selectedSize, setSelectedSize] = useState<number | null>(null);
   const [selectedColor, setSelectedColor] = useState<string>("gradient");
   const [showPromoPopup, setShowPromoPopup] = useState(false);
+
+  const canCheckout = selectedSize !== null && selectedColor !== "";
 
   useEffect(() => {
     // Check if user is coming back from checkout (backredirect)
@@ -48,6 +58,20 @@ const Index = () => {
   }, []);
 
   const handleBuyClick = () => {
+    if (!selectedColor) {
+      toast.error("Selecione uma cor antes de continuar", {
+        icon: <AlertCircle className="h-4 w-4" />,
+      });
+      document.getElementById("produto")?.scrollIntoView({ behavior: "smooth" });
+      return;
+    }
+    if (!selectedSize) {
+      toast.error("Selecione um tamanho antes de continuar", {
+        icon: <AlertCircle className="h-4 w-4" />,
+      });
+      document.getElementById("size-selector")?.scrollIntoView({ behavior: "smooth" });
+      return;
+    }
     window.open(CHECKOUT_URL, "_blank");
   };
 
@@ -110,8 +134,9 @@ const Index = () => {
             <div className="flex items-baseline gap-2">
               <span className="text-3xl font-bold text-success">R$ 78,90</span>
             </div>
-            <p className="text-sm text-success font-medium">
-              em 3x R$ 26,30 sem juros
+            <p className="text-sm text-success font-medium flex items-center gap-1.5">
+              <PixIcon />
+              À vista no PIX
             </p>
           </div>
 
@@ -142,7 +167,11 @@ const Index = () => {
           <Button
             onClick={handleBuyClick}
             size="lg"
-            className="w-full h-14 bg-black hover:bg-black/90 text-white font-bold text-base gap-2"
+            className={`w-full h-14 font-bold text-base gap-2 ${
+              canCheckout 
+                ? "bg-black hover:bg-black/90 text-white" 
+                : "bg-muted text-muted-foreground hover:bg-muted"
+            }`}
           >
             <ShoppingBag className="h-5 w-5" />
             COMPRAR AGORA
@@ -187,7 +216,11 @@ const Index = () => {
           <Button
             onClick={handleBuyClick}
             size="lg"
-            className="w-full bg-black hover:bg-black/90 text-white font-bold text-base h-14 gap-2"
+            className={`w-full h-14 font-bold text-base gap-2 ${
+              canCheckout 
+                ? "bg-black hover:bg-black/90 text-white" 
+                : "bg-muted text-muted-foreground hover:bg-muted"
+            }`}
           >
             <ShoppingBag className="h-5 w-5" />
             COMPRAR AGORA
@@ -199,7 +232,7 @@ const Index = () => {
       <Footer />
 
       {/* Fixed CTA Mobile */}
-      <FixedCTA selectedSize={selectedSize} />
+      <FixedCTA selectedSize={selectedSize} selectedColor={selectedColor} />
 
       {/* Promo Popup for Back Redirect */}
       <Dialog open={showPromoPopup} onOpenChange={setShowPromoPopup}>

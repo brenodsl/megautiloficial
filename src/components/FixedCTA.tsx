@@ -1,14 +1,32 @@
-import { ShoppingBag } from "lucide-react";
+import { ShoppingBag, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 interface FixedCTAProps {
   selectedSize: number | null;
+  selectedColor: string;
 }
 
 const CHECKOUT_URL = "https://pay.maxrunnerpay.shop/69618e8fc4b1fc0d57ae958d";
 
-const FixedCTA = ({ selectedSize }: FixedCTAProps) => {
+const FixedCTA = ({ selectedSize, selectedColor }: FixedCTAProps) => {
+  const canCheckout = selectedSize !== null && selectedColor !== "";
+
   const handleClick = () => {
+    if (!selectedColor) {
+      toast.error("Selecione uma cor antes de continuar", {
+        icon: <AlertCircle className="h-4 w-4" />,
+      });
+      document.getElementById("produto")?.scrollIntoView({ behavior: "smooth" });
+      return;
+    }
+    if (!selectedSize) {
+      toast.error("Selecione um tamanho antes de continuar", {
+        icon: <AlertCircle className="h-4 w-4" />,
+      });
+      document.getElementById("size-selector")?.scrollIntoView({ behavior: "smooth" });
+      return;
+    }
     window.open(CHECKOUT_URL, "_blank");
   };
 
@@ -27,7 +45,11 @@ const FixedCTA = ({ selectedSize }: FixedCTAProps) => {
         
         <Button
           onClick={handleClick}
-          className="bg-black hover:bg-black/90 text-white font-bold px-6 h-12"
+          className={`font-bold px-6 h-12 ${
+            canCheckout 
+              ? "bg-black hover:bg-black/90 text-white" 
+              : "bg-muted text-muted-foreground hover:bg-muted"
+          }`}
         >
           <ShoppingBag className="h-5 w-5 mr-2" />
           COMPRAR AGORA
