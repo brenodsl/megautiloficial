@@ -543,8 +543,18 @@ const Checkout = () => {
                 </div>
               </div>
               <div className="flex-1">
-                <h3 className="font-semibold text-gray-900">Tênis Carbon 3.0</h3>
-                <p className="text-sm text-gray-500">{firstItem.colorName} • Tam. {firstItem.size}</p>
+                <div className="flex items-start justify-between">
+                  <div>
+                    <h3 className="font-semibold text-gray-900">Tênis Carbon 3.0</h3>
+                    <p className="text-sm text-gray-500">{firstItem.colorName} • Tam. {firstItem.size}</p>
+                  </div>
+                  <Link 
+                    to="/" 
+                    className="text-xs text-gray-400 hover:text-[#28af60] underline transition-colors"
+                  >
+                    Editar
+                  </Link>
+                </div>
                 <p className="font-bold text-[#28af60] mt-1">
                   R$ {totalPrice.toFixed(2).replace(".", ",")}
                 </p>
