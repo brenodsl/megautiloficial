@@ -220,20 +220,26 @@ serve(async (req) => {
       );
     }
 
-    // Extract data from response
+    // Extract data from response - SigmaPay returns pix data inside a 'pix' object
     const sigmaData = responseData.data || responseData;
     
+    // Extract PIX data from nested pix object according to SigmaPay API structure
+    const pixInfo = sigmaData.pix || {};
+    
     // Format response for PIX payment
+    // SigmaPay returns: pix.qr_code_base64, pix.pix_qr_code, pix.pix_url
+    // Also check for direct qr_code and pix_code fields per documentation
     const formattedResponse = {
       success: true,
-      transactionId: sigmaData.hash,
-      qrCode: sigmaData.qr_code,
-      qrCodeText: sigmaData.pix_code,
+      transactionId: sigmaData.hash || sigmaData.id,
+      qrCode: pixInfo.qr_code_base64 || pixInfo.pix_qr_code || sigmaData.qr_code || null,
+      qrCodeText: sigmaData.pix_code || pixInfo.pix_url || null,
       expiresAt: sigmaData.expires_at,
-      status: sigmaData.status
+      status: sigmaData.status || sigmaData.payment_status
     };
     
     console.log('Resposta PIX formatada:', JSON.stringify(formattedResponse, null, 2));
+    console.log('PIX info from response:', JSON.stringify(pixInfo, null, 2));
     
     return new Response(
       JSON.stringify(formattedResponse),

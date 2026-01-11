@@ -16,7 +16,7 @@ import {
   ShieldCheck,
   Truck,
   Award,
-  Star,
+  Clock,
   AlertCircle
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -25,6 +25,8 @@ import { toast } from "sonner";
 import { useCart } from "@/contexts/CartContext";
 import { supabase } from "@/integrations/supabase/client";
 import logo from "@/assets/logo.jpg";
+import CheckoutReviews from "@/components/CheckoutReviews";
+import ShippingOptions from "@/components/ShippingOptions";
 
 // PIX Icon Component
 const PixIcon = ({ className = "h-5 w-5" }: { className?: string }) => (
@@ -60,15 +62,17 @@ const Checkout = () => {
     city: "",
     state: "",
   });
-  
+
+  const [selectedShipping, setSelectedShipping] = useState("free");
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingCep, setIsLoadingCep] = useState(false);
   const [pixData, setPixData] = useState<{
-    qrCode: string;
-    qrCodeText: string;
+    qrCode: string | null;
+    qrCodeText: string | null;
     transactionId: string;
   } | null>(null);
   const [copied, setCopied] = useState(false);
+  const [expirationTime, setExpirationTime] = useState(30 * 60); // 30 minutes in seconds
 
   // TikTok Pixel - InitiateCheckout event
   useEffect(() => {
@@ -83,6 +87,22 @@ const Checkout = () => {
       });
     }
   }, []);
+
+  // Countdown timer for PIX expiration
+  useEffect(() => {
+    if (pixData && expirationTime > 0) {
+      const timer = setInterval(() => {
+        setExpirationTime((prev) => prev - 1);
+      }, 1000);
+      return () => clearInterval(timer);
+    }
+  }, [pixData, expirationTime]);
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
 
   // Format CPF
   const formatCPF = (value: string) => {
@@ -256,10 +276,12 @@ const Checkout = () => {
         return;
       }
 
+      console.log("PIX Response:", data);
+
       if (data?.success) {
         setPixData({
-          qrCode: data.qrCode,
-          qrCodeText: data.qrCodeText,
+          qrCode: data.qrCode || null,
+          qrCodeText: data.qrCodeText || null,
           transactionId: data.transactionId,
         });
         
@@ -275,7 +297,7 @@ const Checkout = () => {
           });
         }
         
-        toast.success("QR Code PIX gerado com sucesso!");
+        toast.success("PIX gerado com sucesso!");
       } else {
         toast.error(data?.error || "Erro ao gerar QR Code");
       }
@@ -325,83 +347,132 @@ const Checkout = () => {
     );
   }
 
+  // PIX Payment Screen - Redesigned
   if (pixData) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-white">
         {/* Header */}
         <header className="bg-white border-b border-gray-100 py-3 px-4">
-          <div className="max-w-lg mx-auto flex items-center justify-between">
+          <div className="max-w-lg mx-auto flex items-center justify-center">
             <Link to="/">
               <img src={logo} alt="Max Runner" className="h-8 w-auto" />
             </Link>
-            <div className="flex items-center gap-1.5 text-xs text-gray-500 bg-gray-50 px-3 py-1.5 rounded-full">
-              <Lock className="h-3 w-3 text-[#28af60]" />
-              <span>Ambiente seguro</span>
-            </div>
           </div>
         </header>
 
         <main className="max-w-lg mx-auto px-4 py-6 space-y-6">
-          <div className="text-center">
-            <div className="inline-flex items-center gap-2 bg-green-50 text-[#28af60] px-4 py-2 rounded-full mb-4">
-              <CheckCircle className="h-5 w-5" />
-              <span className="font-medium">QR Code gerado!</span>
+          {/* PIX Icon */}
+          <div className="flex justify-center">
+            <div className="w-16 h-16 rounded-full bg-[#28af60]/10 flex items-center justify-center">
+              <QRCodeIcon />
             </div>
-            <h2 className="text-xl font-bold text-gray-900 mb-2">
-              Escaneie o QR Code
-            </h2>
+          </div>
+
+          {/* Title */}
+          <div className="text-center">
+            <h1 className="text-2xl font-bold text-[#28af60] mb-2">Pagamento via PIX</h1>
             <p className="text-sm text-gray-500">
-              Abra o app do seu banco e escaneie o código
+              Escaneie o QR Code ou copie o código para pagar
             </p>
           </div>
 
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-            <div className="flex justify-center mb-4">
+          {/* Expiration Timer */}
+          <div className="flex justify-center">
+            <div className="inline-flex items-center gap-2 bg-[#28af60] text-white px-6 py-3 rounded-full">
+              <Clock className="h-5 w-5" />
+              <span className="font-medium">Expira em: {formatTime(expirationTime)}</span>
+            </div>
+          </div>
+
+          {/* Value */}
+          <div className="text-center py-4 border-y border-gray-100">
+            <p className="text-sm text-gray-500 mb-1">Valor a pagar</p>
+            <p className="text-3xl font-bold text-[#28af60]">
+              R$ {totalPrice.toFixed(2).replace(".", ",")}
+            </p>
+          </div>
+
+          {/* QR Code */}
+          <div className="bg-white rounded-2xl p-6 border border-gray-200">
+            <div className="flex justify-center">
               {pixData.qrCode ? (
                 <img
                   src={pixData.qrCode.startsWith("data:") ? pixData.qrCode : `data:image/png;base64,${pixData.qrCode}`}
                   alt="QR Code PIX"
-                  className="w-48 h-48"
+                  className="w-64 h-64 rounded-lg"
                 />
               ) : (
-                <div className="w-48 h-48 bg-gray-100 flex items-center justify-center rounded-lg">
-                  <PixIcon className="h-16 w-16 text-gray-400" />
+                <div className="w-64 h-64 bg-gray-100 flex flex-col items-center justify-center rounded-lg">
+                  <PixIcon className="h-16 w-16 text-gray-400 mb-2" />
+                  <p className="text-sm text-gray-500 text-center px-4">
+                    QR Code não disponível.<br/>Use o código Copia e Cola abaixo.
+                  </p>
                 </div>
               )}
             </div>
-            
-            {pixData.qrCodeText && (
-              <div className="space-y-2">
-                <p className="text-xs text-gray-500 text-center">
-                  Ou copie o código PIX:
-                </p>
-                <Button
-                  onClick={handleCopyPixCode}
-                  variant="outline"
-                  className="w-full gap-2 border-[#28af60] text-[#28af60] hover:bg-green-50"
-                >
-                  {copied ? (
-                    <>
-                      <CheckCircle className="h-4 w-4" />
-                      Copiado!
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="h-4 w-4" />
-                      Copiar código PIX
-                    </>
-                  )}
-                </Button>
-              </div>
-            )}
           </div>
 
-          <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
-            <p className="text-sm font-medium text-gray-900 mb-2">Valor a pagar:</p>
-            <p className="text-2xl font-bold text-[#28af60]">
-              R$ {totalPrice.toFixed(2).replace(".", ",")}
-            </p>
+          {/* PIX Copy and Paste Code */}
+          {pixData.qrCodeText && (
+            <div className="space-y-3">
+              <p className="text-sm text-gray-500 text-center">Código PIX Copia e Cola</p>
+              <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                <p className="text-xs text-gray-600 font-mono break-all line-clamp-3">
+                  {pixData.qrCodeText}
+                </p>
+              </div>
+              <Button
+                onClick={handleCopyPixCode}
+                className="w-full h-14 bg-gray-900 hover:bg-gray-800 text-white rounded-xl gap-2"
+              >
+                {copied ? (
+                  <>
+                    <CheckCircle className="h-5 w-5" />
+                    Copiado!
+                  </>
+                ) : (
+                  <>
+                    <Copy className="h-5 w-5" />
+                    Copiar código PIX
+                  </>
+                )}
+              </Button>
+            </div>
+          )}
+
+          {/* How to Pay Instructions */}
+          <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+            <p className="font-semibold text-gray-900 mb-3">Como pagar:</p>
+            <ol className="space-y-2 text-sm text-gray-600">
+              <li className="flex items-start gap-2">
+                <span className="text-[#28af60] font-bold">1.</span>
+                Abra o app do seu banco
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-[#28af60] font-bold">2.</span>
+                Escolha pagar com PIX
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-[#28af60] font-bold">3.</span>
+                Escaneie o QR Code ou cole o código
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-[#28af60] font-bold">4.</span>
+                Confirme o pagamento
+              </li>
+            </ol>
           </div>
+
+          {/* Verification Status */}
+          <div className="flex items-center justify-center gap-2 text-sm text-gray-500">
+            <Loader2 className="h-4 w-4 animate-spin" />
+            <span>Verificando pagamento automaticamente...</span>
+          </div>
+
+          {/* Transaction ID */}
+          <p className="text-center text-xs text-gray-400">
+            ID: {pixData.transactionId}
+          </p>
 
           <Button
             onClick={() => {
@@ -470,6 +541,12 @@ const Checkout = () => {
             </div>
           </div>
         )}
+
+        {/* Shipping Options */}
+        <ShippingOptions 
+          selectedShipping={selectedShipping} 
+          onSelect={setSelectedShipping} 
+        />
 
         {/* Customer Data Section */}
         <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
@@ -658,16 +735,7 @@ const Checkout = () => {
         </div>
 
         {/* Reviews Section */}
-        <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-              <Star className="h-5 w-5 fill-yellow-400 text-yellow-400" />
-              <span className="text-xl font-bold text-gray-900">4.9</span>
-              <span className="text-sm text-gray-500">(327 avaliações)</span>
-            </div>
-            <span className="text-xs text-gray-400 uppercase tracking-wider">Avaliações reais</span>
-          </div>
-        </div>
+        <CheckoutReviews />
 
         {/* Footer Links */}
         <div className="space-y-6 pt-4">
