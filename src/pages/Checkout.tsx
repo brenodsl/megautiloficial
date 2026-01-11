@@ -552,12 +552,6 @@ const Checkout = () => {
           </div>
         )}
 
-        {/* Shipping Options */}
-        <ShippingOptions 
-          selectedShipping={selectedShipping} 
-          onSelect={setSelectedShipping} 
-        />
-
         {/* Customer Data Section */}
         <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
           <div className="flex items-center gap-2 mb-4">
@@ -691,6 +685,12 @@ const Checkout = () => {
             </div>
           </div>
         </div>
+
+        {/* Shipping Options */}
+        <ShippingOptions 
+          selectedShipping={selectedShipping} 
+          onSelect={setSelectedShipping} 
+        />
 
         {/* Payment Section */}
         <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
