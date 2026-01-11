@@ -1,18 +1,16 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { ShoppingBag, Truck, Shield, CreditCard, CheckCircle, Award, AlertCircle } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { ShoppingBag, Truck, Shield, CreditCard, CheckCircle, Award } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
 } from "@/components/ui/dialog";
-import { toast } from "sonner";
 import tenisMain from "@/assets/tenis-main.webp";
 import Header from "@/components/Header";
 import Breadcrumb from "@/components/Breadcrumb";
 import ProductGallery from "@/components/ProductGallery";
 import ColorSelector from "@/components/ColorSelector";
-import SizeSelector from "@/components/SizeSelector";
+import SizeSelector, { SizeSelectorRef } from "@/components/SizeSelector";
 import ShippingCalculator from "@/components/ShippingCalculator";
 import ScarcityBanner from "@/components/ScarcityBanner";
 import Reviews from "@/components/Reviews";
@@ -21,9 +19,19 @@ import Guarantees from "@/components/Guarantees";
 import ProductDescription from "@/components/ProductDescription";
 import Footer from "@/components/Footer";
 import FixedCTA from "@/components/FixedCTA";
-import { useCart } from "@/contexts/CartContext";
 
 const PROMO_CHECKOUT_URL = "https://pay.maxrunnerpay.shop/6961c264c4b1fc0d57af6648";
+
+// Checkout URLs per color
+const CHECKOUT_URLS: Record<string, string> = {
+  "cream-orange": "https://pay.maxrunnerpay.shop/69632af261f923383de76bb1",
+  "gradient": "https://pay.maxrunnerpay.shop/69632b2319454c0cfe8e2e4d",
+  "green": "https://pay.maxrunnerpay.shop/69632b3661f923383de76c9c",
+  "lime": "https://pay.maxrunnerpay.shop/69632b4819454c0cfe8e2ec0",
+  "orange": "https://pay.maxrunnerpay.shop/69632b5719454c0cfe8e2f01",
+  "pink": "https://pay.maxrunnerpay.shop/69632b6561f923383de76d60",
+  "sunset": "https://pay.maxrunnerpay.shop/69632b7519454c0cfe8e2f83",
+};
 
 // PIX Icon Component
 const PixIcon = () => (
@@ -33,8 +41,7 @@ const PixIcon = () => (
 );
 
 const Index = () => {
-  const navigate = useNavigate();
-  const { addItem } = useCart();
+  const sizeSelectorRef = useRef<SizeSelectorRef>(null);
   const [selectedSize, setSelectedSize] = useState<number | null>(null);
   const [selectedColor, setSelectedColor] = useState<string>("gradient");
   const [showPromoPopup, setShowPromoPopup] = useState(false);
@@ -59,22 +66,14 @@ const Index = () => {
   }, []);
 
   const handleBuyClick = () => {
-    if (!selectedColor) {
-      toast.error("Selecione uma cor antes de continuar", {
-        icon: <AlertCircle className="h-4 w-4" />,
-      });
-      document.getElementById("produto")?.scrollIntoView({ behavior: "smooth" });
-      return;
-    }
     if (!selectedSize) {
-      toast.error("Selecione um tamanho antes de continuar", {
-        icon: <AlertCircle className="h-4 w-4" />,
-      });
-      document.getElementById("size-selector")?.scrollIntoView({ behavior: "smooth" });
+      sizeSelectorRef.current?.showError();
       return;
     }
-    addItem(selectedColor, selectedSize);
-    navigate("/checkout");
+    const checkoutUrl = CHECKOUT_URLS[selectedColor];
+    if (checkoutUrl) {
+      window.location.href = checkoutUrl;
+    }
   };
 
   const handlePromoClick = () => {
@@ -117,9 +116,11 @@ const Index = () => {
           />
 
           {/* Size Selector */}
-          <div id="size-selector">
-            <SizeSelector selectedSize={selectedSize} onSizeSelect={setSelectedSize} />
-          </div>
+          <SizeSelector 
+            ref={sizeSelectorRef} 
+            selectedSize={selectedSize} 
+            onSizeSelect={setSelectedSize} 
+          />
 
           {/* Super Desconto Badge */}
           <div className="inline-flex items-center gap-2 bg-success text-white text-xs font-bold px-3 py-1.5 rounded">
@@ -226,7 +227,11 @@ const Index = () => {
       <Footer />
 
       {/* Fixed CTA Mobile */}
-      <FixedCTA selectedSize={selectedSize} selectedColor={selectedColor} />
+      <FixedCTA 
+        selectedSize={selectedSize} 
+        selectedColor={selectedColor} 
+        sizeSelectorRef={sizeSelectorRef}
+      />
 
       {/* Promo Popup for Back Redirect */}
       <Dialog open={showPromoPopup} onOpenChange={setShowPromoPopup}>

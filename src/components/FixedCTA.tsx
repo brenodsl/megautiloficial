@@ -1,35 +1,35 @@
-import { ShoppingBag, AlertCircle } from "lucide-react";
+import { RefObject } from "react";
+import { ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
-import { useNavigate } from "react-router-dom";
-import { useCart } from "@/contexts/CartContext";
+import { SizeSelectorRef } from "@/components/SizeSelector";
+
+// Checkout URLs per color
+const CHECKOUT_URLS: Record<string, string> = {
+  "cream-orange": "https://pay.maxrunnerpay.shop/69632af261f923383de76bb1",
+  "gradient": "https://pay.maxrunnerpay.shop/69632b2319454c0cfe8e2e4d",
+  "green": "https://pay.maxrunnerpay.shop/69632b3661f923383de76c9c",
+  "lime": "https://pay.maxrunnerpay.shop/69632b4819454c0cfe8e2ec0",
+  "orange": "https://pay.maxrunnerpay.shop/69632b5719454c0cfe8e2f01",
+  "pink": "https://pay.maxrunnerpay.shop/69632b6561f923383de76d60",
+  "sunset": "https://pay.maxrunnerpay.shop/69632b7519454c0cfe8e2f83",
+};
 
 interface FixedCTAProps {
   selectedSize: number | null;
   selectedColor: string;
+  sizeSelectorRef: RefObject<SizeSelectorRef>;
 }
 
-const FixedCTA = ({ selectedSize, selectedColor }: FixedCTAProps) => {
-  const navigate = useNavigate();
-  const { addItem } = useCart();
-
+const FixedCTA = ({ selectedSize, selectedColor, sizeSelectorRef }: FixedCTAProps) => {
   const handleClick = () => {
-    if (!selectedColor) {
-      toast.error("Selecione uma cor antes de continuar", {
-        icon: <AlertCircle className="h-4 w-4" />,
-      });
-      document.getElementById("produto")?.scrollIntoView({ behavior: "smooth" });
-      return;
-    }
     if (!selectedSize) {
-      toast.error("Selecione um tamanho antes de continuar", {
-        icon: <AlertCircle className="h-4 w-4" />,
-      });
-      document.getElementById("size-selector")?.scrollIntoView({ behavior: "smooth" });
+      sizeSelectorRef.current?.showError();
       return;
     }
-    addItem(selectedColor, selectedSize);
-    navigate("/checkout");
+    const checkoutUrl = CHECKOUT_URLS[selectedColor];
+    if (checkoutUrl) {
+      window.location.href = checkoutUrl;
+    }
   };
 
   return (
