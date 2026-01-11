@@ -160,6 +160,7 @@ serve(async (req) => {
       amount: Math.round(totalAmount * 100), // Convert to cents
       offer_hash: OFFER_HASH,
       payment_method: 'pix',
+      installments: 1, // Required field for SigmaPay
       customer: {
         name: sanitizeString(customer.name, 100),
         email: sanitizeString(customer.email, 255),
