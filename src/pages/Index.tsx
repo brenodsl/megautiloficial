@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Truck, Zap, Shield, CircleCheckBig, Award } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -203,6 +204,23 @@ const Index = () => {
           }`}
         >
           Comprar agora
+        </Button>
+
+        {/* Add to Cart Button */}
+        <Button
+          onClick={() => {
+            if (!selectedSize) {
+              sizeSelectorRef.current?.showError();
+              return;
+            }
+            addItem(selectedColor, selectedSize, 1);
+            toast.success("Produto adicionado ao carrinho!");
+          }}
+          variant="outline"
+          size="lg"
+          className="w-full h-14 mt-3 font-medium text-base rounded-full border-2 border-[#28af60] text-[#28af60] hover:bg-[#28af60]/10"
+        >
+          Adicionar ao carrinho
         </Button>
 
         {/* Size warning text */}
