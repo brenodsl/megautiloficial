@@ -28,7 +28,7 @@ import { QRCodeSVG } from "qrcode.react";
 import logo from "@/assets/logo-max-runner.png";
 import CheckoutReviews from "@/components/CheckoutReviews";
 import ShippingOptions from "@/components/ShippingOptions";
-
+import CartDrawer from "@/components/CartDrawer";
 // PIX Icon Component
 const PixIcon = ({ className = "h-5 w-5" }: { className?: string }) => (
   <svg width="16" height="16" viewBox="0 0 512 512" fill="currentColor" className={className}>
@@ -74,6 +74,7 @@ const Checkout = () => {
   } | null>(null);
   const [copied, setCopied] = useState(false);
   const [expirationTime, setExpirationTime] = useState(30 * 60); // 30 minutes in seconds
+  const [isCartOpen, setIsCartOpen] = useState(false);
 
   // Scroll to top when component mounts
   useEffect(() => {
@@ -548,12 +549,12 @@ const Checkout = () => {
                     <h3 className="font-semibold text-gray-900">Tênis Carbon 3.0</h3>
                     <p className="text-sm text-gray-500">{firstItem.colorName} • Tam. {firstItem.size}</p>
                   </div>
-                  <Link 
-                    to="/" 
+                  <button 
+                    onClick={() => setIsCartOpen(true)}
                     className="text-xs text-gray-400 hover:text-[#28af60] underline transition-colors"
                   >
                     Editar
-                  </Link>
+                  </button>
                 </div>
                 <p className="font-bold text-[#28af60] mt-1">
                   R$ {totalPrice.toFixed(2).replace(".", ",")}
@@ -835,6 +836,9 @@ const Checkout = () => {
           )}
         </div>
       </div>
+
+      {/* Cart Drawer */}
+      <CartDrawer open={isCartOpen} onOpenChange={setIsCartOpen} />
     </div>
   );
 };
