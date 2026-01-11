@@ -1,16 +1,17 @@
 import { ShoppingBag, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
+import { useCart } from "@/contexts/CartContext";
 
 interface FixedCTAProps {
   selectedSize: number | null;
   selectedColor: string;
 }
 
-const CHECKOUT_URL = "https://pay.maxrunnerpay.shop/69618e8fc4b1fc0d57ae958d";
-
 const FixedCTA = ({ selectedSize, selectedColor }: FixedCTAProps) => {
-  const canCheckout = selectedSize !== null && selectedColor !== "";
+  const navigate = useNavigate();
+  const { addItem } = useCart();
 
   const handleClick = () => {
     if (!selectedColor) {
@@ -27,7 +28,8 @@ const FixedCTA = ({ selectedSize, selectedColor }: FixedCTAProps) => {
       document.getElementById("size-selector")?.scrollIntoView({ behavior: "smooth" });
       return;
     }
-    window.open(CHECKOUT_URL, "_blank");
+    addItem(selectedColor, selectedSize);
+    navigate("/checkout");
   };
 
   return (
@@ -45,11 +47,7 @@ const FixedCTA = ({ selectedSize, selectedColor }: FixedCTAProps) => {
         
         <Button
           onClick={handleClick}
-          className={`font-bold px-6 h-12 ${
-            canCheckout 
-              ? "bg-black hover:bg-black/90 text-white" 
-              : "bg-muted text-muted-foreground hover:bg-muted"
-          }`}
+          className="font-bold px-6 h-12 bg-black hover:bg-black/90 text-white"
         >
           <ShoppingBag className="h-5 w-5 mr-2" />
           COMPRAR AGORA
