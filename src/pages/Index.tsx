@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { ShoppingBag, Truck, Shield, CheckCircle, Award, Star } from "lucide-react";
+import { Truck, Zap, Circle, CircleCheck, Award } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -23,7 +23,14 @@ import Benefits from "@/components/Benefits";
 import Guarantees from "@/components/Guarantees";
 import ProductDescription from "@/components/ProductDescription";
 import Footer from "@/components/Footer";
-import FixedCTA from "@/components/FixedCTA";
+
+// PIX Icon Component (diamond shape like in reference)
+const PixIcon = () => (
+  <svg viewBox="0 0 24 24" className="h-4 w-4" fill="currentColor">
+    <path d="M12 2L2 12l10 10 10-10L12 2zm0 2.83L19.17 12 12 19.17 4.83 12 12 4.83z"/>
+    <path d="M12 7l-5 5 5 5 5-5-5-5z"/>
+  </svg>
+);
 
 const PROMO_CHECKOUT_URL = "https://pay.maxrunnerpay.shop/6961c264c4b1fc0d57af6648";
 
@@ -37,13 +44,6 @@ const CHECKOUT_URLS: Record<string, string> = {
   "pink": "https://pay.maxrunnerpay.shop/69632b6561f923383de76d60",
   "sunset": "https://pay.maxrunnerpay.shop/69632b7519454c0cfe8e2f83",
 };
-
-// PIX Icon Component
-const PixIcon = () => (
-  <svg viewBox="0 0 512 512" className="h-4 w-4" fill="currentColor">
-    <path d="M112.57 391.19c20.056 0 38.928-7.808 53.12-22l76.693-76.692c5.385-5.404 14.765-5.384 20.15 0l76.989 76.989c14.191 14.191 33.046 22 53.12 22h15.098l-97.138 97.139c-30.326 30.327-79.505 30.327-109.831 0L103.472 391.19zm0-270.38c20.056 0 38.928 7.808 53.12 22l76.693 76.692c5.551 5.57 14.6 5.57 20.15 0l76.989-76.989c14.191-14.191 33.046-22 53.12-22h15.098L310.412 23.384c-30.326-30.327-79.505-30.327-109.831 0l-97.138 97.138zm280.068 180.761l45.882-45.882c30.327-30.327 30.327-79.505 0-109.831l-45.882-45.882c-14.191 14.191-33.046 22-53.12 22h-15.098c-20.056 0-38.928-7.808-53.12-22L193.313 177.97c-5.385 5.404-14.765 5.384-20.15 0l-76.989-76.989c-14.191-14.191-33.046-22-53.12-22H26.356l45.882 45.882c30.327 30.327 30.327 79.505 0 109.831l-45.882 45.882c14.191-14.191 33.046-22 53.12-22h15.098c20.056 0 38.928 7.808 53.12 22l77.989 77.989c5.551 5.57 14.6 5.57 20.15 0l76.989-76.989c14.191-14.191 33.046-22 53.12-22h15.098c20.074 0 38.928-7.808 53.12-22z"/>
-  </svg>
-);
 
 const Index = () => {
   const sizeSelectorRef = useRef<SizeSelectorRef>(null);
@@ -86,7 +86,7 @@ const Index = () => {
   const selectedColorData = colors.find(c => c.id === selectedColor);
 
   return (
-    <div className="min-h-screen bg-white pb-24 lg:pb-0">
+    <div className="min-h-screen bg-white">
       <Header />
       
       {/* Breadcrumb */}
@@ -185,20 +185,21 @@ const Index = () => {
         </div>
 
         {/* Benefits List */}
-        <div className="mt-4 space-y-2.5 border border-gray-200 rounded-lg p-4">
+        <div className="mt-4 space-y-2.5">
           <div className="flex items-center gap-2 text-sm text-gray-700">
             <Truck className="h-4 w-4 text-gray-400" />
             <span>Frete grátis para todo o Brasil</span>
           </div>
-          <div className="flex items-center gap-2 text-sm text-green-600 font-medium bg-green-50 rounded px-2 py-1 ml-6">
+          <div className="flex items-center gap-2 text-sm text-green-600 font-medium bg-green-50 rounded-md px-3 py-1.5">
+            <Zap className="h-4 w-4" />
             <span>Envios para Capitais em até 2 dias</span>
           </div>
           <div className="flex items-center gap-2 text-sm text-gray-700">
-            <Shield className="h-4 w-4 text-gray-400" />
+            <Circle className="h-4 w-4 text-gray-400" />
             <span>Garantia de 90 dias</span>
           </div>
           <div className="flex items-center gap-2 text-sm text-gray-700">
-            <CheckCircle className="h-4 w-4 text-gray-400" />
+            <CircleCheck className="h-4 w-4 text-gray-400" />
             <span>Estoque disponível</span>
           </div>
         </div>
@@ -207,7 +208,7 @@ const Index = () => {
         <Button
           onClick={handleBuyClick}
           size="lg"
-          className={`w-full h-14 mt-6 font-bold text-base rounded-lg transition-colors ${
+          className={`w-full h-14 mt-6 font-medium text-base rounded-full transition-colors ${
             selectedSize 
               ? 'bg-gray-900 hover:bg-gray-800 text-white' 
               : 'bg-gray-200 text-gray-500 cursor-default hover:bg-gray-200'
@@ -251,12 +252,6 @@ const Index = () => {
       {/* Footer */}
       <Footer />
 
-      {/* Fixed CTA Mobile */}
-      <FixedCTA 
-        selectedSize={selectedSize} 
-        selectedColor={selectedColor} 
-        sizeSelectorRef={sizeSelectorRef}
-      />
 
       {/* Promo Popup for Back Redirect */}
       <Dialog open={showPromoPopup} onOpenChange={setShowPromoPopup}>
