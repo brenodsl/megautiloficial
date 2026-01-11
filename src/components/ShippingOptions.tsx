@@ -1,7 +1,6 @@
 import { Truck, Clock, Package } from "lucide-react";
-import { useState } from "react";
 
-interface ShippingOption {
+export interface ShippingOption {
   id: string;
   name: string;
   description: string;
@@ -10,7 +9,7 @@ interface ShippingOption {
   badge?: string;
 }
 
-const shippingOptions: ShippingOption[] = [
+export const shippingOptions: ShippingOption[] = [
   {
     id: "free",
     name: "Frete grátis",
@@ -34,6 +33,11 @@ const shippingOptions: ShippingOption[] = [
     icon: Clock,
   },
 ];
+
+export const getShippingPrice = (shippingId: string): number => {
+  const option = shippingOptions.find(opt => opt.id === shippingId);
+  return option?.price || 0;
+};
 
 interface ShippingOptionsProps {
   selectedShipping: string;
