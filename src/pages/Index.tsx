@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { ShoppingBag, Truck, Shield, CreditCard, CheckCircle, Award, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -20,8 +21,8 @@ import Guarantees from "@/components/Guarantees";
 import ProductDescription from "@/components/ProductDescription";
 import Footer from "@/components/Footer";
 import FixedCTA from "@/components/FixedCTA";
+import { useCart } from "@/contexts/CartContext";
 
-const CHECKOUT_URL = "https://pay.maxrunnerpay.shop/69618e8fc4b1fc0d57ae958d";
 const PROMO_CHECKOUT_URL = "https://pay.maxrunnerpay.shop/6961c264c4b1fc0d57af6648";
 
 // PIX Icon Component
@@ -32,11 +33,11 @@ const PixIcon = () => (
 );
 
 const Index = () => {
+  const navigate = useNavigate();
+  const { addItem } = useCart();
   const [selectedSize, setSelectedSize] = useState<number | null>(null);
   const [selectedColor, setSelectedColor] = useState<string>("gradient");
   const [showPromoPopup, setShowPromoPopup] = useState(false);
-
-  const canCheckout = selectedSize !== null && selectedColor !== "";
 
   useEffect(() => {
     // Check if user is coming back from checkout (backredirect)
@@ -72,7 +73,8 @@ const Index = () => {
       document.getElementById("size-selector")?.scrollIntoView({ behavior: "smooth" });
       return;
     }
-    window.open(CHECKOUT_URL, "_blank");
+    addItem(selectedColor, selectedSize);
+    navigate("/checkout");
   };
 
   const handlePromoClick = () => {
@@ -167,11 +169,7 @@ const Index = () => {
           <Button
             onClick={handleBuyClick}
             size="lg"
-            className={`w-full h-14 font-bold text-base gap-2 ${
-              canCheckout 
-                ? "bg-black hover:bg-black/90 text-white" 
-                : "bg-muted text-muted-foreground hover:bg-muted"
-            }`}
+            className="w-full h-14 font-bold text-base gap-2 bg-black hover:bg-black/90 text-white"
           >
             <ShoppingBag className="h-5 w-5" />
             COMPRAR AGORA
@@ -216,11 +214,7 @@ const Index = () => {
           <Button
             onClick={handleBuyClick}
             size="lg"
-            className={`w-full h-14 font-bold text-base gap-2 ${
-              canCheckout 
-                ? "bg-black hover:bg-black/90 text-white" 
-                : "bg-muted text-muted-foreground hover:bg-muted"
-            }`}
+            className="w-full h-14 font-bold text-base gap-2 bg-black hover:bg-black/90 text-white"
           >
             <ShoppingBag className="h-5 w-5" />
             COMPRAR AGORA
