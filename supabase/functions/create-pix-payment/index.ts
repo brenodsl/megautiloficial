@@ -227,13 +227,22 @@ serve(async (req) => {
     const pixInfo = sigmaData.pix || {};
     
     // Format response for PIX payment
-    // SigmaPay returns: pix.qr_code_base64, pix.pix_qr_code, pix.pix_url
-    // Also check for direct qr_code and pix_code fields per documentation
+    // SigmaPay returns: 
+    // - pix.qr_code_base64: base64 image (may be null)
+    // - pix.pix_qr_code: the actual PIX code string (like "00020126580014BR.GOV.BCB.PIX...")
+    // - pix.pix_url: URL for payment page (NOT the pix code)
+    // Per documentation: qr_code is base64 image, pix_code is the text code
+    
+    // The pix_qr_code field IS the pix_code (EMV format), not an image
+    const pixCode = pixInfo.pix_qr_code || sigmaData.pix_code || null;
+    const qrCodeImage = pixInfo.qr_code_base64 || sigmaData.qr_code || null;
+    
     const formattedResponse = {
       success: true,
       transactionId: sigmaData.hash || sigmaData.id,
-      qrCode: pixInfo.qr_code_base64 || pixInfo.pix_qr_code || sigmaData.qr_code || null,
-      qrCodeText: sigmaData.pix_code || pixInfo.pix_url || null,
+      qrCode: qrCodeImage, // Base64 image if available
+      qrCodeText: pixCode, // The actual PIX copia e cola code
+      pixUrl: pixInfo.pix_url || null, // Payment URL (separate from pix code)
       expiresAt: sigmaData.expires_at,
       status: sigmaData.status || sigmaData.payment_status
     };
