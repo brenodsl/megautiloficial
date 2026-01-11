@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Truck, Zap, Circle, CircleCheck, Award } from "lucide-react";
+import { Truck, Zap, Shield, CircleCheckBig, Award } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -24,11 +24,10 @@ import Guarantees from "@/components/Guarantees";
 import ProductDescription from "@/components/ProductDescription";
 import Footer from "@/components/Footer";
 
-// PIX Icon Component (diamond shape like in reference)
+// PIX Icon Component
 const PixIcon = () => (
-  <svg viewBox="0 0 24 24" className="h-4 w-4" fill="currentColor">
-    <path d="M12 2L2 12l10 10 10-10L12 2zm0 2.83L19.17 12 12 19.17 4.83 12 12 4.83z"/>
-    <path d="M12 7l-5 5 5 5 5-5-5-5z"/>
+  <svg width="16" height="16" viewBox="0 0 512 512" fill="currentColor" className="h-4 w-4 flex-shrink-0">
+    <path d="M242.4 292.5C247.8 287.1 257.1 287.1 262.5 292.5L339.5 369.5C353.7 383.7 372.5 391.5 392.5 391.5H407.7L310.6 488.6C280.3 518.9 231.7 518.9 201.4 488.6L103.3 390.5H112.5C132.5 390.5 151.3 382.7 165.5 368.5L242.4 291.6V292.5zM262.5 218.5C257.1 223.9 247.8 223.9 242.4 218.5L165.5 141.6C151.3 127.4 132.5 119.6 112.5 119.6H103.3L201.4 21.49C231.7-8.83 280.3-8.83 310.6 21.49L407.7 118.6H392.5C372.5 118.6 353.7 126.4 339.5 140.6L262.5 217.6V218.5zM112.5 142.1C126.7 142.1 140.3 147.6 150.5 157.9L227.4 234.8C234.3 241.7 243.1 245.9 252.5 247.1V264C243.1 265.2 234.3 269.4 227.4 276.3L150.5 353.2C140.3 363.5 126.7 369 112.5 369H80.19L21.49 310.3C-8.832 280-8.832 231.4 21.49 201.1L80.19 142.4H112.5V142.1zM431.8 369H399.5C385.3 369 371.7 363.5 361.5 353.2L284.6 276.3C277.7 269.4 268.9 265.2 259.5 264V247.1C268.9 245.9 277.7 241.7 284.6 234.8L361.5 157.9C371.7 147.6 385.3 142.1 399.5 142.1H431.8L490.5 200.8C520.8 231.1 520.8 279.7 490.5 310L431.8 368.7V369z"/>
   </svg>
 );
 
@@ -195,11 +194,11 @@ const Index = () => {
             <span>Envios para Capitais em até 2 dias</span>
           </div>
           <div className="flex items-center gap-2 text-sm text-gray-700">
-            <Circle className="h-4 w-4 text-gray-400" />
+            <Shield className="h-4 w-4 text-gray-400" />
             <span>Garantia de 90 dias</span>
           </div>
           <div className="flex items-center gap-2 text-sm text-gray-700">
-            <CircleCheck className="h-4 w-4 text-gray-400" />
+            <CircleCheckBig className="h-4 w-4 text-gray-400" />
             <span>Estoque disponível</span>
           </div>
         </div>
@@ -210,7 +209,7 @@ const Index = () => {
           size="lg"
           className={`w-full h-14 mt-6 font-medium text-base rounded-full transition-colors ${
             selectedSize 
-              ? 'bg-gray-900 hover:bg-gray-800 text-white' 
+              ? 'bg-[#28af60] hover:bg-[#23994f] text-white' 
               : 'bg-gray-200 text-gray-500 cursor-default hover:bg-gray-200'
           }`}
         >
