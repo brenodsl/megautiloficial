@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { Truck, Zap, Shield, CircleCheckBig, Award } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -23,6 +24,7 @@ import Benefits from "@/components/Benefits";
 import Guarantees from "@/components/Guarantees";
 import ProductDescription from "@/components/ProductDescription";
 import Footer from "@/components/Footer";
+import { useCart } from "@/contexts/CartContext";
 
 // PIX Icon Component
 const PixIcon = () => (
@@ -33,18 +35,9 @@ const PixIcon = () => (
 
 const PROMO_CHECKOUT_URL = "https://pay.maxrunnerpay.shop/6961c264c4b1fc0d57af6648";
 
-// Checkout URLs per color
-const CHECKOUT_URLS: Record<string, string> = {
-  "cream-orange": "https://pay.maxrunnerpay.shop/69632af261f923383de76bb1",
-  "gradient": "https://pay.maxrunnerpay.shop/69632b2319454c0cfe8e2e4d",
-  "green": "https://pay.maxrunnerpay.shop/69632b3661f923383de76c9c",
-  "lime": "https://pay.maxrunnerpay.shop/69632b4819454c0cfe8e2ec0",
-  "orange": "https://pay.maxrunnerpay.shop/69632b5719454c0cfe8e2f01",
-  "pink": "https://pay.maxrunnerpay.shop/69632b6561f923383de76d60",
-  "sunset": "https://pay.maxrunnerpay.shop/69632b7519454c0cfe8e2f83",
-};
-
 const Index = () => {
+  const navigate = useNavigate();
+  const { addItem } = useCart();
   const sizeSelectorRef = useRef<SizeSelectorRef>(null);
   const [selectedSize, setSelectedSize] = useState<number | null>(null);
   const [selectedColor, setSelectedColor] = useState<string>("gradient");
@@ -71,10 +64,9 @@ const Index = () => {
       sizeSelectorRef.current?.showError();
       return;
     }
-    const checkoutUrl = CHECKOUT_URLS[selectedColor];
-    if (checkoutUrl) {
-      window.location.href = checkoutUrl;
-    }
+    // Add item to cart and navigate to checkout
+    addItem(selectedColor, selectedSize, 1);
+    navigate("/checkout");
   };
 
   const handlePromoClick = () => {
