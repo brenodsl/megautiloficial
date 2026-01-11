@@ -124,13 +124,6 @@ const Index = () => {
           Tênis de Corrida Chunta Carbon 3.0 - Placa de Carbono Ultra Leve
         </h1>
 
-        {/* Rating */}
-        <div className="flex items-center gap-2 mb-4">
-          <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-          <span className="text-sm font-medium text-gray-900">4.9</span>
-          <span className="text-sm text-gray-500">(327 avaliações)</span>
-        </div>
-
         {/* Product Gallery */}
         <ProductGallery selectedColor={selectedColor} />
 
@@ -192,20 +185,20 @@ const Index = () => {
         </div>
 
         {/* Benefits List */}
-        <div className="mt-4 space-y-2.5">
+        <div className="mt-4 space-y-2.5 border border-gray-200 rounded-lg p-4">
           <div className="flex items-center gap-2 text-sm text-gray-700">
-            <Truck className="h-4 w-4 text-gray-500" />
+            <Truck className="h-4 w-4 text-gray-400" />
             <span>Frete grátis para todo o Brasil</span>
           </div>
-          <div className="text-sm text-green-600 font-medium pl-6">
-            Envios para Capitais em até 2 dias
+          <div className="flex items-center gap-2 text-sm text-green-600 font-medium bg-green-50 rounded px-2 py-1 ml-6">
+            <span>Envios para Capitais em até 2 dias</span>
           </div>
           <div className="flex items-center gap-2 text-sm text-gray-700">
-            <Shield className="h-4 w-4 text-gray-500" />
+            <Shield className="h-4 w-4 text-gray-400" />
             <span>Garantia de 90 dias</span>
           </div>
           <div className="flex items-center gap-2 text-sm text-gray-700">
-            <CheckCircle className="h-4 w-4 text-gray-500" />
+            <CheckCircle className="h-4 w-4 text-gray-400" />
             <span>Estoque disponível</span>
           </div>
         </div>
@@ -214,14 +207,18 @@ const Index = () => {
         <Button
           onClick={handleBuyClick}
           size="lg"
-          className="w-full h-14 mt-6 font-bold text-base gap-2 bg-gray-900 hover:bg-gray-800 text-white rounded-lg"
+          className={`w-full h-14 mt-6 font-bold text-base rounded-lg transition-colors ${
+            selectedSize 
+              ? 'bg-gray-900 hover:bg-gray-800 text-white' 
+              : 'bg-gray-200 text-gray-500 cursor-default hover:bg-gray-200'
+          }`}
         >
           Comprar agora
         </Button>
 
         {/* Size warning text */}
         {!selectedSize && (
-          <p className="text-center text-sm text-red-500 mt-2">
+          <p className="text-center text-sm text-green-600 mt-2">
             Selecione um tamanho para continuar
           </p>
         )}
