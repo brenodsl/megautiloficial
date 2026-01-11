@@ -31,7 +31,6 @@ interface PaymentRequest {
     };
   };
   totalAmount: number;
-  shippingFee: number;
 }
 
 // Validation helpers
@@ -66,15 +65,9 @@ serve(async (req) => {
   }
 
   try {
-    const SIGMA_API_KEY = Deno.env.get("SIGMAPAY_API_TOKEN");
-    
-    if (!SIGMA_API_KEY) {
-      console.error("SIGMAPAY_API_TOKEN not configured");
-      return new Response(
-        JSON.stringify({ error: "Payment gateway not configured" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
+    const SIGMA_API_KEY = "6AUXQgnpYrKrUvUQ2USezmv2hHi8HpyP41q9lznTgz3idUDtgU7uAMKYD2qt";
+    const OFFER_HASH = "awayav3oag";
+    const PRODUCT_HASH = "awayav3oag";
 
     const SIGMA_API_URL = `https://api.sigmapay.com.br/api/public/v1/transactions?api_token=${SIGMA_API_KEY}`;
 
@@ -90,7 +83,7 @@ serve(async (req) => {
 
     console.log("Received payment request:", JSON.stringify(body));
 
-    const { items, customer, totalAmount, shippingFee } = body;
+    const { items, customer, totalAmount } = body;
 
     // Validate items
     if (!Array.isArray(items) || items.length === 0 || items.length > 50) {
@@ -108,7 +101,7 @@ serve(async (req) => {
       );
     }
 
-    if (!customer.name || !customer.email || !customer.document) {
+    if (!customer.name || !customer.email || !customer.document || !customer.phone) {
       return new Response(
         JSON.stringify({ error: "Dados do cliente incompletos" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -144,13 +137,28 @@ serve(async (req) => {
       );
     }
 
-    // Calculate product total (excluding shipping)
-    const productTotal = totalAmount - (shippingFee || 0);
+    if (!address.street || !address.number || !address.neighborhood || !address.city || !address.state) {
+      return new Response(
+        JSON.stringify({ error: 'Endereço incompleto' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
 
-    // Build SigmaPay payload
+    // Build cart items for SigmaPay
+    const cartItems = items.map(item => ({
+      product_hash: PRODUCT_HASH,
+      title: `Tênis Carbon 3.0 - ${item.colorName} - Tam ${item.size}`,
+      price: Math.round(item.price * 100),
+      quantity: item.quantity,
+      operation_type: 1,
+      tangible: true,
+      cover: null
+    }));
+
+    // Build SigmaPay payload according to official documentation
     const sigmaPayload = {
       amount: Math.round(totalAmount * 100), // Convert to cents
-      offer_hash: 'ztkbuzwssc', // Your offer hash from SigmaPay
+      offer_hash: OFFER_HASH,
       payment_method: 'pix',
       customer: {
         name: sanitizeString(customer.name, 100),
@@ -165,19 +173,9 @@ serve(async (req) => {
         state: sanitizeString(address.state, 2).toUpperCase(),
         zip_code: address.zipCode.replace(/\D/g, '')
       },
-      cart: [
-        {
-          product_hash: 'ztkbuzwssc', // Your product hash from SigmaPay
-          title: `Tênis Chunta Carbon 3.0 (${items.length} ${items.length === 1 ? 'item' : 'itens'})`,
-          price: Math.round(productTotal * 100),
-          quantity: 1,
-          operation_type: 1,
-          tangible: true,
-          cover: null
-        }
-      ],
-      installments: 1,
-      expire_in_days: 1
+      cart: cartItems,
+      expire_in_days: 1,
+      transaction_origin: 'api'
     };
 
     console.log('Payload enviado para SigmaPay:', JSON.stringify(sigmaPayload, null, 2));
@@ -227,19 +225,11 @@ serve(async (req) => {
     // Format response for PIX payment
     const formattedResponse = {
       success: true,
-      transaction: {
-        id: sigmaData.hash,
-        status: sigmaData.status,
-        secureId: sigmaData.hash,
-        secureUrl: sigmaData.qr_code,
-        pix: {
-          qrCode: sigmaData.qr_code,
-          qrCodeText: sigmaData.pix_code,
-          expiresAt: sigmaData.expires_at,
-          ...(sigmaData.copy_paste_code && { copyPasteCode: sigmaData.copy_paste_code }),
-          ...(sigmaData.pix_payload && { payload: sigmaData.pix_payload })
-        }
-      }
+      transactionId: sigmaData.hash,
+      qrCode: sigmaData.qr_code,
+      qrCodeText: sigmaData.pix_code,
+      expiresAt: sigmaData.expires_at,
+      status: sigmaData.status
     };
     
     console.log('Resposta PIX formatada:', JSON.stringify(formattedResponse, null, 2));
