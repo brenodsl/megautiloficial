@@ -3,17 +3,12 @@ import { useNavigate } from "react-router-dom";
 import { Truck, Zap, Shield, CircleCheckBig, Award } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
-  Dialog,
-  DialogContent,
-} from "@/components/ui/dialog";
-import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import tenisMain from "@/assets/tenis-main.webp";
 import Header from "@/components/Header";
 import ProductGallery from "@/components/ProductGallery";
 import { colors } from "@/components/ColorSelector";
@@ -33,29 +28,23 @@ const PixIcon = () => (
   </svg>
 );
 
-const PROMO_CHECKOUT_URL = "https://pay.maxrunnerpay.shop/6961c264c4b1fc0d57af6648";
-
 const Index = () => {
   const navigate = useNavigate();
   const { addItem } = useCart();
   const sizeSelectorRef = useRef<SizeSelectorRef>(null);
   const [selectedSize, setSelectedSize] = useState<number | null>(null);
   const [selectedColor, setSelectedColor] = useState<string>("gradient");
-  const [showPromoPopup, setShowPromoPopup] = useState(false);
 
+  // TikTok Pixel - ViewContent event
   useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const isBackRedirect = urlParams.get('backredirect') === 'true' || 
-                           document.referrer.includes('maxrunnerpay.shop') ||
-                           document.referrer.includes('pay.');
-    
-    const hasSeenPromo = sessionStorage.getItem('hasSeenBackPromo');
-    
-    if (isBackRedirect && !hasSeenPromo) {
-      setTimeout(() => {
-        setShowPromoPopup(true);
-        sessionStorage.setItem('hasSeenBackPromo', 'true');
-      }, 500);
+    if (typeof window !== 'undefined' && (window as any).ttq) {
+      (window as any).ttq.track('ViewContent', {
+        content_type: 'product',
+        content_id: 'carbon-3-0',
+        content_name: 'Tênis de Corrida Chunta Carbon 3.0',
+        value: 77.80,
+        currency: 'BRL',
+      });
     }
   }, []);
 
@@ -64,14 +53,22 @@ const Index = () => {
       sizeSelectorRef.current?.showError();
       return;
     }
+    
+    // TikTok Pixel - AddToCart event
+    if (typeof window !== 'undefined' && (window as any).ttq) {
+      (window as any).ttq.track('AddToCart', {
+        content_type: 'product',
+        content_id: 'carbon-3-0',
+        content_name: 'Tênis de Corrida Chunta Carbon 3.0',
+        quantity: 1,
+        value: 77.80,
+        currency: 'BRL',
+      });
+    }
+    
     // Add item to cart and navigate to checkout
     addItem(selectedColor, selectedSize, 1);
     navigate("/checkout");
-  };
-
-  const handlePromoClick = () => {
-    window.open(PROMO_CHECKOUT_URL, "_blank");
-    setShowPromoPopup(false);
   };
 
   const selectedColorData = colors.find(c => c.id === selectedColor);
@@ -242,54 +239,6 @@ const Index = () => {
 
       {/* Footer */}
       <Footer />
-
-
-      {/* Promo Popup for Back Redirect */}
-      <Dialog open={showPromoPopup} onOpenChange={setShowPromoPopup}>
-        <DialogContent className="sm:max-w-[320px] p-0 rounded-2xl border border-gray-200 bg-white overflow-hidden">
-          <div className="bg-gray-100 p-4">
-            <div className="relative mx-auto w-36 h-24">
-              <img 
-                src={tenisMain} 
-                alt="Tênis de Corrida Max Runner" 
-                className="w-full h-full object-contain"
-              />
-            </div>
-          </div>
-          
-          <div className="px-5 pb-5 pt-3 space-y-3">
-            <div className="text-center">
-              <p className="text-xs text-gray-500 mb-1">Oferta exclusiva</p>
-              <h3 className="text-base font-bold text-gray-900 mb-3">
-                Última chance! Desconto especial
-              </h3>
-              
-              <div className="mb-3">
-                <span className="text-sm text-gray-400 line-through mr-2">
-                  R$ 78,90
-                </span>
-                <span className="text-2xl font-bold text-green-600">
-                  R$ 47,20
-                </span>
-              </div>
-            </div>
-            
-            <Button
-              onClick={handlePromoClick}
-              className="w-full h-11 bg-gray-900 hover:bg-gray-800 text-white font-semibold text-sm rounded-lg"
-            >
-              Quero essa oferta
-            </Button>
-            
-            <button
-              onClick={() => setShowPromoPopup(false)}
-              className="w-full text-xs text-gray-500 hover:text-gray-700 transition-colors"
-            >
-              Não, obrigado
-            </button>
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };

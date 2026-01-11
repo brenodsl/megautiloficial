@@ -70,6 +70,20 @@ const Checkout = () => {
   } | null>(null);
   const [copied, setCopied] = useState(false);
 
+  // TikTok Pixel - InitiateCheckout event
+  useEffect(() => {
+    if (items.length > 0 && typeof window !== 'undefined' && (window as any).ttq) {
+      (window as any).ttq.track('InitiateCheckout', {
+        content_type: 'product',
+        content_id: 'carbon-3-0',
+        content_name: 'Tênis de Corrida Chunta Carbon 3.0',
+        quantity: items.reduce((sum, item) => sum + item.quantity, 0),
+        value: totalPrice,
+        currency: 'BRL',
+      });
+    }
+  }, []);
+
   // Format CPF
   const formatCPF = (value: string) => {
     const numbers = value.replace(/\D/g, "");
@@ -248,6 +262,19 @@ const Checkout = () => {
           qrCodeText: data.qrCodeText,
           transactionId: data.transactionId,
         });
+        
+        // TikTok Pixel - CompletePayment event
+        if (typeof window !== 'undefined' && (window as any).ttq) {
+          (window as any).ttq.track('CompletePayment', {
+            content_type: 'product',
+            content_id: 'carbon-3-0',
+            content_name: 'Tênis de Corrida Chunta Carbon 3.0',
+            quantity: items.reduce((sum, item) => sum + item.quantity, 0),
+            value: totalPrice,
+            currency: 'BRL',
+          });
+        }
+        
         toast.success("QR Code PIX gerado com sucesso!");
       } else {
         toast.error(data?.error || "Erro ao gerar QR Code");
