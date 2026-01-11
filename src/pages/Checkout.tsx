@@ -24,7 +24,8 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { useCart } from "@/contexts/CartContext";
 import { supabase } from "@/integrations/supabase/client";
-import logo from "@/assets/logo.jpg";
+import { QRCodeSVG } from "qrcode.react";
+import logo from "@/assets/logo-max-runner.png";
 import CheckoutReviews from "@/components/CheckoutReviews";
 import ShippingOptions from "@/components/ShippingOptions";
 
@@ -395,7 +396,16 @@ const Checkout = () => {
           {/* QR Code */}
           <div className="bg-white rounded-2xl p-6 border border-gray-200">
             <div className="flex justify-center">
-              {pixData.qrCode ? (
+              {pixData.qrCodeText ? (
+                <div className="bg-white p-4 rounded-lg">
+                  <QRCodeSVG
+                    value={pixData.qrCodeText}
+                    size={256}
+                    level="M"
+                    includeMargin={true}
+                  />
+                </div>
+              ) : pixData.qrCode ? (
                 <img
                   src={pixData.qrCode.startsWith("data:") ? pixData.qrCode : `data:image/png;base64,${pixData.qrCode}`}
                   alt="QR Code PIX"
