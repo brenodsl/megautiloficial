@@ -27,7 +27,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { QRCodeSVG } from "qrcode.react";
 import logo from "@/assets/logo-max-runner.png";
 import CheckoutReviews from "@/components/CheckoutReviews";
-import ShippingOptions from "@/components/ShippingOptions";
+import ShippingOptions, { getShippingPrice } from "@/components/ShippingOptions";
 import CartDrawer from "@/components/CartDrawer";
 // PIX Icon Component
 const PixIcon = ({ className = "h-5 w-5" }: { className?: string }) => (
@@ -76,7 +76,9 @@ const Checkout = () => {
   const [expirationTime, setExpirationTime] = useState(30 * 60); // 30 minutes in seconds
   const [isCartOpen, setIsCartOpen] = useState(false);
 
-  // Scroll to top when component mounts
+  // Calculate total with shipping
+  const shippingPrice = getShippingPrice(selectedShipping);
+  const finalTotal = totalPrice + shippingPrice;
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -273,7 +275,7 @@ const Checkout = () => {
               state: addressData.state,
             },
           },
-          totalAmount: totalPrice,
+          totalAmount: finalTotal,
         },
       });
 
@@ -395,7 +397,7 @@ const Checkout = () => {
           <div className="text-center py-4 border-y border-gray-100">
             <p className="text-sm text-gray-500 mb-1">Valor a pagar</p>
             <p className="text-3xl font-bold text-[#28af60]">
-              R$ {totalPrice.toFixed(2).replace(".", ",")}
+              R$ {finalTotal.toFixed(2).replace(".", ",")}
             </p>
           </div>
 
@@ -708,15 +710,33 @@ const Checkout = () => {
           onSelect={setSelectedShipping} 
         />
 
-        {/* Payment Section */}
+        {/* Order Summary */}
         <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
           <div className="flex items-center gap-2 mb-4">
             <div className="w-6 h-6 rounded-full bg-green-50 flex items-center justify-center">
               <CreditCard className="h-3.5 w-3.5 text-[#28af60]" />
             </div>
-            <h2 className="font-semibold text-gray-900">Pagamento</h2>
+            <h2 className="font-semibold text-gray-900">Resumo do pedido</h2>
           </div>
           
+          {/* Price breakdown */}
+          <div className="space-y-2 mb-4">
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-600">Subtotal</span>
+              <span className="text-gray-900">R$ {totalPrice.toFixed(2).replace(".", ",")}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-600">Frete</span>
+              <span className={shippingPrice === 0 ? "text-[#28af60] font-medium" : "text-gray-900"}>
+                {shippingPrice === 0 ? "Grátis" : `R$ ${shippingPrice.toFixed(2).replace(".", ",")}`}
+              </span>
+            </div>
+            <div className="border-t border-gray-100 pt-2 flex justify-between">
+              <span className="font-semibold text-gray-900">Total</span>
+              <span className="font-bold text-lg text-[#28af60]">R$ {finalTotal.toFixed(2).replace(".", ",")}</span>
+            </div>
+          </div>
+
           {/* PIX Payment Option */}
           <div className="border-2 border-[#28af60] rounded-xl p-4 bg-green-50/50">
             <div className="flex items-center justify-between">
@@ -728,12 +748,9 @@ const Checkout = () => {
                     <span className="text-[10px] font-bold text-[#28af60] bg-green-100 px-1.5 py-0.5 rounded">RECOMENDADO</span>
                   </div>
                   <p className="text-xs text-gray-500">Aprovação instantânea</p>
-                  <p className="text-[10px] text-gray-400">Aprovação instantânea • Sem taxas adicionais</p>
+                  <p className="text-[10px] text-gray-400">Sem taxas adicionais</p>
                 </div>
               </div>
-              <span className="font-bold text-[#28af60]">
-                R$ {totalPrice.toFixed(2).replace(".", ",")}
-              </span>
             </div>
           </div>
         </div>
