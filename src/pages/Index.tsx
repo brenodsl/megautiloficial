@@ -1,17 +1,22 @@
 import { useState, useEffect, useRef } from "react";
-import { ShoppingBag, Truck, Shield, CreditCard, CheckCircle, Award } from "lucide-react";
+import { ShoppingBag, Truck, Shield, CheckCircle, Award, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
 } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import tenisMain from "@/assets/tenis-main.webp";
 import Header from "@/components/Header";
-import Breadcrumb from "@/components/Breadcrumb";
 import ProductGallery from "@/components/ProductGallery";
-import ColorSelector from "@/components/ColorSelector";
+import { colors } from "@/components/ColorSelector";
 import SizeSelector, { SizeSelectorRef } from "@/components/SizeSelector";
-import ShippingCalculator from "@/components/ShippingCalculator";
 import ScarcityBanner from "@/components/ScarcityBanner";
 import Reviews from "@/components/Reviews";
 import Benefits from "@/components/Benefits";
@@ -47,17 +52,14 @@ const Index = () => {
   const [showPromoPopup, setShowPromoPopup] = useState(false);
 
   useEffect(() => {
-    // Check if user is coming back from checkout (backredirect)
     const urlParams = new URLSearchParams(window.location.search);
     const isBackRedirect = urlParams.get('backredirect') === 'true' || 
                            document.referrer.includes('maxrunnerpay.shop') ||
                            document.referrer.includes('pay.');
     
-    // Also check sessionStorage to not show popup multiple times
     const hasSeenPromo = sessionStorage.getItem('hasSeenBackPromo');
     
     if (isBackRedirect && !hasSeenPromo) {
-      // Small delay for better UX
       setTimeout(() => {
         setShowPromoPopup(true);
         sessionStorage.setItem('hasSeenBackPromo', 'true');
@@ -81,146 +83,172 @@ const Index = () => {
     setShowPromoPopup(false);
   };
 
-  return (
-    <div className="min-h-screen bg-background pb-24 lg:pb-0">
-      <Header />
-      <Breadcrumb />
+  const selectedColorData = colors.find(c => c.id === selectedColor);
 
-      {/* 1º Lugar Badge */}
-      <div className="bg-warning/10 border-b border-warning/20">
+  return (
+    <div className="min-h-screen bg-white pb-24 lg:pb-0">
+      <Header />
+      
+      {/* Breadcrumb */}
+      <div className="border-b border-gray-200">
         <div className="max-w-lg mx-auto px-4 py-2">
-          <div className="flex items-center justify-center gap-2 text-xs font-semibold text-warning">
-            <Award className="h-4 w-4" />
-            <span>1º Lugar em Tênis de Corrida</span>
-          </div>
+          <nav className="flex items-center gap-1 text-xs text-gray-500">
+            <span>Calçados</span>
+            <span>›</span>
+            <span>Tênis de Corrida</span>
+            <span>›</span>
+            <span className="text-gray-900 font-medium">Carbon 3.0</span>
+          </nav>
         </div>
       </div>
 
-      {/* Product Title */}
-      <div className="max-w-lg mx-auto px-4 pt-4">
-        <h1 className="text-lg font-bold text-foreground leading-tight">
+      <main className="max-w-lg mx-auto px-4 py-4">
+        {/* Badges */}
+        <div className="flex items-center gap-2 mb-3">
+          <span className="inline-flex items-center gap-1 bg-green-500 text-white text-xs font-bold px-2.5 py-1 rounded">
+            🔥 SUPER DESCONTO
+          </span>
+          <span className="inline-flex items-center gap-1 bg-orange-500 text-white text-xs font-bold px-2.5 py-1 rounded">
+            🔥 OFERTA IMPERDÍVEL
+          </span>
+        </div>
+
+        {/* 1º Lugar Badge */}
+        <div className="flex items-center gap-1.5 text-xs text-gray-600 mb-3">
+          <Award className="h-4 w-4 text-yellow-500" />
+          <span>1º Lugar em Tênis de Corrida</span>
+        </div>
+
+        {/* Product Title */}
+        <h1 className="text-lg font-bold text-gray-900 leading-tight mb-2">
           Tênis de Corrida Chunta Carbon 3.0 - Placa de Carbono Ultra Leve
         </h1>
-      </div>
 
-      <main className="max-w-lg mx-auto px-4 py-4">
+        {/* Rating */}
+        <div className="flex items-center gap-2 mb-4">
+          <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+          <span className="text-sm font-medium text-gray-900">4.9</span>
+          <span className="text-sm text-gray-500">(327 avaliações)</span>
+        </div>
+
         {/* Product Gallery */}
         <ProductGallery selectedColor={selectedColor} />
 
-        {/* Product Info */}
-        <div className="space-y-4 mt-4">
-          {/* Color Selector */}
-          <ColorSelector 
-            selectedColor={selectedColor} 
-            onColorSelect={setSelectedColor} 
-          />
+        {/* Scarcity Banner */}
+        <div className="mt-4">
+          <ScarcityBanner />
+        </div>
 
-          {/* Size Selector */}
+        {/* Model Selector (Color Dropdown) */}
+        <div className="mt-4 space-y-2">
+          <label className="text-sm text-gray-600">Modelo</label>
+          <Select value={selectedColor} onValueChange={setSelectedColor}>
+            <SelectTrigger className="w-full h-12 bg-white border border-gray-300">
+              <div className="flex items-center gap-3">
+                {selectedColorData && (
+                  <img 
+                    src={selectedColorData.image} 
+                    alt={selectedColorData.name}
+                    className="h-8 w-8 rounded object-cover"
+                  />
+                )}
+                <span className="text-gray-900">{selectedColorData?.name}</span>
+              </div>
+            </SelectTrigger>
+            <SelectContent className="bg-white">
+              {colors.map((color) => (
+                <SelectItem key={color.id} value={color.id}>
+                  <div className="flex items-center gap-3">
+                    <img 
+                      src={color.image} 
+                      alt={color.name}
+                      className="h-8 w-8 rounded object-cover"
+                    />
+                    <span>{color.name}</span>
+                  </div>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Size Selector */}
+        <div className="mt-4">
           <SizeSelector 
             ref={sizeSelectorRef} 
             selectedSize={selectedSize} 
             onSizeSelect={setSelectedSize} 
           />
-
-          {/* Super Desconto Badge */}
-          <div className="inline-flex items-center gap-2 bg-success text-white text-xs font-bold px-3 py-1.5 rounded">
-            🔥 SUPER DESCONTO
-          </div>
-
-          {/* Price Card */}
-          <div className="space-y-2">
-            <div className="flex items-center gap-3">
-              <span className="text-muted-foreground line-through text-base">
-                R$ 239,80
-              </span>
-            </div>
-            <div className="flex items-baseline gap-2">
-              <span className="text-3xl font-bold text-success">R$ 78,90</span>
-            </div>
-            <p className="text-sm text-success font-medium flex items-center gap-1.5">
-              <PixIcon />
-              À vista no PIX
-            </p>
-          </div>
-
-          {/* Quick Info */}
-          <div className="space-y-2">
-            <div className="flex items-center gap-2 text-sm text-success font-medium">
-              <Truck className="h-4 w-4" />
-              <span>FRETE GRÁTIS para todo o Brasil</span>
-            </div>
-            <div className="flex items-center gap-2 text-sm text-foreground">
-              <Shield className="h-4 w-4 text-muted-foreground" />
-              <span>Garantia de 90 dias</span>
-            </div>
-            <div className="flex items-center gap-2 text-sm text-foreground">
-              <CreditCard className="h-4 w-4 text-muted-foreground" />
-              <span>Parcele em até 3x sem juros</span>
-            </div>
-            <div className="flex items-center gap-2 text-sm text-success font-medium">
-              <CheckCircle className="h-4 w-4" />
-              <span>Estoque disponível</span>
-            </div>
-          </div>
-
-          {/* Shipping Calculator */}
-          <ShippingCalculator />
-
-          {/* CTA Button */}
-          <Button
-            onClick={handleBuyClick}
-            size="lg"
-            className="w-full h-14 font-bold text-base gap-2 bg-black hover:bg-black/90 text-white"
-          >
-            <ShoppingBag className="h-5 w-5" />
-            COMPRAR AGORA
-          </Button>
-
-          {/* Scarcity */}
-          <ScarcityBanner />
         </div>
 
+        {/* Price Section */}
+        <div className="mt-6 space-y-1">
+          <div className="text-sm text-gray-400 line-through">R$ 239,80</div>
+          <div className="text-3xl font-bold text-green-600">R$ 77,80</div>
+          <div className="flex items-center gap-1.5 text-sm text-green-600">
+            <PixIcon />
+            <span>À vista no PIX</span>
+          </div>
+        </div>
+
+        {/* Benefits List */}
+        <div className="mt-4 space-y-2.5">
+          <div className="flex items-center gap-2 text-sm text-gray-700">
+            <Truck className="h-4 w-4 text-gray-500" />
+            <span>Frete grátis para todo o Brasil</span>
+          </div>
+          <div className="text-sm text-green-600 font-medium pl-6">
+            Envios para Capitais em até 2 dias
+          </div>
+          <div className="flex items-center gap-2 text-sm text-gray-700">
+            <Shield className="h-4 w-4 text-gray-500" />
+            <span>Garantia de 90 dias</span>
+          </div>
+          <div className="flex items-center gap-2 text-sm text-gray-700">
+            <CheckCircle className="h-4 w-4 text-gray-500" />
+            <span>Estoque disponível</span>
+          </div>
+        </div>
+
+        {/* CTA Button */}
+        <Button
+          onClick={handleBuyClick}
+          size="lg"
+          className="w-full h-14 mt-6 font-bold text-base gap-2 bg-gray-900 hover:bg-gray-800 text-white rounded-lg"
+        >
+          Comprar agora
+        </Button>
+
+        {/* Size warning text */}
+        {!selectedSize && (
+          <p className="text-center text-sm text-red-500 mt-2">
+            Selecione um tamanho para continuar
+          </p>
+        )}
+
         {/* Divider */}
-        <div className="border-t border-border my-6" />
+        <div className="border-t border-gray-200 my-8" />
 
         {/* Product Description */}
         <ProductDescription />
 
         {/* Divider */}
-        <div className="border-t border-border my-6" />
+        <div className="border-t border-gray-200 my-8" />
 
         {/* Guarantees */}
         <Guarantees />
 
         {/* Divider */}
-        <div className="border-t border-border my-6" />
+        <div className="border-t border-gray-200 my-8" />
 
         {/* Benefits */}
         <Benefits />
 
         {/* Divider */}
-        <div className="border-t border-border my-6" />
+        <div className="border-t border-gray-200 my-8" />
 
         {/* Reviews */}
         <Reviews />
-
-        {/* Final CTA */}
-        <section className="text-center py-8">
-          <h2 className="text-lg font-bold text-foreground mb-2">
-            Garanta já o seu Max Runner!
-          </h2>
-          <p className="text-sm text-muted-foreground mb-4">
-            Aproveite a promoção enquanto durarem os estoques
-          </p>
-          <Button
-            onClick={handleBuyClick}
-            size="lg"
-            className="w-full h-14 font-bold text-base gap-2 bg-black hover:bg-black/90 text-white"
-          >
-            <ShoppingBag className="h-5 w-5" />
-            COMPRAR AGORA
-          </Button>
-        </section>
       </main>
 
       {/* Footer */}
@@ -235,9 +263,8 @@ const Index = () => {
 
       {/* Promo Popup for Back Redirect */}
       <Dialog open={showPromoPopup} onOpenChange={setShowPromoPopup}>
-        <DialogContent className="sm:max-w-[320px] p-0 rounded-2xl border border-border bg-background overflow-hidden">
-          {/* Product Image */}
-          <div className="bg-muted/30 p-4">
+        <DialogContent className="sm:max-w-[320px] p-0 rounded-2xl border border-gray-200 bg-white overflow-hidden">
+          <div className="bg-gray-100 p-4">
             <div className="relative mx-auto w-36 h-24">
               <img 
                 src={tenisMain} 
@@ -247,20 +274,18 @@ const Index = () => {
             </div>
           </div>
           
-          {/* Content */}
           <div className="px-5 pb-5 pt-3 space-y-3">
             <div className="text-center">
-              <p className="text-xs text-muted-foreground mb-1">Oferta exclusiva</p>
-              <h3 className="text-base font-bold text-foreground mb-3">
+              <p className="text-xs text-gray-500 mb-1">Oferta exclusiva</p>
+              <h3 className="text-base font-bold text-gray-900 mb-3">
                 Última chance! Desconto especial
               </h3>
               
-              {/* Price */}
               <div className="mb-3">
-                <span className="text-sm text-muted-foreground line-through mr-2">
+                <span className="text-sm text-gray-400 line-through mr-2">
                   R$ 78,90
                 </span>
-                <span className="text-2xl font-bold text-success">
+                <span className="text-2xl font-bold text-green-600">
                   R$ 47,20
                 </span>
               </div>
@@ -268,14 +293,14 @@ const Index = () => {
             
             <Button
               onClick={handlePromoClick}
-              className="w-full h-11 bg-black hover:bg-black/90 text-white font-semibold text-sm rounded-lg"
+              className="w-full h-11 bg-gray-900 hover:bg-gray-800 text-white font-semibold text-sm rounded-lg"
             >
               Quero essa oferta
             </Button>
             
             <button
               onClick={() => setShowPromoPopup(false)}
-              className="w-full text-xs text-muted-foreground hover:text-foreground transition-colors"
+              className="w-full text-xs text-gray-500 hover:text-gray-700 transition-colors"
             >
               Não, obrigado
             </button>
