@@ -14,7 +14,114 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      orders: {
+        Row: {
+          address_cep: string | null
+          address_city: string | null
+          address_complement: string | null
+          address_neighborhood: string | null
+          address_number: string | null
+          address_state: string | null
+          address_street: string | null
+          created_at: string
+          customer_cpf: string
+          customer_email: string
+          customer_name: string
+          customer_phone: string
+          id: string
+          items: Json
+          paid_at: string | null
+          payment_method: string | null
+          payment_status: string
+          pix_code: string | null
+          pix_qr_code: string | null
+          shipping_price: number
+          subtotal: number
+          total_amount: number
+          transaction_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          address_cep?: string | null
+          address_city?: string | null
+          address_complement?: string | null
+          address_neighborhood?: string | null
+          address_number?: string | null
+          address_state?: string | null
+          address_street?: string | null
+          created_at?: string
+          customer_cpf: string
+          customer_email: string
+          customer_name: string
+          customer_phone: string
+          id?: string
+          items?: Json
+          paid_at?: string | null
+          payment_method?: string | null
+          payment_status?: string
+          pix_code?: string | null
+          pix_qr_code?: string | null
+          shipping_price?: number
+          subtotal?: number
+          total_amount?: number
+          transaction_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          address_cep?: string | null
+          address_city?: string | null
+          address_complement?: string | null
+          address_neighborhood?: string | null
+          address_number?: string | null
+          address_state?: string | null
+          address_street?: string | null
+          created_at?: string
+          customer_cpf?: string
+          customer_email?: string
+          customer_name?: string
+          customer_phone?: string
+          id?: string
+          items?: Json
+          paid_at?: string | null
+          payment_method?: string | null
+          payment_status?: string
+          pix_code?: string | null
+          pix_qr_code?: string | null
+          shipping_price?: number
+          subtotal?: number
+          total_amount?: number
+          transaction_id?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      pixels: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          name: string | null
+          pixel_id: string
+          platform: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name?: string | null
+          pixel_id: string
+          platform?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name?: string | null
+          pixel_id?: string
+          platform?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

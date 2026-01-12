@@ -288,6 +288,37 @@ const Checkout = () => {
       console.log("PIX Response:", data);
 
       if (data?.success) {
+        // Save order to database
+        const orderItems = items.map(item => ({
+          name: `Tênis Carbon 3.0 - ${item.colorName}`,
+          color: item.colorName,
+          size: item.size,
+          quantity: item.quantity,
+          price: item.price,
+        }));
+
+        await supabase.from('orders').insert({
+          transaction_id: data.transactionId,
+          customer_name: customerData.name,
+          customer_email: customerData.email,
+          customer_phone: customerData.phone.replace(/\D/g, ""),
+          customer_cpf: customerData.document.replace(/\D/g, ""),
+          address_cep: addressData.zipCode.replace(/\D/g, ""),
+          address_street: addressData.street,
+          address_number: addressData.number,
+          address_complement: addressData.complement,
+          address_neighborhood: addressData.neighborhood,
+          address_city: addressData.city,
+          address_state: addressData.state,
+          items: orderItems,
+          subtotal: totalPrice,
+          shipping_price: shippingPrice,
+          total_amount: finalTotal,
+          payment_status: 'pending',
+          payment_method: 'pix',
+          pix_code: data.qrCodeText || null,
+        });
+
         setPixData({
           qrCode: data.qrCode || null,
           qrCodeText: data.qrCodeText || null,
