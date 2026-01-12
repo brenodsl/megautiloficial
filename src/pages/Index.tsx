@@ -22,7 +22,6 @@ import ProductDescription from "@/components/ProductDescription";
 import Footer from "@/components/Footer";
 import { useCart } from "@/contexts/CartContext";
 import { usePresence } from "@/hooks/usePresence";
-import AbandonmentPopup from "@/components/AbandonmentPopup";
 import AIChatBot from "@/components/AIChatBot";
 
 // PIX Icon Component
@@ -82,7 +81,6 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-white">
-      <AbandonmentPopup />
       <Header />
       
       {/* Breadcrumb */}
