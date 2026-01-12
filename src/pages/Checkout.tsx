@@ -28,6 +28,7 @@ import { QRCodeSVG } from "qrcode.react";
 import logo from "@/assets/logo-max-runner.png";
 import CheckoutReviews from "@/components/CheckoutReviews";
 import { usePresence } from "@/hooks/usePresence";
+import { trackPixelEvent } from "@/hooks/usePixels";
 import ShippingOptions, { getShippingPrice } from "@/components/ShippingOptions";
 import CartDrawer from "@/components/CartDrawer";
 // PIX Icon Component
@@ -90,10 +91,10 @@ const Checkout = () => {
     window.scrollTo(0, 0);
   }, []);
 
-  // TikTok Pixel - InitiateCheckout event
+  // Track InitiateCheckout event for all pixels
   useEffect(() => {
-    if (items.length > 0 && typeof window !== 'undefined' && (window as any).ttq) {
-      (window as any).ttq.track('InitiateCheckout', {
+    if (items.length > 0) {
+      trackPixelEvent('InitiateCheckout', {
         content_type: 'product',
         content_id: 'carbon-3-0',
         content_name: 'Tênis de Corrida Chunta Carbon 3.0',
