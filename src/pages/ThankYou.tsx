@@ -36,7 +36,19 @@ const ThankYou = () => {
 
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, []);
+    
+    // TikTok Pixel - CompletePayment event (only fires after payment confirmation)
+    if (orderData && typeof window !== 'undefined' && (window as any).ttq) {
+      (window as any).ttq.track('CompletePayment', {
+        content_type: 'product',
+        content_id: 'carbon-3-0',
+        content_name: 'Tênis de Corrida Chunta Carbon 3.0',
+        quantity: orderData.items.reduce((sum, item) => sum + item.quantity, 0),
+        value: orderData.totalAmount,
+        currency: 'BRL',
+      });
+    }
+  }, [orderData]);
 
   // Redirect if no order data
   useEffect(() => {
