@@ -267,6 +267,8 @@ const AdminDashboard = () => {
         return <Badge className="bg-amber-500/20 text-amber-400 border-amber-500/30">Pendente</Badge>;
       case 'cancelled':
         return <Badge className="bg-red-500/20 text-red-400 border-red-500/30">Cancelado</Badge>;
+      case 'failed':
+        return <Badge className="bg-red-500/20 text-red-400 border-red-500/30">Falhou</Badge>;
       default:
         return <Badge variant="outline">{status}</Badge>;
     }
