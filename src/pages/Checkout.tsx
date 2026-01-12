@@ -319,6 +319,12 @@ const Checkout = () => {
   };
 
   const handleCreatePixPayment = async () => {
+    // Prevent duplicate PIX generation
+    if (isLoading || pixData) {
+      console.log("PIX generation blocked - already loading or PIX exists");
+      return;
+    }
+
     if (!validateForm()) return;
 
     if (items.length === 0) {
