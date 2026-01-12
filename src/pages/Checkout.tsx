@@ -76,6 +76,8 @@ const Checkout = () => {
   const [copied, setCopied] = useState(false);
   const [expirationTime, setExpirationTime] = useState(30 * 60); // 30 minutes in seconds
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [paymentStatus, setPaymentStatus] = useState<'pending' | 'paid' | 'checking'>('pending');
+  const [isCheckingPayment, setIsCheckingPayment] = useState(false);
 
   // Calculate total with shipping
   const shippingPrice = getShippingPrice(selectedShipping);
@@ -111,6 +113,77 @@ const Checkout = () => {
       return () => clearInterval(timer);
     }
   }, [pixData, expirationTime]);
+
+  // Auto-check payment status every 5 seconds
+  useEffect(() => {
+    if (!pixData || paymentStatus === 'paid') return;
+
+    const checkPaymentStatus = async () => {
+      if (isCheckingPayment) return;
+      
+      setIsCheckingPayment(true);
+      try {
+        const { data, error } = await supabase.functions.invoke("check-payment-status", {
+          body: { transactionId: pixData.transactionId }
+        });
+
+        console.log("Payment status check:", data);
+
+        if (error) {
+          console.error("Error checking payment status:", error);
+          return;
+        }
+
+        if (data?.isPaid) {
+          setPaymentStatus('paid');
+          toast.success("Pagamento confirmado!");
+          
+          // Auto-redirect to thank you page
+          setTimeout(() => {
+            navigate("/obrigado", {
+              state: {
+                items: items.map(item => ({
+                  colorName: item.colorName,
+                  size: item.size,
+                  quantity: item.quantity,
+                  price: item.price,
+                })),
+                customer: {
+                  name: customerData.name,
+                  email: customerData.email,
+                },
+                address: {
+                  street: addressData.street,
+                  number: addressData.number,
+                  complement: addressData.complement,
+                  neighborhood: addressData.neighborhood,
+                  city: addressData.city,
+                  state: addressData.state,
+                  zipCode: addressData.zipCode,
+                },
+                totalAmount: finalTotal,
+                shippingPrice: shippingPrice,
+                transactionId: pixData.transactionId,
+              },
+            });
+            clearCart();
+          }, 2000);
+        }
+      } catch (err) {
+        console.error("Error checking payment:", err);
+      } finally {
+        setIsCheckingPayment(false);
+      }
+    };
+
+    // Initial check
+    checkPaymentStatus();
+
+    // Check every 5 seconds
+    const interval = setInterval(checkPaymentStatus, 5000);
+
+    return () => clearInterval(interval);
+  }, [pixData, paymentStatus, isCheckingPayment, navigate, items, customerData, addressData, finalTotal, shippingPrice, clearCart]);
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -506,10 +579,17 @@ const Checkout = () => {
           </div>
 
           {/* Verification Status */}
-          <div className="flex items-center justify-center gap-2 text-sm text-gray-500">
-            <Loader2 className="h-4 w-4 animate-spin" />
-            <span>Verificando pagamento automaticamente...</span>
-          </div>
+          {paymentStatus === 'paid' ? (
+            <div className="flex items-center justify-center gap-2 text-sm bg-green-50 text-green-700 p-4 rounded-xl border border-green-200">
+              <CheckCircle className="h-5 w-5" />
+              <span className="font-medium">Pagamento confirmado! Redirecionando...</span>
+            </div>
+          ) : (
+            <div className="flex items-center justify-center gap-2 text-sm text-gray-500">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              <span>Verificando pagamento automaticamente...</span>
+            </div>
+          )}
 
           {/* Transaction ID */}
           <p className="text-center text-xs text-gray-400">
