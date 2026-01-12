@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { CartProvider } from "@/contexts/CartContext";
+import PixelProvider from "@/components/PixelProvider";
 import Index from "./pages/Index";
 import Checkout from "./pages/Checkout";
 import NotFound from "./pages/NotFound";
@@ -23,25 +24,27 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <CartProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/checkout" element={<Checkout />} />
-            <Route path="/upsell" element={<Upsell />} />
-            <Route path="/politica-de-privacidade" element={<PrivacyPolicy />} />
-            <Route path="/termos-de-uso" element={<TermsOfUse />} />
-            <Route path="/politica-de-envio" element={<ShippingPolicy />} />
-            <Route path="/politica-de-reembolso" element={<RefundPolicy />} />
-            <Route path="/trocas-e-devolucoes" element={<ExchangePolicy />} />
-            <Route path="/obrigado" element={<ThankYou />} />
-            <Route path="/admin" element={<AdminLogin />} />
-            <Route path="/admin/dashboard" element={<AdminDashboard />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
+        <PixelProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/checkout" element={<Checkout />} />
+              <Route path="/upsell" element={<Upsell />} />
+              <Route path="/politica-de-privacidade" element={<PrivacyPolicy />} />
+              <Route path="/termos-de-uso" element={<TermsOfUse />} />
+              <Route path="/politica-de-envio" element={<ShippingPolicy />} />
+              <Route path="/politica-de-reembolso" element={<RefundPolicy />} />
+              <Route path="/trocas-e-devolucoes" element={<ExchangePolicy />} />
+              <Route path="/obrigado" element={<ThankYou />} />
+              <Route path="/admin" element={<AdminLogin />} />
+              <Route path="/admin/dashboard" element={<AdminDashboard />} />
+              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </PixelProvider>
       </CartProvider>
     </TooltipProvider>
   </QueryClientProvider>

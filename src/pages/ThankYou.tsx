@@ -4,6 +4,7 @@ import { CheckCircle, Package, Mail, Truck, Clock, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import logo from "@/assets/logo-max-runner.png";
 import { usePresence } from "@/hooks/usePresence";
+import { trackPixelEvent } from "@/hooks/usePixels";
 
 interface OrderData {
   items: Array<{
@@ -41,9 +42,9 @@ const ThankYou = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
     
-    // TikTok Pixel - CompletePayment event (only fires after payment confirmation)
-    if (orderData && typeof window !== 'undefined' && (window as any).ttq) {
-      (window as any).ttq.track('CompletePayment', {
+    // Track CompletePayment event for all pixels (only fires after payment confirmation)
+    if (orderData) {
+      trackPixelEvent('CompletePayment', {
         content_type: 'product',
         content_id: 'carbon-3-0',
         content_name: 'Tênis de Corrida Chunta Carbon 3.0',

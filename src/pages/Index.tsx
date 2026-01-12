@@ -22,6 +22,7 @@ import ProductDescription from "@/components/ProductDescription";
 import Footer from "@/components/Footer";
 import { useCart } from "@/contexts/CartContext";
 import { usePresence } from "@/hooks/usePresence";
+import { trackPixelEvent } from "@/hooks/usePixels";
 import AIChatBot from "@/components/AIChatBot";
 
 // PIX Icon Component
@@ -41,17 +42,15 @@ const Index = () => {
   usePresence("/");
   const [selectedColor, setSelectedColor] = useState<string>("gradient");
 
-  // TikTok Pixel - ViewContent event
+  // Track ViewContent event for all pixels
   useEffect(() => {
-    if (typeof window !== 'undefined' && (window as any).ttq) {
-      (window as any).ttq.track('ViewContent', {
-        content_type: 'product',
-        content_id: 'carbon-3-0',
-        content_name: 'Tênis de Corrida Chunta Carbon 3.0',
-        value: 77.80,
-        currency: 'BRL',
-      });
-    }
+    trackPixelEvent('ViewContent', {
+      content_type: 'product',
+      content_id: 'carbon-3-0',
+      content_name: 'Tênis de Corrida Chunta Carbon 3.0',
+      value: 77.80,
+      currency: 'BRL',
+    });
   }, []);
 
   const handleBuyClick = () => {
@@ -60,17 +59,15 @@ const Index = () => {
       return;
     }
     
-    // TikTok Pixel - AddToCart event
-    if (typeof window !== 'undefined' && (window as any).ttq) {
-      (window as any).ttq.track('AddToCart', {
-        content_type: 'product',
-        content_id: 'carbon-3-0',
-        content_name: 'Tênis de Corrida Chunta Carbon 3.0',
-        quantity: 1,
-        value: 77.80,
-        currency: 'BRL',
-      });
-    }
+    // Track AddToCart event for all pixels
+    trackPixelEvent('AddToCart', {
+      content_type: 'product',
+      content_id: 'carbon-3-0',
+      content_name: 'Tênis de Corrida Chunta Carbon 3.0',
+      quantity: 1,
+      value: 77.80,
+      currency: 'BRL',
+    });
     
     // Add item to cart and navigate to checkout
     addItem(selectedColor, selectedSize, 1);
