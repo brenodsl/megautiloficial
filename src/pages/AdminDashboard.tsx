@@ -77,7 +77,7 @@ const AdminDashboard = () => {
   usePresenceCleanup();
 
   useEffect(() => {
-    const isAuthenticated = sessionStorage.getItem("admin_authenticated");
+    const isAuthenticated = localStorage.getItem("admin_authenticated");
     if (!isAuthenticated) {
       navigate("/admin");
       return;
@@ -178,7 +178,7 @@ const AdminDashboard = () => {
   };
 
   const handleLogout = () => {
-    sessionStorage.removeItem("admin_authenticated");
+    localStorage.removeItem("admin_authenticated");
     navigate("/admin");
     toast.success("Logout realizado");
   };

@@ -25,7 +25,7 @@ const AdminLogin = () => {
     // Simulate API delay
     setTimeout(() => {
       if (username === ADMIN_USER && password === ADMIN_PASS) {
-        sessionStorage.setItem("admin_authenticated", "true");
+        localStorage.setItem("admin_authenticated", "true");
         toast.success("Login realizado com sucesso!");
         navigate("/admin/dashboard");
       } else {
