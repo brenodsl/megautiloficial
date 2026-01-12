@@ -27,6 +27,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { QRCodeSVG } from "qrcode.react";
 import logo from "@/assets/logo-max-runner.png";
 import CheckoutReviews from "@/components/CheckoutReviews";
+import { usePresence } from "@/hooks/usePresence";
+import { setCheckoutAbandoned, clearCheckoutAbandoned } from "@/components/AbandonmentPopup";
 import ShippingOptions, { getShippingPrice } from "@/components/ShippingOptions";
 import CartDrawer from "@/components/CartDrawer";
 // PIX Icon Component
@@ -76,12 +78,29 @@ const Checkout = () => {
   const [expirationTime, setExpirationTime] = useState(30 * 60); // 30 minutes in seconds
   const [isCartOpen, setIsCartOpen] = useState(false);
 
-  // Calculate total with shipping
+  // Calculate total with shipping - check for discount
+  const hasDiscount = sessionStorage.getItem("apply_discount") === "true";
+  const basePrice = hasDiscount ? totalPrice * 0.8 : totalPrice; // 20% discount if applied
   const shippingPrice = getShippingPrice(selectedShipping);
-  const finalTotal = totalPrice + shippingPrice;
+  const finalTotal = basePrice + shippingPrice;
+
+  // Track presence on checkout
+  usePresence("/checkout");
+
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, []);
+    
+    // Save cart items for abandonment tracking
+    if (items.length > 0) {
+      setCheckoutAbandoned(items.map(item => ({
+        colorId: item.colorId,
+        colorName: item.colorName,
+        size: item.size,
+        quantity: item.quantity,
+        price: item.price,
+      })));
+    }
+  }, [items]);
 
   // TikTok Pixel - InitiateCheckout event
   useEffect(() => {
@@ -91,7 +110,7 @@ const Checkout = () => {
         content_id: 'carbon-3-0',
         content_name: 'Tênis de Corrida Chunta Carbon 3.0',
         quantity: items.reduce((sum, item) => sum + item.quantity, 0),
-        value: totalPrice,
+        value: basePrice,
         currency: 'BRL',
       });
     }
@@ -324,6 +343,10 @@ const Checkout = () => {
           qrCodeText: data.qrCodeText || null,
           transactionId: data.transactionId,
         });
+        
+        // Clear abandonment tracking and discount when payment is initiated
+        clearCheckoutAbandoned();
+        sessionStorage.removeItem("apply_discount");
         
         toast.success("PIX gerado com sucesso!");
       } else {
@@ -614,9 +637,21 @@ const Checkout = () => {
                     Editar
                   </button>
                 </div>
-                <p className="font-bold text-[#28af60] mt-1">
-                  R$ {totalPrice.toFixed(2).replace(".", ",")}
-                </p>
+                <div className="flex items-center gap-2 mt-1">
+                  {hasDiscount && (
+                    <span className="text-sm text-gray-400 line-through">
+                      R$ {totalPrice.toFixed(2).replace(".", ",")}
+                    </span>
+                  )}
+                  <p className="font-bold text-[#28af60]">
+                    R$ {basePrice.toFixed(2).replace(".", ",")}
+                  </p>
+                  {hasDiscount && (
+                    <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium">
+                      -20%
+                    </span>
+                  )}
+                </div>
               </div>
             </div>
             <div className="flex items-center gap-2 mt-3 pt-3 border-t border-gray-100">

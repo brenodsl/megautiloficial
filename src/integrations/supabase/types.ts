@@ -122,6 +122,30 @@ export type Database = {
         }
         Relationships: []
       }
+      presence: {
+        Row: {
+          created_at: string
+          id: string
+          last_seen: string
+          page: string
+          session_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          last_seen?: string
+          page: string
+          session_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          last_seen?: string
+          page?: string
+          session_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

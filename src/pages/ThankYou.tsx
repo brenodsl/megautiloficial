@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { CheckCircle, Package, Mail, Truck, Clock, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import logo from "@/assets/logo-max-runner.png";
+import { usePresence } from "@/hooks/usePresence";
 
 interface OrderData {
   items: Array<{
@@ -33,6 +34,9 @@ const ThankYou = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const orderData = location.state as OrderData | null;
+  
+  // Track presence on thank you page
+  usePresence("/obrigado");
 
   useEffect(() => {
     window.scrollTo(0, 0);
