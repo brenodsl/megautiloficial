@@ -11,6 +11,7 @@ interface Message {
 
 const AIChatBot = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [showBubble, setShowBubble] = useState(true);
   const [messages, setMessages] = useState<Message[]>([
     { role: 'assistant', content: 'Olá! 👋 Sou o assistente virtual da Max Runner. Como posso ajudar você hoje?' }
   ]);
@@ -26,6 +27,16 @@ const AIChatBot = () => {
     scrollToBottom();
   }, [messages]);
 
+  // Hide bubble after 10 seconds or when chat is opened
+  useEffect(() => {
+    if (isOpen) {
+      setShowBubble(false);
+      return;
+    }
+    const timer = setTimeout(() => setShowBubble(false), 10000);
+    return () => clearTimeout(timer);
+  }, [isOpen]);
+
   const sendMessage = async () => {
     if (!input.trim() || isLoading) return;
 
@@ -38,7 +49,7 @@ const AIChatBot = () => {
       const { data, error } = await supabase.functions.invoke('customer-support-chat', {
         body: { 
           message: userMessage,
-          history: messages.slice(-10) // Keep last 10 messages for context
+          history: messages.slice(-10)
         }
       });
 
@@ -65,10 +76,20 @@ const AIChatBot = () => {
 
   return (
     <>
+      {/* Speech Bubble */}
+      {showBubble && !isOpen && (
+        <div className="fixed bottom-[88px] right-4 z-50 animate-in fade-in slide-in-from-bottom-2 duration-300">
+          <div className="relative bg-white text-gray-800 text-sm font-medium px-4 py-2 rounded-xl shadow-lg border border-gray-200">
+            Alguma dúvida? 💬
+            <div className="absolute -bottom-2 right-6 w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-t-[8px] border-t-white" />
+          </div>
+        </div>
+      )}
+
       {/* Floating Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full gradient-cta glow-cta flex items-center justify-center text-white shadow-lg hover:scale-110 transition-transform duration-200"
+        className="fixed bottom-4 right-4 z-50 w-14 h-14 rounded-full bg-gray-900 hover:bg-gray-800 flex items-center justify-center text-white shadow-lg hover:scale-110 transition-all duration-200"
         aria-label="Abrir chat de suporte"
       >
         {isOpen ? (
@@ -80,15 +101,15 @@ const AIChatBot = () => {
 
       {/* Chat Window */}
       {isOpen && (
-        <div className="fixed bottom-24 right-6 z-50 w-[350px] max-w-[calc(100vw-48px)] h-[500px] max-h-[calc(100vh-150px)] bg-card border border-border rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-bottom-5 duration-300">
+        <div className="fixed bottom-[88px] right-4 z-50 w-[350px] max-w-[calc(100vw-32px)] h-[480px] max-h-[calc(100vh-120px)] bg-white border border-gray-200 rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-bottom-5 duration-300">
           {/* Header */}
-          <div className="gradient-cta p-4 text-white">
+          <div className="bg-gray-900 p-4 text-white">
             <h3 className="font-bold text-lg">Atendimento Max Runner</h3>
-            <p className="text-sm opacity-90">Tire suas dúvidas com nossa IA</p>
+            <p className="text-sm text-gray-300">Tire suas dúvidas com nossa IA</p>
           </div>
 
           {/* Messages */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-muted/30">
+          <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-gray-50">
             {messages.map((message, index) => (
               <div
                 key={index}
@@ -97,8 +118,8 @@ const AIChatBot = () => {
                 <div
                   className={`max-w-[80%] p-3 rounded-2xl text-sm ${
                     message.role === 'user'
-                      ? 'bg-primary text-primary-foreground rounded-br-md'
-                      : 'bg-card text-card-foreground border border-border rounded-bl-md'
+                      ? 'bg-gray-900 text-white rounded-br-md'
+                      : 'bg-white text-gray-800 border border-gray-200 rounded-bl-md shadow-sm'
                   }`}
                 >
                   {message.content}
@@ -107,8 +128,8 @@ const AIChatBot = () => {
             ))}
             {isLoading && (
               <div className="flex justify-start">
-                <div className="bg-card text-card-foreground border border-border p-3 rounded-2xl rounded-bl-md">
-                  <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
+                <div className="bg-white text-gray-800 border border-gray-200 p-3 rounded-2xl rounded-bl-md shadow-sm">
+                  <Loader2 className="w-5 h-5 animate-spin text-gray-400" />
                 </div>
               </div>
             )}
@@ -116,21 +137,21 @@ const AIChatBot = () => {
           </div>
 
           {/* Input */}
-          <div className="p-3 bg-card border-t border-border">
+          <div className="p-3 bg-white border-t border-gray-200">
             <div className="flex gap-2">
               <Input
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyPress={handleKeyPress}
                 placeholder="Digite sua mensagem..."
-                className="flex-1 bg-muted border-0"
+                className="flex-1 bg-gray-100 border-0 focus-visible:ring-gray-400"
                 disabled={isLoading}
               />
               <Button
                 onClick={sendMessage}
                 disabled={!input.trim() || isLoading}
                 size="icon"
-                className="gradient-cta shrink-0"
+                className="bg-gray-900 hover:bg-gray-800 shrink-0"
               >
                 <Send className="w-4 h-4" />
               </Button>
