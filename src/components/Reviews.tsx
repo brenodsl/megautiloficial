@@ -1,5 +1,6 @@
-import { useState } from "react";
-import { Star, ThumbsUp } from "lucide-react";
+import { useState, useMemo } from "react";
+import { Star, ThumbsUp, X, Play } from "lucide-react";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import review1 from "@/assets/review-1.webp";
 import review2 from "@/assets/review-2.webp";
 import review4 from "@/assets/review-4.webp";
@@ -7,79 +8,183 @@ import reviewCamila1 from "@/assets/review-camila-1.webp";
 import reviewCamila2 from "@/assets/review-camila-2.webp";
 import reviewSabrina1 from "@/assets/review-sabrina-1.webp";
 import reviewSabrina2 from "@/assets/review-sabrina-2.webp";
+import avaliacao01Video from "@/assets/avaliacao01-video.mp4";
+import avaliacao01Img from "@/assets/avaliacao01-img.png";
+import avaliacao02Img1 from "@/assets/avaliacao02-img1.webp";
+import avaliacao02Img2 from "@/assets/avaliacao02-img2.webp";
+import avaliacao03Video from "@/assets/avaliacao03-video.mp4";
+import avaliacao03Img from "@/assets/avaliacao03-img.webp";
+import avaliacao04Img1 from "@/assets/avaliacao04-img1.webp";
+import avaliacao04Img2 from "@/assets/avaliacao04-img2.webp";
+import avaliacao05Video from "@/assets/avaliacao05-video.mp4";
+import avaliacao05Img from "@/assets/avaliacao05-img.webp";
 
-const reviews = [
+// Helper to generate dynamic dates based on offset from today
+const getDynamicDate = (daysAgo: number): string => {
+  const date = new Date();
+  date.setDate(date.getDate() - daysAgo);
+  return date.toLocaleDateString('pt-BR');
+};
+
+interface ReviewMedia {
+  type: 'image' | 'video';
+  src: string;
+  thumbnail?: string;
+}
+
+interface Review {
+  id: number;
+  name: string;
+  daysAgo: number;
+  rating: number;
+  comment: string;
+  helpful: number;
+  media: ReviewMedia[];
+}
+
+const reviewsData: Review[] = [
   {
     id: 1,
-    name: "Sabrina Viana",
-    date: "08/01/2026",
+    name: "Mariana L.",
+    daysAgo: 1,
     rating: 5,
-    comment: "Tênis incrível! A placa de carbono realmente faz diferença na corrida. Super leve e confortável, uso para treinos e provas. Chegou rápido e bem embalado!",
-    helpful: 34,
-    images: [reviewSabrina1, reviewSabrina2],
+    comment: "Um custo x benefício maravilhoso! Já usei para correr e está mais que aprovado!!",
+    helpful: 52,
+    media: [
+      { type: 'video', src: avaliacao01Video, thumbnail: avaliacao01Img },
+      { type: 'image', src: avaliacao01Img },
+    ],
   },
   {
     id: 2,
-    name: "Camila Souza",
-    date: "06/01/2026",
+    name: "Bruno R.",
+    daysAgo: 2,
     rating: 5,
-    comment: "Comprei para meu marido e ele amou! O design é lindo e o conforto é impressionante. Ele usa para correr todos os dias e diz que nunca teve um tênis tão bom.",
-    helpful: 28,
-    images: [reviewCamila1, reviewCamila2],
+    comment: "Tênis leve, material resistente, respirável, bom acabamento, macio, te impulsiona pra frente, excelente tênis! Recomendo. Chegou no primeiro dia do prazo de entrega.",
+    helpful: 47,
+    media: [
+      { type: 'image', src: avaliacao02Img1 },
+      { type: 'image', src: avaliacao02Img2 },
+    ],
   },
   {
     id: 3,
-    name: "Fernando Costa",
-    date: "04/01/2026",
+    name: "Juliana M.",
+    daysAgo: 3,
     rating: 5,
-    comment: "Excelente custo-benefício! Placa de carbono por esse preço é muito difícil encontrar. O acabamento é de qualidade e o retorno de energia é muito bom.",
-    helpful: 22,
-    images: [review1, review2],
+    comment: "Surpreendeu as minhas expectativas, chegou rápido a numeração bate, é leve, confortável, adorei.",
+    helpful: 38,
+    media: [
+      { type: 'video', src: avaliacao03Video, thumbnail: avaliacao03Img },
+      { type: 'image', src: avaliacao03Img },
+    ],
   },
   {
     id: 4,
-    name: "Ana Paula",
-    date: "02/01/2026",
+    name: "Carlos E.",
+    daysAgo: 4,
     rating: 5,
-    comment: "Perfeito para academia! Muito estiloso e super confortável. Todo mundo pergunta onde comprei.",
-    helpful: 19,
-    images: [review4],
+    comment: "Chegou bem rapidão, dentro do prazo. Pedi um numero maior. Calço 40 e pedi 41. Ficou perfeito!! Material de alta qualidade. Podem comprar sem medo!!",
+    helpful: 41,
+    media: [
+      { type: 'image', src: avaliacao04Img1 },
+      { type: 'image', src: avaliacao04Img2 },
+    ],
   },
   {
     id: 5,
-    name: "Ricardo Almeida",
-    date: "30/12/2025",
+    name: "Rafael S.",
+    daysAgo: 5,
     rating: 5,
-    comment: "Melhor tênis de corrida que já tive! A placa de carbono dá uma propulsão incrível. Uso para maratonas e meias maratonas. Superou todas as minhas expectativas!",
-    helpful: 45,
-    images: [],
+    comment: "Excepcional, muito bom mesmo, melhor do que pagar 1000 reais em um tênis de marca famosa no Brasil, tênis leve, confortável, respirável, com placa, sem palavras pra descrever o quanto esse tênis vale a pena.",
+    helpful: 63,
+    media: [
+      { type: 'video', src: avaliacao05Video, thumbnail: avaliacao05Img },
+      { type: 'image', src: avaliacao05Img },
+    ],
   },
   {
     id: 6,
-    name: "Juliana Martins",
-    date: "28/12/2025",
+    name: "Sabrina Viana",
+    daysAgo: 6,
     rating: 5,
-    comment: "Tênis muito bonito e confortável. Comprei na cor rosa e ficou lindo! A entrega foi super rápida e veio bem embalado. Recomendo muito!",
-    helpful: 31,
-    images: [],
+    comment: "Tênis incrível! A placa de carbono realmente faz diferença na corrida. Super leve e confortável, uso para treinos e provas. Chegou rápido e bem embalado!",
+    helpful: 34,
+    media: [
+      { type: 'image', src: reviewSabrina1 },
+      { type: 'image', src: reviewSabrina2 },
+    ],
   },
   {
     id: 7,
-    name: "Marcos Silva",
-    date: "25/12/2025",
-    rating: 4,
-    comment: "Ótimo tênis! O único ponto é que poderia ter mais opções de cores. Mas no geral, o conforto e a qualidade são excelentes. Vale muito a pena pelo preço.",
-    helpful: 18,
-    images: [],
+    name: "Camila Souza",
+    daysAgo: 8,
+    rating: 5,
+    comment: "Comprei para meu marido e ele amou! O design é lindo e o conforto é impressionante. Ele usa para correr todos os dias e diz que nunca teve um tênis tão bom.",
+    helpful: 28,
+    media: [
+      { type: 'image', src: reviewCamila1 },
+      { type: 'image', src: reviewCamila2 },
+    ],
   },
   {
     id: 8,
+    name: "Fernando Costa",
+    daysAgo: 10,
+    rating: 5,
+    comment: "Excelente custo-benefício! Placa de carbono por esse preço é muito difícil encontrar. O acabamento é de qualidade e o retorno de energia é muito bom.",
+    helpful: 22,
+    media: [
+      { type: 'image', src: review1 },
+      { type: 'image', src: review2 },
+    ],
+  },
+  {
+    id: 9,
+    name: "Ana Paula",
+    daysAgo: 12,
+    rating: 5,
+    comment: "Perfeito para academia! Muito estiloso e super confortável. Todo mundo pergunta onde comprei.",
+    helpful: 19,
+    media: [
+      { type: 'image', src: review4 },
+    ],
+  },
+  {
+    id: 10,
+    name: "Ricardo Almeida",
+    daysAgo: 14,
+    rating: 5,
+    comment: "Melhor tênis de corrida que já tive! A placa de carbono dá uma propulsão incrível. Uso para maratonas e meias maratonas. Superou todas as minhas expectativas!",
+    helpful: 45,
+    media: [],
+  },
+  {
+    id: 11,
+    name: "Juliana Martins",
+    daysAgo: 16,
+    rating: 5,
+    comment: "Tênis muito bonito e confortável. Comprei na cor rosa e ficou lindo! A entrega foi super rápida e veio bem embalado. Recomendo muito!",
+    helpful: 31,
+    media: [],
+  },
+  {
+    id: 12,
+    name: "Marcos Silva",
+    daysAgo: 18,
+    rating: 4,
+    comment: "Ótimo tênis! O único ponto é que poderia ter mais opções de cores. Mas no geral, o conforto e a qualidade são excelentes. Vale muito a pena pelo preço.",
+    helpful: 18,
+    media: [],
+  },
+  {
+    id: 13,
     name: "Patricia Oliveira",
-    date: "22/12/2025",
+    daysAgo: 20,
     rating: 5,
     comment: "Comprei para minha filha que é atleta e ela adorou! O tênis é muito leve e o retorno de energia é impressionante. Ela já quer comprar outro de reserva!",
     helpful: 27,
-    images: [],
+    media: [],
   },
 ];
 
@@ -95,6 +200,15 @@ const Reviews = () => {
   const averageRating = 4.9;
   const totalReviews = 327;
   const [showAll, setShowAll] = useState(false);
+  const [selectedMedia, setSelectedMedia] = useState<ReviewMedia | null>(null);
+  
+  // Generate reviews with dynamic dates
+  const reviews = useMemo(() => 
+    reviewsData.map(review => ({
+      ...review,
+      date: getDynamicDate(review.daysAgo),
+    })), 
+  []);
   
   const visibleReviews = showAll ? reviews : reviews.slice(0, 4);
   const totalCount = ratingDistribution.reduce((sum, r) => sum + r.count, 0);
@@ -163,16 +277,26 @@ const Reviews = () => {
             {/* Comment */}
             <p className="text-sm text-gray-700 leading-relaxed">{review.comment}</p>
 
-            {/* Review Images */}
-            {review.images && review.images.length > 0 && (
-              <div className="flex gap-2">
-                {review.images.map((image, index) => (
-                  <img
+            {/* Review Media (Images and Videos) */}
+            {review.media && review.media.length > 0 && (
+              <div className="flex gap-2 flex-wrap">
+                {review.media.map((media, index) => (
+                  <button
                     key={index}
-                    src={image}
-                    alt={`Foto do cliente ${review.name}`}
-                    className="h-20 w-20 object-cover rounded-lg"
-                  />
+                    onClick={() => setSelectedMedia(media)}
+                    className="relative h-20 w-20 rounded-lg overflow-hidden group cursor-pointer"
+                  >
+                    <img
+                      src={media.type === 'video' ? media.thumbnail : media.src}
+                      alt={`Mídia do cliente ${review.name}`}
+                      className="h-full w-full object-cover group-hover:scale-105 transition-transform"
+                    />
+                    {media.type === 'video' && (
+                      <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+                        <Play className="h-6 w-6 text-white fill-white" />
+                      </div>
+                    )}
+                  </button>
                 ))}
               </div>
             )}
@@ -210,6 +334,32 @@ const Reviews = () => {
           Ver menos
         </button>
       )}
+
+      {/* Media Modal */}
+      <Dialog open={!!selectedMedia} onOpenChange={() => setSelectedMedia(null)}>
+        <DialogContent className="max-w-3xl p-0 bg-black border-none">
+          <button
+            onClick={() => setSelectedMedia(null)}
+            className="absolute top-4 right-4 z-10 p-2 bg-black/50 rounded-full text-white hover:bg-black/70 transition-colors"
+          >
+            <X className="h-5 w-5" />
+          </button>
+          {selectedMedia?.type === 'video' ? (
+            <video
+              src={selectedMedia.src}
+              controls
+              autoPlay
+              className="w-full max-h-[80vh] object-contain"
+            />
+          ) : (
+            <img
+              src={selectedMedia?.src}
+              alt="Avaliação do cliente"
+              className="w-full max-h-[80vh] object-contain"
+            />
+          )}
+        </DialogContent>
+      </Dialog>
     </section>
   );
 };
