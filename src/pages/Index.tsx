@@ -23,6 +23,7 @@ import Footer from "@/components/Footer";
 import { useCart } from "@/contexts/CartContext";
 import { usePresence } from "@/hooks/usePresence";
 import AbandonmentPopup from "@/components/AbandonmentPopup";
+import AIChatBot from "@/components/AIChatBot";
 
 // PIX Icon Component
 const PixIcon = () => (
@@ -263,6 +264,9 @@ const Index = () => {
 
       {/* Footer */}
       <Footer />
+
+      {/* AI ChatBot */}
+      <AIChatBot />
     </div>
   );
 };
