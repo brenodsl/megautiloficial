@@ -21,6 +21,8 @@ import Guarantees from "@/components/Guarantees";
 import ProductDescription from "@/components/ProductDescription";
 import Footer from "@/components/Footer";
 import { useCart } from "@/contexts/CartContext";
+import { usePresence } from "@/hooks/usePresence";
+import AbandonmentPopup from "@/components/AbandonmentPopup";
 
 // PIX Icon Component
 const PixIcon = () => (
@@ -34,6 +36,9 @@ const Index = () => {
   const { addItem } = useCart();
   const sizeSelectorRef = useRef<SizeSelectorRef>(null);
   const [selectedSize, setSelectedSize] = useState<number | null>(null);
+
+  // Track presence on this page
+  usePresence("/");
   const [selectedColor, setSelectedColor] = useState<string>("gradient");
 
   // TikTok Pixel - ViewContent event
@@ -76,6 +81,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-white">
+      <AbandonmentPopup />
       <Header />
       
       {/* Breadcrumb */}

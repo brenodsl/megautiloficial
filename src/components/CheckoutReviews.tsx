@@ -142,7 +142,7 @@ const CheckoutReviews = () => {
         <div className="flex items-center gap-2">
           <Star className="h-5 w-5 fill-yellow-400 text-yellow-400" />
           <span className="text-xl font-bold text-gray-900">4.9</span>
-          <span className="text-sm text-gray-500">(327 avaliações)</span>
+          <span className="text-sm text-gray-500">(578 avaliações)</span>
         </div>
         <div className="flex items-center gap-1">
           <button

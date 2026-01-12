@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import meiasImg from "@/assets/upsell-meias.png";
 import oculosImg from "@/assets/upsell-oculos.png";
 import pocheteImg from "@/assets/upsell-pochete.png";
+import { usePresence } from "@/hooks/usePresence";
 
 const products = [
   {
@@ -41,6 +42,9 @@ const bundlePrice = 47.90;
 
 const Upsell = () => {
   const [timeLeft, setTimeLeft] = useState(600); // 10 minutes
+  
+  // Track presence on upsell page
+  usePresence("/upsell");
 
   useEffect(() => {
     const timer = setInterval(() => {

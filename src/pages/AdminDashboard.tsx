@@ -23,10 +23,12 @@ import {
   RefreshCw,
   TrendingUp,
   Users,
-  Package
+  Package,
+  Radio
 } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
+import { usePresenceCleanup } from "@/hooks/usePresence";
 import { ptBR } from "date-fns/locale";
 
 interface Order {
@@ -54,6 +56,11 @@ interface Pixel {
   created_at: string;
 }
 
+interface PresenceCount {
+  page: string;
+  count: number;
+}
+
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const [orders, setOrders] = useState<Order[]>([]);
@@ -64,6 +71,10 @@ const AdminDashboard = () => {
   const [newPixelName, setNewPixelName] = useState("");
   const [newPixelPlatform, setNewPixelPlatform] = useState("tiktok");
   const [isAddingPixel, setIsAddingPixel] = useState(false);
+  const [liveVisitors, setLiveVisitors] = useState<PresenceCount[]>([]);
+
+  // Cleanup old presence entries
+  usePresenceCleanup();
 
   useEffect(() => {
     const isAuthenticated = sessionStorage.getItem("admin_authenticated");
@@ -73,9 +84,13 @@ const AdminDashboard = () => {
     }
     
     fetchData();
+    fetchLiveVisitors();
     
-    // Subscribe to realtime updates
-    const channel = supabase
+    // Refresh live visitors every 10 seconds
+    const visitorInterval = setInterval(fetchLiveVisitors, 10000);
+    
+    // Subscribe to realtime updates for orders
+    const ordersChannel = supabase
       .channel('orders-changes')
       .on(
         'postgres_changes',
@@ -86,15 +101,52 @@ const AdminDashboard = () => {
       )
       .subscribe();
 
+    // Subscribe to realtime updates for presence
+    const presenceChannel = supabase
+      .channel('presence-changes')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'presence' },
+        () => {
+          fetchLiveVisitors();
+        }
+      )
+      .subscribe();
+
     return () => {
-      supabase.removeChannel(channel);
+      clearInterval(visitorInterval);
+      supabase.removeChannel(ordersChannel);
+      supabase.removeChannel(presenceChannel);
     };
   }, [navigate]);
 
   const fetchData = async () => {
     setIsLoading(true);
-    await Promise.all([fetchOrders(), fetchPixels()]);
+    await Promise.all([fetchOrders(), fetchPixels(), fetchLiveVisitors()]);
     setIsLoading(false);
+  };
+
+  const fetchLiveVisitors = async () => {
+    const oneMinuteAgo = new Date(Date.now() - 60000).toISOString();
+    const { data, error } = await supabase
+      .from('presence')
+      .select('page')
+      .gte('last_seen', oneMinuteAgo);
+
+    if (!error && data) {
+      // Count visitors per page
+      const counts: Record<string, number> = {};
+      data.forEach(row => {
+        counts[row.page] = (counts[row.page] || 0) + 1;
+      });
+      
+      const presenceCounts: PresenceCount[] = Object.entries(counts).map(([page, count]) => ({
+        page,
+        count
+      }));
+      
+      setLiveVisitors(presenceCounts);
+    }
   };
 
   const fetchOrders = async () => {
@@ -334,6 +386,45 @@ const AdminDashboard = () => {
             </CardContent>
           </Card>
         </div>
+
+        {/* Live Visitors Section */}
+        <Card className="bg-slate-800/50 border-slate-700 mb-8">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-white flex items-center gap-2">
+              <Radio className="w-5 h-5 text-red-500 animate-pulse" />
+              Visitantes ao Vivo
+              <span className="ml-2 text-sm font-normal text-slate-400">
+                ({liveVisitors.reduce((sum, v) => sum + v.count, 0)} online)
+              </span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {liveVisitors.length === 0 ? (
+              <p className="text-slate-400 text-sm">Nenhum visitante ativo no momento</p>
+            ) : (
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+                {liveVisitors.map((visitor) => (
+                  <div key={visitor.page} className="bg-slate-700/50 rounded-lg p-3 flex items-center justify-between">
+                    <div>
+                      <p className="text-white font-medium text-sm capitalize">
+                        {visitor.page === "/" ? "Página Inicial" : 
+                         visitor.page === "/checkout" ? "Checkout" :
+                         visitor.page === "/upsell" ? "Upsell" :
+                         visitor.page === "/obrigado" ? "Obrigado" :
+                         visitor.page}
+                      </p>
+                      <p className="text-slate-400 text-xs">{visitor.page}</p>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                      <span className="text-green-400 font-bold">{visitor.count}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
         {/* Main Content */}
         <Tabs defaultValue="orders" className="space-y-6">
