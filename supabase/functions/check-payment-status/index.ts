@@ -19,6 +19,7 @@ serve(async (req) => {
     try {
       body = await req.json();
     } catch {
+      console.error('Failed to parse JSON body');
       return new Response(
         JSON.stringify({ error: 'Invalid JSON payload' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -28,6 +29,7 @@ serve(async (req) => {
     const { transactionId } = body;
 
     if (!transactionId) {
+      console.error('Transaction ID is missing');
       return new Response(
         JSON.stringify({ error: 'Transaction ID is required' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -36,18 +38,23 @@ serve(async (req) => {
 
     console.log("Checking payment status for transaction:", transactionId);
 
-    // Check payment status on SigmaPay
+    // Check payment status on SigmaPay - Using the correct endpoint format
+    // The SigmaPay API uses the transaction hash directly in the URL
     const SIGMA_CHECK_URL = `https://api.sigmapay.com.br/api/public/v1/transactions/${transactionId}?api_token=${SIGMA_API_KEY}`;
+
+    console.log("Calling SigmaPay API:", SIGMA_CHECK_URL.replace(SIGMA_API_KEY, "***"));
 
     const response = await fetch(SIGMA_CHECK_URL, {
       method: 'GET',
       headers: {
-        'Accept': 'application/json'
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
       }
     });
 
     const responseText = await response.text();
-    console.log('SigmaPay status response:', responseText);
+    console.log('SigmaPay raw response status:', response.status);
+    console.log('SigmaPay raw response:', responseText);
 
     let responseData;
     try {
@@ -55,45 +62,80 @@ serve(async (req) => {
     } catch {
       console.error('Invalid JSON response from SigmaPay:', responseText);
       return new Response(
-        JSON.stringify({ error: 'Resposta inválida do gateway de pagamento' }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        JSON.stringify({ 
+          error: 'Resposta inválida do gateway de pagamento',
+          isPaid: false,
+          status: 'unknown'
+        }),
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
     if (!response.ok) {
       console.error('SigmaPay API error:', responseData);
+      // Return a valid response even on error, so frontend can continue polling
       return new Response(
-        JSON.stringify({ error: responseData.message || 'Erro ao verificar status' }),
-        { status: response.status || 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        JSON.stringify({ 
+          error: responseData.message || 'Erro ao verificar status',
+          isPaid: false,
+          status: 'error',
+          transactionId: transactionId
+        }),
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
+    // SigmaPay returns data in a 'data' object
     const sigmaData = responseData.data || responseData;
     
-    // SigmaPay status values: pending, paid, refused, refunded, chargedback, expired, waiting_payment
-    const status = sigmaData.status || sigmaData.payment_status;
+    // SigmaPay status values: pending, waiting_payment, paid, refused, refunded, chargedback, expired, failed
+    const status = sigmaData.status || sigmaData.payment_status || 'unknown';
     const isPaid = status === 'paid' || status === 'approved' || status === 'completed';
+    const isFailed = status === 'failed' || status === 'refused' || status === 'expired' || status === 'chargedback';
     
-    console.log('Payment status:', status, 'isPaid:', isPaid);
+    console.log('Payment status:', status, 'isPaid:', isPaid, 'isFailed:', isFailed);
+    console.log('Full SigmaPay data:', JSON.stringify(sigmaData, null, 2));
+
+    // Initialize Supabase client
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const supabase = createClient(supabaseUrl, supabaseKey);
 
     // If paid, update the order in the database
     if (isPaid) {
-      const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-      const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-      const supabase = createClient(supabaseUrl, supabaseKey);
+      console.log('Payment confirmed! Updating order in database...');
 
-      const { error: updateError } = await supabase
+      const { data: updateData, error: updateError } = await supabase
         .from('orders')
         .update({ 
           payment_status: 'paid',
           paid_at: new Date().toISOString()
         })
-        .eq('transaction_id', transactionId);
+        .eq('transaction_id', transactionId)
+        .select();
 
       if (updateError) {
         console.error('Error updating order:', updateError);
       } else {
-        console.log('Order updated successfully to paid status');
+        console.log('Order updated successfully to paid status:', updateData);
+      }
+    }
+
+    // If failed, update the order status to failed
+    if (isFailed) {
+      console.log('Payment failed! Updating order in database...');
+
+      const { error: updateError } = await supabase
+        .from('orders')
+        .update({ 
+          payment_status: 'failed'
+        })
+        .eq('transaction_id', transactionId);
+
+      if (updateError) {
+        console.error('Error updating order to failed:', updateError);
+      } else {
+        console.log('Order updated successfully to failed status');
       }
     }
 
@@ -103,7 +145,8 @@ serve(async (req) => {
         transactionId: transactionId,
         status: status,
         isPaid: isPaid,
-        paidAt: isPaid ? sigmaData.paid_at : null
+        isFailed: isFailed,
+        paidAt: isPaid ? (sigmaData.paid_at || new Date().toISOString()) : null
       }),
       { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
@@ -113,9 +156,11 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({ 
         error: 'Erro interno no servidor.',
-        details: error instanceof Error ? error.message : 'Unknown error'
+        details: error instanceof Error ? error.message : 'Unknown error',
+        isPaid: false,
+        status: 'error'
       }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
 });
