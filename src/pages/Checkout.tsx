@@ -494,6 +494,43 @@ const Checkout = () => {
 
           <Button
             onClick={() => {
+              // Navigate to thank you page with order data
+              navigate("/obrigado", {
+                state: {
+                  items: items.map(item => ({
+                    colorName: item.colorName,
+                    size: item.size,
+                    quantity: item.quantity,
+                    price: item.price,
+                  })),
+                  customer: {
+                    name: customerData.name,
+                    email: customerData.email,
+                  },
+                  address: {
+                    street: addressData.street,
+                    number: addressData.number,
+                    complement: addressData.complement,
+                    neighborhood: addressData.neighborhood,
+                    city: addressData.city,
+                    state: addressData.state,
+                    zipCode: addressData.zipCode,
+                  },
+                  totalAmount: finalTotal,
+                  shippingPrice: shippingPrice,
+                  transactionId: pixData.transactionId,
+                },
+              });
+              clearCart();
+            }}
+            className="w-full h-14 bg-[#28af60] hover:bg-[#23994f] text-white rounded-xl gap-2"
+          >
+            <CheckCircle className="h-5 w-5" />
+            Já fiz o pagamento
+          </Button>
+
+          <Button
+            onClick={() => {
               clearCart();
               navigate("/");
             }}
