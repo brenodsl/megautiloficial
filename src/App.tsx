@@ -13,6 +13,7 @@ import ShippingPolicy from "./pages/ShippingPolicy";
 import RefundPolicy from "./pages/RefundPolicy";
 import ExchangePolicy from "./pages/ExchangePolicy";
 import Upsell from "./pages/Upsell";
+import ThankYou from "./pages/ThankYou";
 
 const queryClient = new QueryClient();
 
@@ -32,6 +33,7 @@ const App = () => (
             <Route path="/politica-de-envio" element={<ShippingPolicy />} />
             <Route path="/politica-de-reembolso" element={<RefundPolicy />} />
             <Route path="/trocas-e-devolucoes" element={<ExchangePolicy />} />
+            <Route path="/obrigado" element={<ThankYou />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
