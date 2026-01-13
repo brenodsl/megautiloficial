@@ -191,10 +191,10 @@ const reviewsData: Review[] = [
 ];
 
 const ratingDistribution = [
-  { stars: 5, count: 156 },
-  { stars: 4, count: 32 },
+  { stars: 5, count: 520 },
+  { stars: 4, count: 45 },
   { stars: 3, count: 8 },
-  { stars: 2, count: 2 },
+  { stars: 2, count: 3 },
   { stars: 1, count: 2 },
 ];
 
