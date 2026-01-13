@@ -87,10 +87,10 @@ const ProductGallery = ({ selectedColor }: ProductGalleryProps) => {
         <span className="underline">(578 avaliações)</span>
       </a>
 
-      {/* Gallery with Thumbnails on Left */}
-      <div className="flex gap-3">
-        {/* Thumbnails Column - Left Side */}
-        <div className="hidden md:flex flex-col gap-2 w-20 flex-shrink-0">
+      {/* Gallery with Thumbnails on Left (Desktop) / Bottom (Mobile) */}
+      <div className="flex flex-col md:flex-row gap-3">
+        {/* Thumbnails Column - Left Side (Desktop) */}
+        <div className="hidden md:flex flex-col gap-2 w-20 flex-shrink-0 order-1">
           {mediaItems.map((item, index) => (
             <button
               key={item.id}
@@ -126,7 +126,7 @@ const ProductGallery = ({ selectedColor }: ProductGalleryProps) => {
         </div>
 
         {/* Main Image/Video Display */}
-        <div className="relative flex-1 aspect-square overflow-hidden rounded-xl bg-white border border-gray-100">
+        <div className="relative flex-1 aspect-square overflow-hidden rounded-xl bg-white border border-gray-100 order-1 md:order-2">
           <div ref={emblaRef} className="overflow-hidden h-full">
             <div className="flex h-full">
               {mediaItems.map((item) => (
@@ -151,40 +151,42 @@ const ProductGallery = ({ selectedColor }: ProductGalleryProps) => {
               ))}
             </div>
           </div>
-          
+        </div>
 
-          {/* Mobile Slide Indicators */}
-          <div className="md:hidden absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 z-10">
-            {mediaItems.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => scrollTo(index)}
-                className={`w-2 h-2 rounded-full transition-all ${
-                  currentIndex === index
-                    ? "bg-gray-900 w-4"
-                    : "bg-gray-400"
-                }`}
-              />
-            ))}
-          </div>
-
-          {/* Media Type Toggle - Mobile */}
-          <button
-            onClick={() => scrollTo(currentIndex === 0 ? 1 : 0)}
-            className="md:hidden absolute bottom-3 right-3 flex items-center gap-2 bg-white/95 backdrop-blur-sm px-3 py-2 rounded-lg text-sm font-medium text-gray-900 border border-gray-200 shadow-sm z-10"
-          >
-            {currentIndex === 0 ? (
-              <>
-                <ImageIcon className="h-4 w-4" />
-                Fotos
-              </>
-            ) : (
-              <>
-                <Play className="h-4 w-4" />
-                Vídeo
-              </>
-            )}
-          </button>
+        {/* Thumbnails Row - Bottom (Mobile Only) */}
+        <div className="flex md:hidden gap-2 overflow-x-auto scrollbar-hide order-2 pb-1">
+          {mediaItems.map((item, index) => (
+            <button
+              key={item.id}
+              onClick={() => scrollTo(index)}
+              className={`
+                relative flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all duration-200
+                ${currentIndex === index 
+                  ? "border-gray-900 shadow-md" 
+                  : "border-gray-200"
+                }
+              `}
+            >
+              {item.type === "video" ? (
+                <>
+                  <img
+                    src={item.thumbnail || tenisMain}
+                    alt={item.alt}
+                    className="h-full w-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+                    <Play className="h-4 w-4 text-white fill-white" />
+                  </div>
+                </>
+              ) : (
+                <img
+                  src={item.src}
+                  alt={item.alt}
+                  className="h-full w-full object-cover"
+                />
+              )}
+            </button>
+          ))}
         </div>
       </div>
     </div>
