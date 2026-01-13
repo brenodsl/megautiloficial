@@ -36,7 +36,7 @@ const PrivacyPolicy = () => {
 
           <section>
             <h2 className="text-lg font-semibold text-foreground mb-2">6. Seus Direitos</h2>
-            <p>Você tem direito de acessar, corrigir ou excluir seus dados pessoais. Entre em contato conosco através do e-mail contato@lojatools.com.br para exercer seus direitos.</p>
+            <p>Você tem direito de acessar, corrigir ou excluir seus dados pessoais. Entre em contato conosco através do e-mail contato@maxrunner.com.br para exercer seus direitos.</p>
           </section>
 
           <section>
