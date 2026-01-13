@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { Truck, Zap, Shield, CircleCheckBig, Award } from "lucide-react";
+import { Truck, Zap, Shield, CircleCheckBig, Award, ShieldCheck, BadgeCheck } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/select";
 import Header from "@/components/Header";
 import ProductGallery from "@/components/ProductGallery";
-import { colors } from "@/components/ColorSelector";
+import ColorSelector, { colors } from "@/components/ColorSelector";
 import SizeSelector, { SizeSelectorRef } from "@/components/SizeSelector";
 import ScarcityBanner from "@/components/ScarcityBanner";
 import Reviews from "@/components/Reviews";
@@ -77,184 +77,167 @@ const Index = () => {
   const selectedColorData = colors.find(c => c.id === selectedColor);
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-gray-50">
       <Header />
       
       {/* Breadcrumb */}
-      <div className="border-b border-gray-200">
-        <div className="max-w-lg mx-auto px-4 py-2">
-          <nav className="flex items-center gap-1 text-xs text-gray-500">
+      <div className="bg-white border-b border-gray-100">
+        <div className="max-w-lg mx-auto px-4 py-2.5">
+          <nav className="flex items-center gap-1.5 text-xs text-gray-400">
             <span>Calçados</span>
-            <span>›</span>
+            <span className="text-gray-300">›</span>
             <span>Tênis de Corrida</span>
-            <span>›</span>
-            <span className="text-gray-900 font-medium">Carbon 3.0</span>
+            <span className="text-gray-300">›</span>
+            <span className="text-gray-700 font-medium">Carbon 3.0</span>
           </nav>
         </div>
       </div>
 
-      <main className="max-w-lg mx-auto px-4 py-4">
-        {/* Badges */}
-        <div className="flex items-center gap-2 mb-3">
-          <span className="inline-flex items-center gap-1 bg-green-500 text-white text-xs font-bold px-2.5 py-1 rounded">
-            🔥 SUPER DESCONTO
-          </span>
-          <span className="inline-flex items-center gap-1 bg-orange-500 text-white text-xs font-bold px-2.5 py-1 rounded">
-            🔥 OFERTA IMPERDÍVEL
-          </span>
-        </div>
-
-        {/* 1º Lugar Badge */}
-        <div className="flex items-center gap-1.5 text-xs text-gray-600 mb-3">
-          <Award className="h-4 w-4 text-yellow-500" />
-          <span>1º Lugar em Tênis de Corrida</span>
-        </div>
-
-        {/* Product Title */}
-        <h1 className="text-lg font-bold text-gray-900 leading-tight mb-2">
-          Tênis de Corrida Chunta Carbon 3.0 - Placa de Carbono Ultra Leve
-        </h1>
-
-        {/* Product Gallery */}
-        <ProductGallery selectedColor={selectedColor} />
-
-        {/* Scarcity Banner */}
-        <div className="mt-4">
-          <ScarcityBanner />
-        </div>
-
-        {/* Model Selector (Color Dropdown) */}
-        <div className="mt-4 space-y-2">
-          <label className="text-sm text-gray-600">Modelo</label>
-          <Select value={selectedColor} onValueChange={setSelectedColor}>
-            <SelectTrigger className="w-full h-12 bg-white border border-gray-300">
-              <div className="flex items-center gap-3">
-                {selectedColorData && (
-                  <img 
-                    src={selectedColorData.image} 
-                    alt={selectedColorData.name}
-                    className="h-8 w-8 rounded object-cover"
-                  />
-                )}
-                <span className="text-gray-900">{selectedColorData?.name}</span>
+      <main className="max-w-lg mx-auto">
+        {/* Product Card */}
+        <div className="bg-white">
+          <div className="px-4 py-5">
+            {/* Trust Badges */}
+            <div className="flex items-center gap-3 mb-4">
+              <div className="flex items-center gap-1.5 text-xs text-gray-600 bg-gray-100 px-2.5 py-1.5 rounded-full">
+                <BadgeCheck className="h-3.5 w-3.5 text-emerald-600" />
+                <span>Loja Verificada</span>
               </div>
-            </SelectTrigger>
-            <SelectContent className="bg-white">
-              {colors.map((color) => (
-                <SelectItem key={color.id} value={color.id}>
-                  <div className="flex items-center gap-3">
-                    <img 
-                      src={color.image} 
-                      alt={color.name}
-                      className="h-8 w-8 rounded object-cover"
-                    />
-                    <span>{color.name}</span>
-                  </div>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+              <div className="flex items-center gap-1.5 text-xs text-gray-600 bg-gray-100 px-2.5 py-1.5 rounded-full">
+                <Award className="h-3.5 w-3.5 text-amber-500" />
+                <span>Top 1 em Corrida</span>
+              </div>
+            </div>
+
+            {/* Product Title */}
+            <h1 className="text-xl font-bold text-gray-900 leading-tight mb-1">
+              Tênis de Corrida Chunta Carbon 3.0
+            </h1>
+            <p className="text-sm text-gray-500 mb-4">Placa de Carbono • Ultra Leve • Profissional</p>
+
+            {/* Product Gallery */}
+            <ProductGallery selectedColor={selectedColor} />
+
+            {/* Scarcity Banner */}
+            <div className="mt-4">
+              <ScarcityBanner />
+            </div>
+
+            {/* Color Selector with Stock */}
+            <div className="mt-5">
+              <ColorSelector 
+                selectedColor={selectedColor} 
+                onColorSelect={setSelectedColor} 
+              />
+            </div>
+
+            {/* Size Selector */}
+            <div className="mt-5">
+              <SizeSelector 
+                ref={sizeSelectorRef} 
+                selectedSize={selectedSize} 
+                onSizeSelect={setSelectedSize} 
+              />
+            </div>
+          </div>
         </div>
 
-        {/* Size Selector */}
-        <div className="mt-4">
-          <SizeSelector 
-            ref={sizeSelectorRef} 
-            selectedSize={selectedSize} 
-            onSizeSelect={setSelectedSize} 
-          />
-        </div>
-
-        {/* Price Section */}
-        <div className="mt-6 space-y-1">
-          <div className="text-sm text-gray-400 line-through">R$ 239,80</div>
-          <div className="text-3xl font-bold text-green-600">R$ 77,80</div>
-          <div className="flex items-center gap-1.5 text-sm text-green-600">
+        {/* Price Card */}
+        <div className="bg-white mt-2 px-4 py-5">
+          <div className="flex items-baseline gap-3 mb-1">
+            <span className="text-sm text-gray-400 line-through">R$ 239,80</span>
+            <span className="text-xs font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">-67%</span>
+          </div>
+          <div className="text-3xl font-bold text-gray-900">R$ 77,80</div>
+          <div className="flex items-center gap-1.5 text-sm text-emerald-600 mt-1">
             <PixIcon />
-            <span>À vista no PIX</span>
+            <span className="font-medium">À vista no PIX</span>
+          </div>
+
+          {/* Benefits */}
+          <div className="mt-5 space-y-2.5">
+            <div className="flex items-center gap-2.5 text-sm text-gray-600">
+              <div className="w-8 h-8 rounded-full bg-emerald-50 flex items-center justify-center">
+                <Truck className="h-4 w-4 text-emerald-600" />
+              </div>
+              <span>Frete grátis para todo o Brasil</span>
+            </div>
+            <div className="flex items-center gap-2.5 text-sm text-gray-600">
+              <div className="w-8 h-8 rounded-full bg-emerald-50 flex items-center justify-center">
+                <Zap className="h-4 w-4 text-emerald-600" />
+              </div>
+              <span>Entrega expressa em até 2 dias</span>
+            </div>
+            <div className="flex items-center gap-2.5 text-sm text-gray-600">
+              <div className="w-8 h-8 rounded-full bg-emerald-50 flex items-center justify-center">
+                <ShieldCheck className="h-4 w-4 text-emerald-600" />
+              </div>
+              <span>Garantia de 90 dias</span>
+            </div>
+          </div>
+
+          {/* CTA Buttons */}
+          <div className="mt-6 space-y-3">
+            <Button
+              onClick={handleBuyClick}
+              size="lg"
+              className={`w-full h-14 font-semibold text-base rounded-xl transition-all shadow-lg ${
+                selectedSize 
+                  ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-200' 
+                  : 'bg-gray-200 text-gray-400 cursor-default hover:bg-gray-200 shadow-none'
+              }`}
+            >
+              Comprar agora
+            </Button>
+
+            <Button
+              onClick={() => {
+                if (!selectedSize) {
+                  sizeSelectorRef.current?.showError();
+                  return;
+                }
+                addItem(selectedColor, selectedSize, 1);
+                toast.success("Produto adicionado ao carrinho!");
+              }}
+              variant="outline"
+              size="lg"
+              className="w-full h-12 font-medium text-sm rounded-xl border-2 border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300"
+            >
+              Adicionar ao carrinho
+            </Button>
+
+            {!selectedSize && (
+              <p className="text-center text-xs text-gray-400">
+                Selecione cor e tamanho para continuar
+              </p>
+            )}
           </div>
         </div>
 
-        {/* Benefits List */}
-        <div className="mt-4 space-y-2.5">
-          <div className="flex items-center gap-2 text-sm text-gray-700">
-            <Truck className="h-4 w-4 text-gray-400" />
-            <span>Frete grátis para todo o Brasil</span>
-          </div>
-          <div className="flex items-center gap-2 text-sm text-green-600 font-medium bg-green-50 rounded-md px-3 py-1.5">
-            <Zap className="h-4 w-4" />
-            <span>Envios para Capitais em até 2 dias</span>
-          </div>
-          <div className="flex items-center gap-2 text-sm text-gray-700">
-            <Shield className="h-4 w-4 text-gray-400" />
-            <span>Garantia de 90 dias</span>
-          </div>
-          <div className="flex items-center gap-2 text-sm text-gray-700">
-            <CircleCheckBig className="h-4 w-4 text-gray-400" />
-            <span>Estoque disponível</span>
-          </div>
+        {/* Content Sections */}
+        <div className="bg-white mt-2 px-4 py-6">
+
+          {/* Product Description */}
+          <ProductDescription />
+
+          {/* Divider */}
+          <div className="border-t border-gray-100 my-8" />
+
+          {/* Guarantees */}
+          <Guarantees />
+
+          {/* Divider */}
+          <div className="border-t border-gray-100 my-8" />
+
+          {/* Benefits */}
+          <Benefits />
+
+          {/* Divider */}
+          <div className="border-t border-gray-100 my-8" />
+
+          {/* Reviews */}
+          <Reviews />
         </div>
-
-        {/* CTA Button */}
-        <Button
-          onClick={handleBuyClick}
-          size="lg"
-          className={`w-full h-14 mt-6 font-medium text-base rounded-full transition-colors ${
-            selectedSize 
-              ? 'bg-[#28af60] hover:bg-[#23994f] text-white' 
-              : 'bg-gray-200 text-gray-500 cursor-default hover:bg-gray-200'
-          }`}
-        >
-          Comprar agora
-        </Button>
-
-        {/* Add to Cart Button */}
-        <Button
-          onClick={() => {
-            if (!selectedSize) {
-              sizeSelectorRef.current?.showError();
-              return;
-            }
-            addItem(selectedColor, selectedSize, 1);
-            toast.success("Produto adicionado ao carrinho!");
-          }}
-          variant="outline"
-          size="lg"
-          className="w-full h-14 mt-3 font-medium text-base rounded-full border-2 border-[#28af60] text-[#28af60] hover:bg-[#28af60]/10"
-        >
-          Adicionar ao carrinho
-        </Button>
-
-        {/* Size warning text */}
-        {!selectedSize && (
-          <p className="text-center text-sm text-green-600 mt-2">
-            Selecione um tamanho para continuar
-          </p>
-        )}
-
-        {/* Divider */}
-        <div className="border-t border-gray-200 my-8" />
-
-        {/* Product Description */}
-        <ProductDescription />
-
-        {/* Divider */}
-        <div className="border-t border-gray-200 my-8" />
-
-        {/* Guarantees */}
-        <Guarantees />
-
-        {/* Divider */}
-        <div className="border-t border-gray-200 my-8" />
-
-        {/* Benefits */}
-        <Benefits />
-
-        {/* Divider */}
-        <div className="border-t border-gray-200 my-8" />
-
-        {/* Reviews */}
-        <Reviews />
       </main>
 
       {/* Footer */}

@@ -1,6 +1,8 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Star, ThumbsUp, X, Play } from "lucide-react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
+import ReviewForm from "@/components/ReviewForm";
+import { supabase } from "@/integrations/supabase/client";
 import review1 from "@/assets/review-1.webp";
 import review2 from "@/assets/review-2.webp";
 import review4 from "@/assets/review-4.webp";
@@ -196,11 +198,38 @@ const ratingDistribution = [
   { stars: 1, count: 2 },
 ];
 
+interface UserReview {
+  id: string;
+  customer_name: string;
+  rating: number;
+  comment: string;
+  created_at: string;
+}
+
 const Reviews = () => {
   const averageRating = 4.9;
   const totalReviews = 327;
   const [showAll, setShowAll] = useState(false);
   const [selectedMedia, setSelectedMedia] = useState<ReviewMedia | null>(null);
+  const [userReviews, setUserReviews] = useState<UserReview[]>([]);
+  
+  // Fetch approved user reviews
+  useEffect(() => {
+    const fetchUserReviews = async () => {
+      const { data } = await supabase
+        .from("reviews")
+        .select("*")
+        .eq("status", "approved")
+        .order("created_at", { ascending: false })
+        .limit(10);
+      
+      if (data) {
+        setUserReviews(data);
+      }
+    };
+    
+    fetchUserReviews();
+  }, []);
   
   // Generate reviews with dynamic dates
   const reviews = useMemo(() => 
@@ -334,6 +363,52 @@ const Reviews = () => {
           Ver menos
         </button>
       )}
+
+      {/* User Submitted Reviews */}
+      {userReviews.length > 0 && (
+        <div className="space-y-4 pt-4 border-t border-gray-200">
+          <h3 className="text-sm font-semibold text-gray-700">Avaliações de clientes</h3>
+          {userReviews.map((review) => (
+            <div key={review.id} className="bg-gray-50 rounded-lg p-4 space-y-2">
+              <div className="flex items-center gap-2">
+                <div className="flex">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <Star
+                      key={star}
+                      className={`h-4 w-4 ${
+                        star <= review.rating
+                          ? "fill-yellow-400 text-yellow-400"
+                          : "text-gray-300"
+                      }`}
+                    />
+                  ))}
+                </div>
+                <span className="text-xs text-gray-500">
+                  {new Date(review.created_at).toLocaleDateString('pt-BR')}
+                </span>
+              </div>
+              <p className="text-sm text-gray-700">{review.comment}</p>
+              <p className="text-xs text-gray-500">— {review.customer_name}</p>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Review Form */}
+      <div className="pt-6">
+        <ReviewForm onReviewSubmitted={() => {
+          // Refetch reviews after submission
+          supabase
+            .from("reviews")
+            .select("*")
+            .eq("status", "approved")
+            .order("created_at", { ascending: false })
+            .limit(10)
+            .then(({ data }) => {
+              if (data) setUserReviews(data);
+            });
+        }} />
+      </div>
 
       {/* Media Modal */}
       <Dialog open={!!selectedMedia} onOpenChange={() => setSelectedMedia(null)}>
