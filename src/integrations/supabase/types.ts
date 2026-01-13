@@ -146,6 +146,51 @@ export type Database = {
         }
         Relationships: []
       }
+      reviews: {
+        Row: {
+          admin_notes: string | null
+          color_purchased: string | null
+          comment: string
+          created_at: string
+          customer_email: string
+          customer_name: string
+          helpful_count: number
+          id: string
+          rating: number
+          reviewed_at: string | null
+          size_purchased: number | null
+          status: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          color_purchased?: string | null
+          comment: string
+          created_at?: string
+          customer_email: string
+          customer_name: string
+          helpful_count?: number
+          id?: string
+          rating: number
+          reviewed_at?: string | null
+          size_purchased?: number | null
+          status?: string
+        }
+        Update: {
+          admin_notes?: string | null
+          color_purchased?: string | null
+          comment?: string
+          created_at?: string
+          customer_email?: string
+          customer_name?: string
+          helpful_count?: number
+          id?: string
+          rating?: number
+          reviewed_at?: string | null
+          size_purchased?: number | null
+          status?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
