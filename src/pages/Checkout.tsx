@@ -192,6 +192,36 @@ const Checkout = () => {
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
+  // Validate CPF using the algorithm
+  const validateCPF = (cpf: string): boolean => {
+    const numbers = cpf.replace(/\D/g, "");
+    
+    if (numbers.length !== 11) return false;
+    
+    // Check for known invalid CPFs (all same digits)
+    if (/^(\d)\1{10}$/.test(numbers)) return false;
+    
+    // Validate first digit
+    let sum = 0;
+    for (let i = 0; i < 9; i++) {
+      sum += parseInt(numbers[i]) * (10 - i);
+    }
+    let remainder = (sum * 10) % 11;
+    if (remainder === 10 || remainder === 11) remainder = 0;
+    if (remainder !== parseInt(numbers[9])) return false;
+    
+    // Validate second digit
+    sum = 0;
+    for (let i = 0; i < 10; i++) {
+      sum += parseInt(numbers[i]) * (11 - i);
+    }
+    remainder = (sum * 10) % 11;
+    if (remainder === 10 || remainder === 11) remainder = 0;
+    if (remainder !== parseInt(numbers[10])) return false;
+    
+    return true;
+  };
+
   // Format CPF
   const formatCPF = (value: string) => {
     const numbers = value.replace(/\D/g, "");
@@ -282,6 +312,10 @@ const Checkout = () => {
     }
     if (!customerData.document || customerData.document.replace(/\D/g, "").length < 11) {
       toast.error("Preencha um CPF válido");
+      return false;
+    }
+    if (!validateCPF(customerData.document)) {
+      toast.error("CPF inválido. Por favor, verifique o número digitado.");
       return false;
     }
     if (!customerData.phone || customerData.phone.replace(/\D/g, "").length < 10) {
@@ -604,40 +638,76 @@ const Checkout = () => {
           </p>
 
           <Button
-            onClick={() => {
-              // Navigate to thank you page with order data
-              navigate("/obrigado", {
-                state: {
-                  items: items.map(item => ({
-                    colorName: item.colorName,
-                    size: item.size,
-                    quantity: item.quantity,
-                    price: item.price,
-                  })),
-                  customer: {
-                    name: customerData.name,
-                    email: customerData.email,
-                  },
-                  address: {
-                    street: addressData.street,
-                    number: addressData.number,
-                    complement: addressData.complement,
-                    neighborhood: addressData.neighborhood,
-                    city: addressData.city,
-                    state: addressData.state,
-                    zipCode: addressData.zipCode,
-                  },
-                  totalAmount: finalTotal,
-                  shippingPrice: shippingPrice,
-                  transactionId: pixData.transactionId,
-                },
-              });
-              clearCart();
+            onClick={async () => {
+              // Check payment status before redirecting
+              setPaymentStatus('checking');
+              try {
+                const { data, error } = await supabase.functions.invoke("check-payment-status", {
+                  body: { transactionId: pixData.transactionId }
+                });
+
+                if (error) {
+                  toast.error("Erro ao verificar pagamento. Tente novamente.");
+                  setPaymentStatus('pending');
+                  return;
+                }
+
+                if (data?.isPaid) {
+                  setPaymentStatus('paid');
+                  toast.success("Pagamento confirmado!");
+                  setTimeout(() => {
+                    navigate("/obrigado", {
+                      state: {
+                        items: items.map(item => ({
+                          colorName: item.colorName,
+                          size: item.size,
+                          quantity: item.quantity,
+                          price: item.price,
+                        })),
+                        customer: {
+                          name: customerData.name,
+                          email: customerData.email,
+                        },
+                        address: {
+                          street: addressData.street,
+                          number: addressData.number,
+                          complement: addressData.complement,
+                          neighborhood: addressData.neighborhood,
+                          city: addressData.city,
+                          state: addressData.state,
+                          zipCode: addressData.zipCode,
+                        },
+                        totalAmount: finalTotal,
+                        shippingPrice: shippingPrice,
+                        transactionId: pixData.transactionId,
+                      },
+                    });
+                    clearCart();
+                  }, 1000);
+                } else {
+                  toast.error("Pagamento ainda não confirmado. Aguarde ou escaneie o QR Code novamente.");
+                  setPaymentStatus('pending');
+                }
+              } catch (err) {
+                console.error("Error checking payment:", err);
+                toast.error("Erro ao verificar pagamento. Tente novamente.");
+                setPaymentStatus('pending');
+              }
             }}
-            className="w-full h-14 bg-[#28af60] hover:bg-[#23994f] text-white rounded-xl gap-2"
+            disabled={paymentStatus === 'checking' || paymentStatus === 'paid'}
+            className="w-full h-14 bg-[#28af60] hover:bg-[#23994f] text-white rounded-xl gap-2 disabled:opacity-50"
           >
-            <CheckCircle className="h-5 w-5" />
-            Já fiz o pagamento
+            {paymentStatus === 'checking' ? (
+              <>
+                <Loader2 className="h-5 w-5 animate-spin" />
+                Verificando pagamento...
+              </>
+            ) : (
+              <>
+                <CheckCircle className="h-5 w-5" />
+                Já fiz o pagamento
+              </>
+            )}
           </Button>
 
           <Button
@@ -965,6 +1035,15 @@ const Checkout = () => {
             <div className="mt-3 bg-green-50 border border-[#28af60] rounded-lg p-3">
               <p className="text-xs font-semibold text-[#28af60]">Ambiente Protegido</p>
               <p className="text-[10px] text-gray-500">Seus dados são protegidos com criptografia de ponta a ponta.</p>
+            </div>
+          </div>
+
+          {/* Company Info */}
+          <div className="border-t border-gray-200 pt-4 mt-4">
+            <div className="text-center text-xs text-gray-400 space-y-1">
+              <p className="font-medium text-gray-500">Max Runner Comércio de Calçados LTDA</p>
+              <p>CNPJ: 02.160.402/0001-89</p>
+              <p>Rua Brigadeiro Machado, 175, Brás - São Paulo/SP - CEP 03050-050</p>
             </div>
           </div>
         </div>
