@@ -67,8 +67,11 @@ const Footer = () => {
         {/* Divider */}
         <div className="border-t border-gray-200 my-6" />
 
-        {/* Copyright */}
+        {/* Company Info */}
         <div className="text-center space-y-1">
+          <p className="text-xs text-gray-600 font-medium">
+            Max Runner Comércio de Calçados LTDA
+          </p>
           <p className="text-xs text-gray-500">
             CNPJ: 02.160.402/0001-89
           </p>

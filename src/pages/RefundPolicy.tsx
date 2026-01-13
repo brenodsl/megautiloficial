@@ -21,7 +21,7 @@ const RefundPolicy = () => {
 
           <section>
             <h2 className="text-lg font-semibold text-foreground mb-2">3. Como Solicitar</h2>
-            <p>Entre em contato conosco através do e-mail contato@lojatools.com.br informando o número do pedido e o motivo da solicitação. Responderemos em até 48 horas úteis.</p>
+            <p>Entre em contato conosco através do e-mail contato@maxrunner.com.br informando o número do pedido e o motivo da solicitação. Responderemos em até 48 horas úteis.</p>
           </section>
 
           <section>
