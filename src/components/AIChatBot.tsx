@@ -61,7 +61,7 @@ const AIChatBot = () => {
       console.error('Error sending message:', error);
       setMessages(prev => [...prev, { 
         role: 'assistant', 
-        content: 'Desculpe, tive um problema. Tente novamente ou entre em contato pelo WhatsApp! 📱' 
+        content: 'Desculpe, tive um problema. Tente novamente ou envie um e-mail para contato@maxrunner.com.br - respondemos em menos de 10 min! 📧' 
       }]);
     } finally {
       setIsLoading(false);

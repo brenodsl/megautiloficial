@@ -23,11 +23,13 @@ const Footer = () => {
           <div>
             <h4 className="font-bold text-gray-900 mb-3">Atendimento</h4>
             <ul className="space-y-2 text-gray-600">
-              <li><a href="#" className="hover:text-gray-900 transition-colors">Fale Conosco</a></li>
-              <li>
-                <span className="text-gray-500">E-mail:</span>
-                <br />
-                <span>contato@maxrunner.com.br</span>
+              <li className="flex items-center gap-2">
+                <Mail className="h-4 w-4 text-gray-500" />
+                <a href="mailto:contato@maxrunner.com.br" className="hover:text-gray-900 transition-colors">contato@maxrunner.com.br</a>
+              </li>
+              <li className="flex items-center gap-2 text-green-600">
+                <Clock className="h-4 w-4" />
+                <span className="font-medium">Respondemos em menos de 10 min!</span>
               </li>
               <li>
                 <span className="text-gray-500">Horário:</span>
