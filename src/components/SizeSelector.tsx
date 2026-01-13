@@ -6,7 +6,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
+import { Ruler } from "lucide-react";
+import tabelaTamanhos from "@/assets/tabela-tamanhos.png";
 
 interface SizeSelectorProps {
   selectedSize: number | null;
@@ -17,7 +24,7 @@ export interface SizeSelectorRef {
   showError: () => void;
 }
 
-const sizes = [34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45];
+const sizes = [31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 44];
 
 const SizeSelector = forwardRef<SizeSelectorRef, SizeSelectorProps>(
   ({ selectedSize, onSizeSelect }, ref) => {
@@ -40,12 +47,31 @@ const SizeSelector = forwardRef<SizeSelectorRef, SizeSelectorProps>(
 
     return (
       <div ref={containerRef} className="space-y-2">
-        <label className={cn(
-          "text-sm transition-colors",
-          showError ? "text-destructive font-semibold" : "text-muted-foreground"
-        )}>
-          Tamanho: {showError && <span className="ml-1">⚠️ Selecione um tamanho!</span>}
-        </label>
+        <div className="flex items-center justify-between">
+          <label className={cn(
+            "text-sm transition-colors",
+            showError ? "text-destructive font-semibold" : "text-muted-foreground"
+          )}>
+            Tamanho: {showError && <span className="ml-1">⚠️ Selecione um tamanho!</span>}
+          </label>
+          
+          <Dialog>
+            <DialogTrigger asChild>
+              <button className="flex items-center gap-1 text-xs text-gray-500 hover:text-gray-900 transition-colors">
+                <Ruler className="h-3.5 w-3.5" />
+                <span className="underline">Tabela de tamanhos</span>
+              </button>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl p-0 overflow-hidden bg-transparent border-0">
+              <img 
+                src={tabelaTamanhos} 
+                alt="Tabela de Tamanhos Max Runner" 
+                className="w-full h-auto rounded-lg"
+              />
+            </DialogContent>
+          </Dialog>
+        </div>
+        
         <Select
           value={selectedSize?.toString() || ""}
           onValueChange={handleSelect}
