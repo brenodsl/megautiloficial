@@ -68,7 +68,10 @@ const Footer = () => {
         <div className="border-t border-gray-200 my-6" />
 
         {/* Copyright */}
-        <div className="text-center">
+        <div className="text-center space-y-1">
+          <p className="text-xs text-gray-500">
+            CNPJ: 02.160.402/0001-89
+          </p>
           <p className="text-xs text-gray-500">
             © 2026 Max Runner. Todos os direitos reservados.
           </p>
