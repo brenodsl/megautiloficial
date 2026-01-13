@@ -152,10 +152,6 @@ const ProductGallery = ({ selectedColor }: ProductGalleryProps) => {
             </div>
           </div>
           
-          {/* Clean Badge */}
-          <div className="absolute top-3 left-3 bg-gray-900 text-white text-xs font-medium px-3 py-1.5 rounded-full z-10">
-            Últimas Unidades
-          </div>
 
           {/* Mobile Slide Indicators */}
           <div className="md:hidden absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 z-10">
