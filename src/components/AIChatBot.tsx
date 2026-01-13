@@ -90,13 +90,17 @@ const AIChatBot = () => {
       {/* Floating Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-4 right-4 z-50 w-14 h-14 rounded-full bg-gray-900 hover:bg-gray-800 flex items-center justify-center text-white shadow-lg hover:scale-110 transition-all duration-200"
+        className="fixed bottom-4 right-4 z-50 w-16 h-16 rounded-full bg-gray-900 hover:bg-gray-800 flex items-center justify-center text-white shadow-lg hover:scale-110 transition-all duration-200 overflow-hidden border-2 border-white"
         aria-label="Abrir chat de suporte"
       >
         {isOpen ? (
           <X className="w-6 h-6" />
         ) : (
-          <MessageCircle className="w-6 h-6" />
+          <img 
+            src={perfilAtendente} 
+            alt="João Lucas" 
+            className="w-full h-full object-cover"
+          />
         )}
       </button>
 
