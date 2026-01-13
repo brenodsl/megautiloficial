@@ -76,6 +76,9 @@ const Footer = () => {
             CNPJ: 02.160.402/0001-89
           </p>
           <p className="text-xs text-gray-500">
+            Rua Brigadeiro Machado, 175, Brás - São Paulo/SP - CEP 03050-050
+          </p>
+          <p className="text-xs text-gray-500 mt-2">
             © 2026 Max Runner. Todos os direitos reservados.
           </p>
         </div>
