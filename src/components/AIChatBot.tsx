@@ -3,6 +3,7 @@ import { MessageCircle, X, Send, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
+import perfilAtendente from "@/assets/perfil-atendente.png";
 
 interface Message {
   role: 'user' | 'assistant';
@@ -13,7 +14,7 @@ const AIChatBot = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [showBubble, setShowBubble] = useState(true);
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'assistant', content: 'Olá! 👋 Sou o assistente virtual da Max Runner. Como posso ajudar você hoje?' }
+    { role: 'assistant', content: 'Olá! 👋 Sou o João Lucas, atendente da Max Runner. Como posso ajudar você hoje?' }
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -102,10 +103,17 @@ const AIChatBot = () => {
       {/* Chat Window */}
       {isOpen && (
         <div className="fixed bottom-[88px] right-4 z-50 w-[350px] max-w-[calc(100vw-32px)] h-[480px] max-h-[calc(100vh-120px)] bg-white border border-gray-200 rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-bottom-5 duration-300">
-          {/* Header */}
-          <div className="bg-gray-900 p-4 text-white">
-            <h3 className="font-bold text-lg">Atendimento Max Runner</h3>
-            <p className="text-sm text-gray-300">Tire suas dúvidas com nossa IA</p>
+          {/* Header with Attendant */}
+          <div className="bg-gray-900 p-4 text-white flex items-center gap-3">
+            <img 
+              src={perfilAtendente} 
+              alt="João Lucas - Atendente" 
+              className="w-12 h-12 rounded-full object-cover border-2 border-white/20"
+            />
+            <div>
+              <h3 className="font-bold text-lg">João Lucas</h3>
+              <p className="text-sm text-gray-300">Atendente Max Runner</p>
+            </div>
           </div>
 
           {/* Messages */}

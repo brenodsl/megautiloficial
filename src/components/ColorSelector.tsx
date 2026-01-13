@@ -5,6 +5,13 @@ import colorOrangeHd from "@/assets/color-orange-hd.webp";
 import colorPink from "@/assets/color-pink.webp";
 import colorSunset from "@/assets/color-sunset.webp";
 import colorCreamOrange from "@/assets/color-cream-orange.webp";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export interface ColorOption {
   id: string;
@@ -32,72 +39,74 @@ const ColorSelector = ({ selectedColor, onColorSelect }: ColorSelectorProps) => 
   const selectedColorData = colors.find(c => c.id === selectedColor);
   
   return (
-    <div className="space-y-3">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-gray-500">Cor:</span>
-          {selectedColor ? (
-            <span className="text-sm font-semibold text-gray-900">{selectedColorData?.name}</span>
-          ) : (
-            <span className="text-sm text-red-500 font-medium">Selecione</span>
-          )}
-        </div>
-        {selectedColorData && (
-          <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
-            selectedColorData.stock <= 5 
-              ? 'bg-red-50 text-red-600' 
-              : selectedColorData.stock <= 10 
-                ? 'bg-amber-50 text-amber-600' 
-                : 'bg-emerald-50 text-emerald-600'
-          }`}>
-            {selectedColorData.stock <= 5 
-              ? `Últimas ${selectedColorData.stock} unidades` 
-              : `${selectedColorData.stock} em estoque`}
-          </span>
+    <div className="space-y-2">
+      <div className="flex items-center gap-2">
+        <span className="text-sm text-gray-500">Cor:</span>
+        {!selectedColor && (
+          <span className="text-sm text-red-500 font-medium">Selecione</span>
         )}
       </div>
       
-      <div className="flex gap-2.5 overflow-x-auto pb-2 -mx-1 px-1 scrollbar-hide">
-        {colors.map((color) => {
-          const isSelected = selectedColor === color.id;
-          const isLowStock = color.stock <= 5;
-          
-          return (
-            <button
-              key={color.id}
-              onClick={() => onColorSelect(color.id)}
-              className={`
-                group relative flex-shrink-0 w-16 h-16 rounded-xl overflow-hidden transition-all duration-200
-                ${isSelected 
-                  ? "ring-2 ring-gray-900 ring-offset-2 scale-105 shadow-lg" 
-                  : "ring-1 ring-gray-200 hover:ring-gray-400 hover:scale-102"
-                }
-              `}
+      <Select value={selectedColor} onValueChange={onColorSelect}>
+        <SelectTrigger className="w-full h-14 bg-white border-gray-200">
+          <SelectValue placeholder="Selecione a cor">
+            {selectedColorData && (
+              <div className="flex items-center gap-3">
+                <img 
+                  src={selectedColorData.image} 
+                  alt={selectedColorData.name}
+                  className="w-10 h-10 rounded-lg object-cover"
+                />
+                <div className="flex items-center gap-2">
+                  <span className="font-medium">{selectedColorData.name}</span>
+                  <span className={`text-xs px-2 py-0.5 rounded-full ${
+                    selectedColorData.stock <= 5 
+                      ? 'bg-red-50 text-red-600' 
+                      : selectedColorData.stock <= 10 
+                        ? 'bg-amber-50 text-amber-600' 
+                        : 'bg-emerald-50 text-emerald-600'
+                  }`}>
+                    {selectedColorData.stock <= 5 
+                      ? `Últimas ${selectedColorData.stock}` 
+                      : `${selectedColorData.stock} un.`}
+                  </span>
+                </div>
+              </div>
+            )}
+          </SelectValue>
+        </SelectTrigger>
+        <SelectContent className="bg-white z-50">
+          {colors.map((color) => (
+            <SelectItem 
+              key={color.id} 
+              value={color.id}
+              className="cursor-pointer hover:bg-gray-50"
             >
-              <img
-                src={color.image}
-                alt={color.name}
-                className="h-full w-full object-cover"
-              />
-              {isSelected && (
-                <div className="absolute inset-0 bg-black/10 flex items-center justify-center">
-                  <div className="w-5 h-5 bg-gray-900 rounded-full flex items-center justify-center">
-                    <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                    </svg>
-                  </div>
+              <div className="flex items-center gap-3 py-1">
+                <img 
+                  src={color.image} 
+                  alt={color.name}
+                  className="w-10 h-10 rounded-lg object-cover"
+                />
+                <div className="flex items-center gap-2">
+                  <span className="font-medium">{color.name}</span>
+                  <span className={`text-xs px-2 py-0.5 rounded-full ${
+                    color.stock <= 5 
+                      ? 'bg-red-50 text-red-600' 
+                      : color.stock <= 10 
+                        ? 'bg-amber-50 text-amber-600' 
+                        : 'bg-emerald-50 text-emerald-600'
+                  }`}>
+                    {color.stock <= 5 
+                      ? `Últimas ${color.stock}` 
+                      : `${color.stock} un.`}
+                  </span>
                 </div>
-              )}
-              {/* Stock indicator */}
-              {isLowStock && (
-                <div className="absolute bottom-0 left-0 right-0 bg-red-500 text-white text-[8px] font-bold text-center py-0.5">
-                  {color.stock} un.
-                </div>
-              )}
-            </button>
-          );
-        })}
-      </div>
+              </div>
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
     </div>
   );
 };
