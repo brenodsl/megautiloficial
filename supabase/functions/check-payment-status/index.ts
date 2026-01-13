@@ -13,7 +13,7 @@ serve(async (req) => {
   }
 
   try {
-    const SIGMA_API_KEY = "6AUXQgnpYrKrUvUQ2USezmv2hHi8HpyP41q9lznTgz3idUDtgU7uAMKYD2qt";
+    const SIGMA_API_KEY = "hLVd9EOMkYj9NJ47LzcIJHAMxU9mxfwZaSwhBpPurAiLXNCN8cTyZHLFsWk7";
 
     let body;
     try {
@@ -40,7 +40,7 @@ serve(async (req) => {
 
     // Check payment status on SigmaPay - Using the correct endpoint format
     // The SigmaPay API uses the transaction hash directly in the URL
-    const SIGMA_CHECK_URL = `https://api.sigmapay.com.br/api/public/v1/transactions/${transactionId}?api_token=${SIGMA_API_KEY}`;
+    const SIGMA_CHECK_URL = `https://api.goatpayments.com.br/api/public/v1/transactions/${transactionId}?api_token=${SIGMA_API_KEY}`;
 
     console.log("Calling SigmaPay API:", SIGMA_CHECK_URL.replace(SIGMA_API_KEY, "***"));
 
