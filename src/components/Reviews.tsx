@@ -208,7 +208,7 @@ interface UserReview {
 
 const Reviews = () => {
   const averageRating = 4.9;
-  const totalReviews = 327;
+  const totalReviews = 578;
   const [showAll, setShowAll] = useState(false);
   const [selectedMedia, setSelectedMedia] = useState<ReviewMedia | null>(null);
   const [userReviews, setUserReviews] = useState<UserReview[]>([]);
