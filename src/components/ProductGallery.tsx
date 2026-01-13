@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { Star, Play, Image as ImageIcon } from "lucide-react";
 import useEmblaCarousel from "embla-carousel-react";
-import Autoplay from "embla-carousel-autoplay";
 import tenisMain from "@/assets/tenis-main.webp";
 import tenis2 from "@/assets/tenis-2.webp";
 import tenis3 from "@/assets/tenis-3.webp";
@@ -16,34 +15,43 @@ interface ProductGalleryProps {
   selectedColor: string;
 }
 
-const baseImages = [
-  { id: 1, src: tenisMain, alt: "Max Runner - Principal" },
-  { id: 2, src: tenis2, alt: "Max Runner - Vista Lateral" },
-  { id: 3, src: tenis3, alt: "Max Runner - Vista Traseira" },
-  { id: 4, src: tenis4, alt: "Max Runner - Detalhe" },
-  { id: 5, src: tenis5, alt: "Max Runner - Sola" },
-  { id: 6, src: tenis6, alt: "Max Runner - Vista Angular" },
-  { id: 7, src: tenis7, alt: "Max Runner - Vista Traseira" },
+interface MediaItem {
+  id: number;
+  type: "video" | "image";
+  src: string;
+  alt: string;
+  thumbnail?: string;
+}
+
+const baseImages: MediaItem[] = [
+  { id: 0, type: "video", src: tenisVideo, alt: "Max Runner - Vídeo", thumbnail: tenisMain },
+  { id: 1, type: "image", src: tenisMain, alt: "Max Runner - Principal" },
+  { id: 2, type: "image", src: tenis2, alt: "Max Runner - Vista Lateral" },
+  { id: 3, type: "image", src: tenis3, alt: "Max Runner - Vista Traseira" },
+  { id: 4, type: "image", src: tenis4, alt: "Max Runner - Detalhe" },
+  { id: 5, type: "image", src: tenis5, alt: "Max Runner - Sola" },
+  { id: 6, type: "image", src: tenis6, alt: "Max Runner - Vista Angular" },
+  { id: 7, type: "image", src: tenis7, alt: "Max Runner - Vista Traseira" },
 ];
 
 const ProductGallery = ({ selectedColor }: ProductGalleryProps) => {
-  const [showVideo, setShowVideo] = useState(false);
-  const [currentSlide, setCurrentSlide] = useState(0);
+  const [currentIndex, setCurrentIndex] = useState(0);
   
-  const [emblaRef, emblaApi] = useEmblaCarousel(
-    { loop: true, dragFree: false },
-    [Autoplay({ delay: 3000, stopOnInteraction: false, stopOnMouseEnter: true })]
-  );
+  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, dragFree: false });
 
-  // Get selected color image and prepend to carousel
+  // Get selected color image and add to media array
   const selectedColorData = colors.find(c => c.id === selectedColor);
-  const images = selectedColorData 
-    ? [{ id: 0, src: selectedColorData.image, alt: `Max Runner - ${selectedColorData.name}` }, ...baseImages]
+  const mediaItems: MediaItem[] = selectedColorData 
+    ? [
+        baseImages[0], // Video first
+        { id: -1, type: "image", src: selectedColorData.image, alt: `Max Runner - ${selectedColorData.name}` },
+        ...baseImages.slice(1)
+      ]
     : baseImages;
 
   const onSelect = useCallback(() => {
     if (!emblaApi) return;
-    setCurrentSlide(emblaApi.selectedScrollSnap());
+    setCurrentIndex(emblaApi.selectedScrollSnap());
   }, [emblaApi]);
 
   useEffect(() => {
@@ -61,6 +69,10 @@ const ProductGallery = ({ selectedColor }: ProductGalleryProps) => {
     }
   }, [selectedColor, emblaApi]);
 
+  const scrollTo = (index: number) => {
+    emblaApi?.scrollTo(index);
+  };
+
   return (
     <div id="produto" className="space-y-3">
       {/* Rating Link */}
@@ -75,73 +87,109 @@ const ProductGallery = ({ selectedColor }: ProductGalleryProps) => {
         <span className="underline">(578 avaliações)</span>
       </a>
 
-      {/* Main Image/Video Carousel */}
-      <div className="relative aspect-square overflow-hidden rounded-lg bg-white border border-border">
-        {showVideo ? (
-          <video
-            src={tenisVideo}
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="h-full w-full object-cover"
-          />
-        ) : (
-          <div ref={emblaRef} className="overflow-hidden h-full">
-            <div className="flex h-full">
-              {images.map((image) => (
-                <div key={image.id} className="flex-[0_0_100%] min-w-0 h-full">
+      {/* Gallery with Thumbnails on Left */}
+      <div className="flex gap-3">
+        {/* Thumbnails Column - Left Side */}
+        <div className="hidden md:flex flex-col gap-2 w-20 flex-shrink-0">
+          {mediaItems.map((item, index) => (
+            <button
+              key={item.id}
+              onClick={() => scrollTo(index)}
+              className={`
+                relative aspect-square rounded-lg overflow-hidden border-2 transition-all duration-200
+                ${currentIndex === index 
+                  ? "border-gray-900 shadow-md" 
+                  : "border-gray-200 hover:border-gray-400"
+                }
+              `}
+            >
+              {item.type === "video" ? (
+                <>
                   <img
-                    src={image.src}
-                    alt={image.alt}
+                    src={item.thumbnail || tenisMain}
+                    alt={item.alt}
                     className="h-full w-full object-cover"
                   />
+                  <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+                    <Play className="h-4 w-4 text-white fill-white" />
+                  </div>
+                </>
+              ) : (
+                <img
+                  src={item.src}
+                  alt={item.alt}
+                  className="h-full w-full object-cover"
+                />
+              )}
+            </button>
+          ))}
+        </div>
+
+        {/* Main Image/Video Display */}
+        <div className="relative flex-1 aspect-square overflow-hidden rounded-xl bg-white border border-gray-100">
+          <div ref={emblaRef} className="overflow-hidden h-full">
+            <div className="flex h-full">
+              {mediaItems.map((item) => (
+                <div key={item.id} className="flex-[0_0_100%] min-w-0 h-full">
+                  {item.type === "video" ? (
+                    <video
+                      src={item.src}
+                      autoPlay
+                      loop
+                      muted
+                      playsInline
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <img
+                      src={item.src}
+                      alt={item.alt}
+                      className="h-full w-full object-cover"
+                    />
+                  )}
                 </div>
               ))}
             </div>
           </div>
-        )}
-        
-        {/* Badge */}
-        <div className="absolute top-3 left-3 bg-destructive text-white text-xs font-bold px-3 py-1.5 rounded flex items-center gap-1 z-10">
-          <span className="animate-pulse">⚡</span>
-          ÚLTIMAS UNIDADES
-        </div>
+          
+          {/* Clean Badge */}
+          <div className="absolute top-3 left-3 bg-gray-900 text-white text-xs font-medium px-3 py-1.5 rounded-full z-10">
+            Últimas Unidades
+          </div>
 
-        {/* Slide Indicators */}
-        {!showVideo && (
-          <div className="absolute bottom-14 left-1/2 -translate-x-1/2 flex gap-1.5 z-10">
-            {images.map((_, index) => (
+          {/* Mobile Slide Indicators */}
+          <div className="md:hidden absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 z-10">
+            {mediaItems.map((_, index) => (
               <button
                 key={index}
-                onClick={() => emblaApi?.scrollTo(index)}
+                onClick={() => scrollTo(index)}
                 className={`w-2 h-2 rounded-full transition-all ${
-                  currentSlide === index
-                    ? "bg-foreground w-4"
-                    : "bg-foreground/40"
+                  currentIndex === index
+                    ? "bg-gray-900 w-4"
+                    : "bg-gray-400"
                 }`}
               />
             ))}
           </div>
-        )}
 
-        {/* Toggle Button */}
-        <button
-          onClick={() => setShowVideo(!showVideo)}
-          className="absolute bottom-3 right-3 flex items-center gap-2 bg-white/95 backdrop-blur-sm px-3 py-2 rounded-lg text-sm font-medium text-foreground border border-border hover:bg-white transition-colors shadow-sm z-10"
-        >
-          {showVideo ? (
-            <>
-              <ImageIcon className="h-4 w-4" />
-              Ver Fotos
-            </>
-          ) : (
-            <>
-              <Play className="h-4 w-4" />
-              Ver Vídeo
-            </>
-          )}
-        </button>
+          {/* Media Type Toggle - Mobile */}
+          <button
+            onClick={() => scrollTo(currentIndex === 0 ? 1 : 0)}
+            className="md:hidden absolute bottom-3 right-3 flex items-center gap-2 bg-white/95 backdrop-blur-sm px-3 py-2 rounded-lg text-sm font-medium text-gray-900 border border-gray-200 shadow-sm z-10"
+          >
+            {currentIndex === 0 ? (
+              <>
+                <ImageIcon className="h-4 w-4" />
+                Fotos
+              </>
+            ) : (
+              <>
+                <Play className="h-4 w-4" />
+                Vídeo
+              </>
+            )}
+          </button>
+        </div>
       </div>
     </div>
   );
