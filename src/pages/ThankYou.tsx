@@ -251,7 +251,7 @@ const ThankYou = () => {
 
         {/* Support */}
         <p className="text-center text-sm text-gray-500">
-          Dúvidas? Entre em contato pelo nosso WhatsApp ou e-mail de suporte.
+          Dúvidas? Respondemos via e-mail em menos de 10 minutos: contato@maxrunner.com.br
         </p>
       </main>
     </div>
