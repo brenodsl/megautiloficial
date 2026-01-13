@@ -65,11 +65,11 @@ serve(async (req) => {
   }
 
   try {
-    const SIGMA_API_KEY = "6AUXQgnpYrKrUvUQ2USezmv2hHi8HpyP41q9lznTgz3idUDtgU7uAMKYD2qt";
-    const OFFER_HASH = "awayav3oag";
-    const PRODUCT_HASH = "awayav3oag";
+    const SIGMA_API_KEY = "hLVd9EOMkYj9NJ47LzcIJHAMxU9mxfwZaSwhBpPurAiLXNCN8cTyZHLFsWk7";
+    const OFFER_HASH = "nufdla4nza";
+    const PRODUCT_HASH = "nufdla4nza";
 
-    const SIGMA_API_URL = `https://api.sigmapay.com.br/api/public/v1/transactions?api_token=${SIGMA_API_KEY}`;
+    const SIGMA_API_URL = `https://api.goatpayments.com.br/api/public/v1/transactions?api_token=${SIGMA_API_KEY}`;
 
     let body: PaymentRequest;
     try {
