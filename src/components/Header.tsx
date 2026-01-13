@@ -34,11 +34,11 @@ const Header = () => {
   return (
     <>
       <header className="sticky top-0 z-40">
-        {/* Top Promo Bar - Premium gradient */}
-        <div className="bg-gradient-to-r from-emerald-600 to-emerald-500 py-2">
+        {/* Top Promo Bar - Black Premium */}
+        <div className="bg-black py-2">
           <div className="container mx-auto px-4">
-            <p className="text-center text-xs font-medium text-white flex items-center justify-center gap-2 tracking-wide">
-              ✨ OFERTA EXCLUSIVA • 67% OFF + FRETE GRÁTIS
+            <p className="text-center text-xs font-medium text-white tracking-wider uppercase">
+              Oferta Exclusiva • 67% OFF + Frete Grátis
             </p>
           </div>
         </div>
