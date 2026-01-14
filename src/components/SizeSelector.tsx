@@ -23,7 +23,8 @@ interface SizeOption {
 }
 
 const sizes: SizeOption[] = [
-  { size: 34, inStock: false },
+  { size: 33, inStock: false },
+  { size: 34, inStock: true },
   { size: 35, inStock: true },
   { size: 36, inStock: true },
   { size: 37, inStock: true },
@@ -32,7 +33,8 @@ const sizes: SizeOption[] = [
   { size: 40, inStock: true },
   { size: 41, inStock: true },
   { size: 42, inStock: true },
-  { size: 44, inStock: false },
+  { size: 44, inStock: true },
+  { size: 45, inStock: false },
 ];
 
 const SizeSelector = forwardRef<SizeSelectorRef, SizeSelectorProps>(
