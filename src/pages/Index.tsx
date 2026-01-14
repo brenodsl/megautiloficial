@@ -165,7 +165,7 @@ const Index = () => {
               <div>
                 <span className="font-medium text-emerald-600">Frete grátis</span>
                 {!userLocation.loading && userLocation.city && (
-                  <span className="text-gray-500"> para {userLocation.city}, {userLocation.state}</span>
+                  <span className="text-gray-500"> para <span className="font-medium text-emerald-600">{userLocation.city}, {userLocation.state}</span></span>
                 )}
                 {!userLocation.loading && !userLocation.city && (
                   <span className="text-gray-500"> para todo o Brasil</span>
