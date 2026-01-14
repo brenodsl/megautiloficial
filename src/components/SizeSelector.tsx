@@ -94,9 +94,9 @@ const SizeSelector = forwardRef<SizeSelectorRef, SizeSelectorProps>(
         >
           <SelectTrigger 
             className={cn(
-              "w-full h-14 bg-card border rounded-lg font-medium transition-all",
+              "w-full h-14 bg-card border rounded-lg font-medium transition-all focus:ring-0 focus:ring-offset-0",
               showError 
-                ? "border-destructive ring-2 ring-destructive/20" 
+                ? "border-destructive" 
                 : "border-border"
             )}
           >
@@ -113,7 +113,7 @@ const SizeSelector = forwardRef<SizeSelectorRef, SizeSelectorProps>(
                 value={sizeOption.size.toString()}
                 disabled={!sizeOption.inStock}
                 className={cn(
-                  "cursor-pointer rounded-md transition-colors",
+                  "cursor-pointer rounded-md focus:bg-muted focus:text-foreground",
                   !sizeOption.inStock 
                     ? "opacity-40 cursor-not-allowed" 
                     : selectedSize === sizeOption.size
@@ -121,13 +121,10 @@ const SizeSelector = forwardRef<SizeSelectorRef, SizeSelectorProps>(
                       : "hover:bg-muted/50"
                 )}
               >
-                <div className="flex items-center gap-3 py-0.5">
-                  <span className="w-8 h-8 flex items-center justify-center bg-muted rounded-md text-sm font-semibold">
-                    {sizeOption.size}
-                  </span>
-                  <span className="text-foreground">Tamanho {sizeOption.size}</span>
+                <div className="flex items-center justify-between w-full py-0.5">
+                  <span className="text-foreground">{sizeOption.size}</span>
                   {!sizeOption.inStock && (
-                    <span className="text-xs text-muted-foreground ml-auto">Esgotado</span>
+                    <span className="text-xs text-muted-foreground">Esgotado</span>
                   )}
                 </div>
               </SelectItem>
