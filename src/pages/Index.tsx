@@ -56,6 +56,13 @@ const Index = () => {
   }, []);
 
   const handleBuyClick = () => {
+    // If cart has items, go directly to checkout (user is finishing their purchase)
+    if (totalItems > 0) {
+      navigate("/checkout");
+      return;
+    }
+    
+    // If cart is empty, user needs to select a size first
     if (!selectedSize) {
       sizeSelectorRef.current?.showError();
       return;
@@ -215,7 +222,7 @@ const Index = () => {
               onClick={handleBuyClick}
               size="lg"
               className={`w-full h-14 font-semibold text-base rounded-xl transition-all shadow-lg ${
-                selectedSize 
+                (selectedSize || totalItems > 0)
                   ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-200' 
                   : 'bg-gray-200 text-gray-400 cursor-default hover:bg-gray-200 shadow-none'
               }`}
