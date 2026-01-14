@@ -186,18 +186,28 @@ const Index = () => {
             </div>
           </div>
 
-          {/* Promotion Banner */}
-          <div className="mt-5 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-xl p-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0">
-                <span className="text-lg">🎉</span>
-              </div>
-              <div>
-                <p className="font-semibold text-gray-900 text-sm">Leve 2, pague menos!</p>
-                <p className="text-sm text-gray-600">O 2º par sai com <span className="font-bold text-emerald-600">20% OFF</span></p>
+          {/* Promotion Banner - Only shows when size is selected */}
+          {selectedSize && (
+            <div className="mt-5 relative overflow-hidden bg-gradient-to-r from-emerald-600 to-emerald-500 rounded-xl p-4 shadow-lg animate-fade-in">
+              <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2" />
+              <div className="absolute bottom-0 left-0 w-16 h-16 bg-white/10 rounded-full translate-y-1/2 -translate-x-1/2" />
+              <div className="relative flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0 backdrop-blur-sm">
+                    <span className="text-2xl">👟</span>
+                  </div>
+                  <div>
+                    <p className="font-bold text-white text-sm">Leve 2, pague menos!</p>
+                    <p className="text-emerald-100 text-xs">Adicione outro par ao carrinho</p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p className="text-xs text-emerald-100">2º par com</p>
+                  <p className="text-xl font-black text-white">20% OFF</p>
+                </div>
               </div>
             </div>
-          </div>
+          )}
 
           {/* CTA Buttons */}
           <div className="mt-6 space-y-3">
