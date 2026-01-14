@@ -186,6 +186,19 @@ const Index = () => {
             </div>
           </div>
 
+          {/* Promotion Banner */}
+          <div className="mt-5 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-xl p-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0">
+                <span className="text-lg">🎉</span>
+              </div>
+              <div>
+                <p className="font-semibold text-gray-900 text-sm">Leve 2, pague menos!</p>
+                <p className="text-sm text-gray-600">O 2º par sai com <span className="font-bold text-emerald-600">20% OFF</span></p>
+              </div>
+            </div>
+          </div>
+
           {/* CTA Buttons */}
           <div className="mt-6 space-y-3">
             <Button
