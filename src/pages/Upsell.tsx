@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { 
   CheckCircle, 
   Clock, 
@@ -9,7 +9,9 @@ import {
   Loader2,
   Copy,
   ArrowRight,
-  Sparkles
+  Sparkles,
+  Gift,
+  X
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -75,28 +77,48 @@ const PixIcon = ({ className = "h-5 w-5" }: { className?: string }) => (
 
 const Upsell = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const checkoutData = location.state as {
+    fromCheckout?: boolean;
+    customer?: {
+      name: string;
+      email: string;
+      phone: string;
+      document: string;
+    };
+    address?: {
+      street: string;
+      number: string;
+      complement: string;
+      neighborhood: string;
+      city: string;
+      state: string;
+      zipCode: string;
+    };
+  } | null;
+
   const [timeLeft, setTimeLeft] = useState(600); // 10 minutes
   const [selectedProduct, setSelectedProduct] = useState<string | null>(null);
   const [isBundle, setIsBundle] = useState(false);
   const [showCheckout, setShowCheckout] = useState(false);
   
-  // Customer data
+  // Customer data - pre-fill if coming from checkout
   const [customerData, setCustomerData] = useState({
-    name: "",
-    document: "",
-    phone: "",
-    email: "",
+    name: checkoutData?.customer?.name || "",
+    document: checkoutData?.customer?.document || "",
+    phone: checkoutData?.customer?.phone || "",
+    email: checkoutData?.customer?.email || "",
   });
   
-  // Address data
+  // Address data - pre-fill if coming from checkout
   const [addressData, setAddressData] = useState({
-    zipCode: "",
-    street: "",
-    number: "",
-    complement: "",
-    neighborhood: "",
-    city: "",
-    state: "",
+    zipCode: checkoutData?.address?.zipCode || "",
+    street: checkoutData?.address?.street || "",
+    number: checkoutData?.address?.number || "",
+    complement: checkoutData?.address?.complement || "",
+    neighborhood: checkoutData?.address?.neighborhood || "",
+    city: checkoutData?.address?.city || "",
+    state: checkoutData?.address?.state || "",
   });
 
   const [isLoading, setIsLoading] = useState(false);
@@ -110,6 +132,8 @@ const Upsell = () => {
   const [expirationTime, setExpirationTime] = useState(30 * 60);
   const [paymentStatus, setPaymentStatus] = useState<'pending' | 'paid' | 'checking'>('pending');
   const [isCheckingPayment, setIsCheckingPayment] = useState(false);
+  
+  const isFromCheckout = checkoutData?.fromCheckout === true;
   
   // Track presence on upsell page
   usePresence("/upsell");
@@ -755,11 +779,19 @@ const Upsell = () => {
         </div>
       </div>
 
+      {/* Exclusive Offer Banner */}
+      <div className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white py-3 px-4">
+        <div className="max-w-lg mx-auto flex items-center justify-center gap-2">
+          <Gift className="w-5 h-5" />
+          <span className="text-sm font-medium">Oferta exclusiva para clientes Max Runner!</span>
+        </div>
+      </div>
+
       {/* Timer Banner */}
       <div className="bg-gray-900 text-white py-3 px-4">
         <div className="max-w-lg mx-auto flex items-center justify-center gap-3">
           <Sparkles className="w-4 h-4 text-yellow-400" />
-          <span className="text-sm">Oferta exclusiva expira em</span>
+          <span className="text-sm">Esta oferta expira em</span>
           <span className="bg-white/10 px-3 py-1 rounded font-mono font-bold">
             {formatTime(timeLeft)}
           </span>
@@ -770,7 +802,7 @@ const Upsell = () => {
         {/* Section Title */}
         <div className="text-center">
           <h2 className="text-xl font-bold text-gray-900 mb-1">Complete seu Kit de Corrida</h2>
-          <p className="text-sm text-gray-500">Produtos selecionados com desconto especial</p>
+          <p className="text-sm text-gray-500">Produtos selecionados com desconto especial só para você</p>
         </div>
 
         {/* Individual Products */}
@@ -895,14 +927,15 @@ const Upsell = () => {
           </div>
         </div>
 
-        {/* Skip Link */}
-        <div className="text-center pt-2">
-          <Link
-            to="/"
-            className="text-sm text-gray-400 hover:text-gray-600"
+        {/* Skip Link - go to thank you page */}
+        <div className="text-center pt-4">
+          <button
+            onClick={() => navigate("/obrigado")}
+            className="inline-flex items-center gap-2 text-sm text-gray-400 hover:text-gray-600 transition-colors"
           >
-            Não, obrigado. Voltar para a loja.
-          </Link>
+            <X className="w-4 h-4" />
+            Não, obrigado. Finalizar minha compra.
+          </button>
         </div>
       </main>
     </div>
