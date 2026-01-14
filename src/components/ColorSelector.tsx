@@ -1,3 +1,4 @@
+import { useState, useRef } from "react";
 import colorGradient from "@/assets/color-gradient.webp";
 import colorGreen from "@/assets/color-green.webp";
 import colorLime from "@/assets/color-lime.webp";
@@ -39,14 +40,53 @@ interface ColorSelectorProps {
 
 const ColorSelector = ({ selectedColor, onColorSelect }: ColorSelectorProps) => {
   const selectedColorData = colors.find(c => c.id === selectedColor);
+  const [isOpen, setIsOpen] = useState(false);
+  const touchStartRef = useRef<{ x: number; y: number } | null>(null);
+  
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartRef.current = {
+      x: e.touches[0].clientX,
+      y: e.touches[0].clientY,
+    };
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (!touchStartRef.current) return;
+    
+    const touchEnd = {
+      x: e.changedTouches[0].clientX,
+      y: e.changedTouches[0].clientY,
+    };
+    
+    const deltaX = Math.abs(touchEnd.x - touchStartRef.current.x);
+    const deltaY = Math.abs(touchEnd.y - touchStartRef.current.y);
+    
+    // Only open if it was a tap (minimal movement)
+    if (deltaX < 10 && deltaY < 10) {
+      setIsOpen(true);
+    }
+    
+    touchStartRef.current = null;
+  };
   
   return (
     <div className="space-y-2">
       <span className="text-sm font-medium text-foreground">Cor</span>
       
-      <DropdownMenu modal={false}>
+      <DropdownMenu open={isOpen} onOpenChange={setIsOpen} modal={false}>
         <DropdownMenuTrigger asChild>
-          <button className="w-full h-14 bg-card border border-border rounded-lg px-3 flex items-center justify-between">
+          <button 
+            className="w-full h-14 bg-card border border-border rounded-lg px-3 flex items-center justify-between"
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
+            onClick={(e) => {
+              // For desktop clicks, toggle normally
+              if (!('ontouchstart' in window)) {
+                setIsOpen(!isOpen);
+              }
+              e.preventDefault();
+            }}
+          >
             {selectedColorData && (
               <div className="flex items-center gap-3">
                 <img 
