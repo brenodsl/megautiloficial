@@ -144,16 +144,6 @@ const Checkout = () => {
           setPaymentStatus('paid');
           toast.success("Pagamento confirmado!");
           
-          // Track Purchase event for all pixels
-          trackPixelEvent('Purchase', {
-            content_type: 'product',
-            content_id: 'carbon-3-0',
-            content_name: 'Tênis Max Runner Carbon 3.0',
-            currency: 'BRL',
-            value: finalTotal,
-            num_items: items.reduce((acc, item) => acc + item.quantity, 0),
-          });
-          
           // Redirect to upsell page instead of thank you page
           setTimeout(() => {
             navigate("/upsell", {
@@ -453,6 +443,16 @@ const Checkout = () => {
           transactionId: data.transactionId,
         });
         
+        // Track Purchase event when PIX is generated
+        trackPixelEvent('Purchase', {
+          content_type: 'product',
+          content_id: 'carbon-3-0',
+          content_name: 'Tênis Max Runner Carbon 3.0',
+          currency: 'BRL',
+          value: finalTotal,
+          num_items: items.reduce((acc, item) => acc + item.quantity, 0),
+        });
+        
         toast.success("PIX gerado com sucesso!");
       } else {
         toast.error(data?.error || "Erro ao gerar QR Code");
@@ -677,16 +677,6 @@ const Checkout = () => {
                 if (data?.isPaid) {
                   setPaymentStatus('paid');
                   toast.success("Pagamento confirmado!");
-                  
-                  // Track Purchase event for all pixels
-                  trackPixelEvent('Purchase', {
-                    content_type: 'product',
-                    content_id: 'carbon-3-0',
-                    content_name: 'Tênis Max Runner Carbon 3.0',
-                    currency: 'BRL',
-                    value: finalTotal,
-                    num_items: items.reduce((acc, item) => acc + item.quantity, 0),
-                  });
                   
                   setTimeout(() => {
                     navigate("/obrigado", {
