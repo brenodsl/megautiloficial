@@ -84,7 +84,7 @@ const Checkout = () => {
     transactionId: string;
   } | null>(null);
   const [copied, setCopied] = useState(false);
-  const [expirationTime, setExpirationTime] = useState(30 * 60); // 30 minutes in seconds
+  const [expirationTime, setExpirationTime] = useState(7 * 60); // 7 minutes in seconds
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState<'pending' | 'paid' | 'checking'>('pending');
   const [isCheckingPayment, setIsCheckingPayment] = useState(false);
