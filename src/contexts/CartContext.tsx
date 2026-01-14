@@ -19,6 +19,9 @@ interface CartContextType {
   clearCart: () => void;
   totalItems: number;
   totalPrice: number;
+  originalPrice: number;
+  discount: number;
+  discountPercentage: number;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -75,7 +78,19 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
-  const totalPrice = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  const originalPrice = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  
+  // Calculate progressive discount: 2nd pair onwards gets 20% off
+  const calculateDiscount = () => {
+    if (totalItems < 2) return 0;
+    // First item is full price, remaining items get 20% off
+    const discountedItems = totalItems - 1;
+    return discountedItems * UNIT_PRICE * 0.20;
+  };
+  
+  const discount = calculateDiscount();
+  const totalPrice = originalPrice - discount;
+  const discountPercentage = originalPrice > 0 ? (discount / originalPrice) * 100 : 0;
 
   return (
     <CartContext.Provider value={{
@@ -86,6 +101,9 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       clearCart,
       totalItems,
       totalPrice,
+      originalPrice,
+      discount,
+      discountPercentage,
     }}>
       {children}
     </CartContext.Provider>

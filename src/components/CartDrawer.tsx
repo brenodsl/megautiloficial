@@ -49,7 +49,7 @@ interface CartDrawerProps {
 
 const CartDrawer = ({ open, onOpenChange }: CartDrawerProps) => {
   const navigate = useNavigate();
-  const { items, updateQuantity, removeItem, totalPrice, totalItems } = useCart();
+  const { items, updateQuantity, removeItem, totalPrice, totalItems, originalPrice, discount } = useCart();
 
   const handleCheckout = () => {
     onOpenChange(false);
@@ -140,11 +140,39 @@ const CartDrawer = ({ open, onOpenChange }: CartDrawerProps) => {
 
             {/* Footer */}
             <div className="border-t border-border p-4 space-y-4">
-              <div className="flex justify-between items-center">
-                <span className="text-muted-foreground">Subtotal</span>
-                <span className="font-bold text-lg text-foreground">
-                  R$ {totalPrice.toFixed(2).replace(".", ",")}
-                </span>
+              {/* Promotion Banner */}
+              {totalItems === 1 && (
+                <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-center">
+                  <p className="text-sm font-medium text-amber-800">
+                    🎉 Adicione mais 1 par e ganhe <span className="font-bold text-emerald-600">20% OFF</span> no segundo!
+                  </p>
+                </div>
+              )}
+              
+              {discount > 0 && (
+                <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-3">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm font-medium text-emerald-800">🎉 Desconto aplicado!</span>
+                    <span className="text-sm font-bold text-emerald-600">-R$ {discount.toFixed(2).replace(".", ",")}</span>
+                  </div>
+                </div>
+              )}
+              
+              <div className="space-y-2">
+                {discount > 0 && (
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-muted-foreground">Subtotal</span>
+                    <span className="text-muted-foreground line-through">
+                      R$ {originalPrice.toFixed(2).replace(".", ",")}
+                    </span>
+                  </div>
+                )}
+                <div className="flex justify-between items-center">
+                  <span className="text-muted-foreground">Total</span>
+                  <span className="font-bold text-lg text-foreground">
+                    R$ {totalPrice.toFixed(2).replace(".", ",")}
+                  </span>
+                </div>
               </div>
               <Button
                 onClick={handleCheckout}
