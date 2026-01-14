@@ -30,9 +30,6 @@ interface SizeOption {
 }
 
 const sizes: SizeOption[] = [
-  { size: 31, inStock: true },
-  { size: 32, inStock: true },
-  { size: 33, inStock: false },
   { size: 34, inStock: false },
   { size: 35, inStock: true },
   { size: 36, inStock: true },
@@ -105,10 +102,14 @@ const SizeSelector = forwardRef<SizeSelectorRef, SizeSelectorProps>(
           >
             <SelectValue placeholder="Selecione o tamanho" />
           </SelectTrigger>
-          <SelectContent className="bg-white border border-border z-50">
+          <SelectContent 
+            className="bg-white border border-border z-50"
+            position="popper"
+            sideOffset={4}
+          >
             {sizes.map((sizeOption) => (
               <SelectItem 
-                key={sizeOption.size} 
+                key={sizeOption.size}
                 value={sizeOption.size.toString()}
                 disabled={!sizeOption.inStock}
                 className={`cursor-pointer ${!sizeOption.inStock ? 'opacity-50 cursor-not-allowed' : 'hover:bg-muted'}`}
