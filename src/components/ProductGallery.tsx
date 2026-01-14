@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Star, Play, Image as ImageIcon } from "lucide-react";
 import useEmblaCarousel from "embla-carousel-react";
 import tenisMain from "@/assets/tenis-main.webp";
@@ -36,6 +36,7 @@ const baseImages: MediaItem[] = [
 
 const ProductGallery = ({ selectedColor }: ProductGalleryProps) => {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const prevColorRef = useRef(selectedColor);
   
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, dragFree: false });
 
@@ -62,10 +63,12 @@ const ProductGallery = ({ selectedColor }: ProductGalleryProps) => {
     };
   }, [emblaApi, onSelect]);
 
-  // Reset to first slide when color changes
+  // Navigate to color image when color changes (index 1 is the color image)
   useEffect(() => {
-    if (emblaApi) {
-      emblaApi.scrollTo(0);
+    if (emblaApi && selectedColor !== prevColorRef.current) {
+      prevColorRef.current = selectedColor;
+      // Scroll to index 1 which is the color image
+      emblaApi.scrollTo(1);
     }
   }, [selectedColor, emblaApi]);
 
