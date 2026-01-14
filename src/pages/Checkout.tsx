@@ -36,6 +36,7 @@ import CheckoutProgressBar from "@/components/CheckoutProgressBar";
 
 import ValidatedInput from "@/components/ValidatedInput";
 import FloatingCheckoutSummary from "@/components/FloatingCheckoutSummary";
+import OfferTimer from "@/components/OfferTimer";
 // PIX Icon Component
 const PixIcon = ({ className = "h-5 w-5" }: { className?: string }) => (
   <svg width="16" height="16" viewBox="0 0 512 512" fill="currentColor" className={className}>
@@ -756,6 +757,9 @@ const Checkout = () => {
         shippingPrice={shippingPrice}
         itemCount={items.reduce((sum, i) => sum + i.quantity, 0)}
       />
+
+      {/* Offer Timer */}
+      <OfferTimer />
 
       {/* Header */}
       <header className="bg-white border-b border-gray-100 py-3 px-4">
