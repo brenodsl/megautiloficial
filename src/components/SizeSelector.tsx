@@ -1,12 +1,5 @@
 import { forwardRef, useImperativeHandle, useRef, useState } from "react";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
   Dialog,
   DialogContent,
   DialogTrigger,
@@ -51,18 +44,17 @@ const SizeSelector = forwardRef<SizeSelectorRef, SizeSelectorProps>(
       showError: () => {
         setShowError(true);
         containerRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
-        // Remove error after 3 seconds
         setTimeout(() => setShowError(false), 3000);
       },
     }));
 
-    const handleSelect = (value: string) => {
+    const handleSelect = (size: number) => {
       setShowError(false);
-      onSizeSelect(Number(value));
+      onSizeSelect(size);
     };
 
     return (
-      <div ref={containerRef} className="space-y-2">
+      <div ref={containerRef} className="space-y-3">
         <div className="flex items-center justify-between">
           <span className={cn(
             "text-sm font-medium transition-colors",
@@ -88,49 +80,26 @@ const SizeSelector = forwardRef<SizeSelectorRef, SizeSelectorProps>(
           </Dialog>
         </div>
         
-        <Select
-          value={selectedSize?.toString() || ""}
-          onValueChange={handleSelect}
-        >
-          <SelectTrigger 
-            className={cn(
-              "w-full h-14 bg-card border rounded-lg font-medium transition-all focus:ring-0 focus:ring-offset-0",
-              showError 
-                ? "border-destructive" 
-                : "border-border"
-            )}
-          >
-            <SelectValue placeholder="Selecione o tamanho" />
-          </SelectTrigger>
-          <SelectContent 
-            className="bg-card border border-border rounded-lg shadow-lg z-50"
-            position="popper"
-            sideOffset={4}
-          >
-            {sizes.map((sizeOption) => (
-              <SelectItem 
-                key={sizeOption.size}
-                value={sizeOption.size.toString()}
-                disabled={!sizeOption.inStock}
-                className={cn(
-                  "cursor-pointer rounded-md focus:bg-muted focus:text-foreground",
-                  !sizeOption.inStock 
-                    ? "opacity-40 cursor-not-allowed" 
-                    : selectedSize === sizeOption.size
-                      ? "bg-muted"
-                      : "hover:bg-muted/50"
-                )}
-              >
-                <div className="flex items-center justify-between w-full py-0.5">
-                  <span className="text-foreground">{sizeOption.size}</span>
-                  {!sizeOption.inStock && (
-                    <span className="text-xs text-muted-foreground">Esgotado</span>
-                  )}
-                </div>
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <div className="grid grid-cols-5 gap-2">
+          {sizes.map((sizeOption) => (
+            <button
+              key={sizeOption.size}
+              onClick={() => sizeOption.inStock && handleSelect(sizeOption.size)}
+              disabled={!sizeOption.inStock}
+              className={cn(
+                "h-12 rounded-lg border text-sm font-medium transition-all",
+                !sizeOption.inStock 
+                  ? "bg-muted/30 text-muted-foreground/50 border-border/50 cursor-not-allowed line-through" 
+                  : selectedSize === sizeOption.size
+                    ? "bg-foreground text-background border-foreground"
+                    : "bg-card text-foreground border-border hover:border-foreground/50",
+                showError && !selectedSize && sizeOption.inStock && "border-destructive"
+              )}
+            >
+              {sizeOption.size}
+            </button>
+          ))}
+        </div>
       </div>
     );
   }
