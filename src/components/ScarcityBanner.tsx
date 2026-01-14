@@ -1,10 +1,10 @@
-import { Flame } from "lucide-react";
+import { Zap } from "lucide-react";
 
 const ScarcityBanner = () => {
   return (
-    <div className="inline-flex items-center gap-2 bg-gradient-to-r from-orange-500 via-red-500 to-orange-600 text-white text-xs font-bold px-4 py-2 rounded-full shadow-lg animate-pulse">
-      <Flame className="w-4 h-4 animate-bounce" />
-      <span className="tracking-wide">ÚLTIMAS UNIDADES</span>
+    <div className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-xs font-semibold px-3 py-1.5 rounded-md shadow-md">
+      <Zap className="w-3.5 h-3.5 fill-current" />
+      <span>Últimas unidades</span>
     </div>
   );
 };
