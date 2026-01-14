@@ -24,7 +24,26 @@ export interface SizeSelectorRef {
   showError: () => void;
 }
 
-const sizes = [31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 44];
+interface SizeOption {
+  size: number;
+  inStock: boolean;
+}
+
+const sizes: SizeOption[] = [
+  { size: 31, inStock: true },
+  { size: 32, inStock: true },
+  { size: 33, inStock: false },
+  { size: 34, inStock: false },
+  { size: 35, inStock: true },
+  { size: 36, inStock: true },
+  { size: 37, inStock: true },
+  { size: 38, inStock: true },
+  { size: 39, inStock: true },
+  { size: 40, inStock: true },
+  { size: 41, inStock: true },
+  { size: 42, inStock: true },
+  { size: 44, inStock: false },
+];
 
 const SizeSelector = forwardRef<SizeSelectorRef, SizeSelectorProps>(
   ({ selectedSize, onSizeSelect }, ref) => {
@@ -87,13 +106,19 @@ const SizeSelector = forwardRef<SizeSelectorRef, SizeSelectorProps>(
             <SelectValue placeholder="Selecione o tamanho" />
           </SelectTrigger>
           <SelectContent className="bg-white border border-border z-50">
-            {sizes.map((size) => (
+            {sizes.map((sizeOption) => (
               <SelectItem 
-                key={size} 
-                value={size.toString()}
-                className="cursor-pointer hover:bg-muted"
+                key={sizeOption.size} 
+                value={sizeOption.size.toString()}
+                disabled={!sizeOption.inStock}
+                className={`cursor-pointer ${!sizeOption.inStock ? 'opacity-50 cursor-not-allowed' : 'hover:bg-muted'}`}
               >
-                Tamanho {size}
+                <span className="flex items-center justify-between w-full gap-4">
+                  <span>Tamanho {sizeOption.size}</span>
+                  {!sizeOption.inStock && (
+                    <span className="text-xs text-muted-foreground">(Esgotado)</span>
+                  )}
+                </span>
               </SelectItem>
             ))}
           </SelectContent>
