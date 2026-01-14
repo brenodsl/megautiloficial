@@ -51,7 +51,7 @@ const QRCodeIcon = () => (
 
 const Checkout = () => {
   const navigate = useNavigate();
-  const { items, totalPrice, clearCart } = useCart();
+  const { items, totalPrice, originalPrice, discount, clearCart } = useCart();
   
   const [customerData, setCustomerData] = useState({
     name: "",
@@ -790,9 +790,23 @@ const Checkout = () => {
                     Editar
                   </button>
                 </div>
-                <p className="font-bold text-[#28af60]">
-                  R$ {totalPrice.toFixed(2).replace(".", ",")}
-                </p>
+                <div className="flex items-center gap-2">
+                  {discount > 0 && (
+                    <span className="text-sm text-gray-400 line-through">
+                      R$ {originalPrice.toFixed(2).replace(".", ",")}
+                    </span>
+                  )}
+                  <span className="font-bold text-[#28af60]">
+                    R$ {totalPrice.toFixed(2).replace(".", ",")}
+                  </span>
+                </div>
+                {discount > 0 && (
+                  <div className="flex items-center gap-1.5 mt-1">
+                    <span className="text-xs font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
+                      Economizando R$ {discount.toFixed(2).replace(".", ",")}
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
             <div className="flex items-center gap-2 mt-3 pt-3 border-t border-gray-100">
