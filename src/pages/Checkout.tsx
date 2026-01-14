@@ -35,6 +35,7 @@ import { trackPixelEvent } from "@/hooks/usePixels";
 import ShippingOptions, { getShippingPrice } from "@/components/ShippingOptions";
 import CartDrawer from "@/components/CartDrawer";
 import CheckoutProgressBar from "@/components/CheckoutProgressBar";
+import PaymentProgressBar from "@/components/PaymentProgressBar";
 
 import ValidatedInput from "@/components/ValidatedInput";
 import FloatingCheckoutSummary from "@/components/FloatingCheckoutSummary";
@@ -531,6 +532,9 @@ const Checkout = () => {
             </Link>
           </div>
         </header>
+
+        {/* Payment Progress Bar */}
+        <PaymentProgressBar currentStep={1} />
 
         <main className="max-w-lg mx-auto px-4 py-6 space-y-6">
           {/* PIX Icon */}
