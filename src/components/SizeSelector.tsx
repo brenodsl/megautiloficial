@@ -64,16 +64,16 @@ const SizeSelector = forwardRef<SizeSelectorRef, SizeSelectorProps>(
     return (
       <div ref={containerRef} className="space-y-2">
         <div className="flex items-center justify-between">
-          <label className={cn(
-            "text-sm transition-colors",
-            showError ? "text-destructive font-semibold" : "text-muted-foreground"
+          <span className={cn(
+            "text-sm font-medium transition-colors",
+            showError ? "text-destructive" : "text-foreground"
           )}>
-            Tamanho: {showError && <span className="ml-1">⚠️ Selecione um tamanho!</span>}
-          </label>
+            Tamanho {showError && <span className="text-destructive ml-1">• Selecione</span>}
+          </span>
           
           <Dialog>
             <DialogTrigger asChild>
-              <button className="flex items-center gap-1 text-xs text-gray-500 hover:text-gray-900 transition-colors">
+              <button className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors">
                 <Ruler className="h-3.5 w-3.5" />
                 <span className="underline">Tabela de tamanhos</span>
               </button>
@@ -94,16 +94,16 @@ const SizeSelector = forwardRef<SizeSelectorRef, SizeSelectorProps>(
         >
           <SelectTrigger 
             className={cn(
-              "w-full h-12 bg-white border-2 text-foreground font-medium transition-all",
+              "w-full h-14 bg-card border rounded-lg font-medium transition-all",
               showError 
-                ? "border-destructive ring-2 ring-destructive/20 animate-pulse" 
+                ? "border-destructive ring-2 ring-destructive/20" 
                 : "border-border"
             )}
           >
             <SelectValue placeholder="Selecione o tamanho" />
           </SelectTrigger>
           <SelectContent 
-            className="bg-white border border-border z-50"
+            className="bg-card border border-border rounded-lg shadow-lg z-50"
             position="popper"
             sideOffset={4}
           >
@@ -112,14 +112,24 @@ const SizeSelector = forwardRef<SizeSelectorRef, SizeSelectorProps>(
                 key={sizeOption.size}
                 value={sizeOption.size.toString()}
                 disabled={!sizeOption.inStock}
-                className={`cursor-pointer ${!sizeOption.inStock ? 'opacity-50 cursor-not-allowed' : 'hover:bg-muted'}`}
+                className={cn(
+                  "cursor-pointer rounded-md transition-colors",
+                  !sizeOption.inStock 
+                    ? "opacity-40 cursor-not-allowed" 
+                    : selectedSize === sizeOption.size
+                      ? "bg-muted"
+                      : "hover:bg-muted/50"
+                )}
               >
-                <span className="flex items-center justify-between w-full gap-4">
-                  <span>Tamanho {sizeOption.size}</span>
+                <div className="flex items-center gap-3 py-0.5">
+                  <span className="w-8 h-8 flex items-center justify-center bg-muted rounded-md text-sm font-semibold">
+                    {sizeOption.size}
+                  </span>
+                  <span className="text-foreground">Tamanho {sizeOption.size}</span>
                   {!sizeOption.inStock && (
-                    <span className="text-xs text-muted-foreground">(Esgotado)</span>
+                    <span className="text-xs text-muted-foreground ml-auto">Esgotado</span>
                   )}
-                </span>
+                </div>
               </SelectItem>
             ))}
           </SelectContent>
