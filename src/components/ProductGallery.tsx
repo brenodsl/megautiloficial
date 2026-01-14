@@ -90,16 +90,16 @@ const ProductGallery = ({ selectedColor }: ProductGalleryProps) => {
         <span className="underline">(578 avaliações)</span>
       </a>
 
-      {/* Gallery with Thumbnails on Left (Desktop) / Bottom (Mobile) */}
-      <div className="flex flex-col md:flex-row gap-3">
-        {/* Thumbnails Column - Left Side (Desktop) */}
-        <div className="hidden md:flex flex-col gap-2 w-20 flex-shrink-0 order-1">
+      {/* Gallery with Thumbnails on Left (All Devices) */}
+      <div className="flex flex-row gap-2 sm:gap-3">
+        {/* Thumbnails Column - Left Side (All Devices) */}
+        <div className="flex flex-col gap-1.5 sm:gap-2 w-14 sm:w-20 flex-shrink-0 max-h-[300px] sm:max-h-[500px] overflow-y-auto scrollbar-hide">
           {mediaItems.map((item, index) => (
             <button
               key={item.id}
               onClick={() => scrollTo(index)}
               className={`
-                relative aspect-square rounded-lg overflow-hidden border-2 transition-all duration-200
+                relative aspect-square rounded-md sm:rounded-lg overflow-hidden border-2 transition-all duration-200 flex-shrink-0
                 ${currentIndex === index 
                   ? "border-gray-900 shadow-md" 
                   : "border-gray-200 hover:border-gray-400"
@@ -114,7 +114,7 @@ const ProductGallery = ({ selectedColor }: ProductGalleryProps) => {
                     className="h-full w-full object-cover"
                   />
                   <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
-                    <Play className="h-4 w-4 text-white fill-white" />
+                    <Play className="h-3 w-3 sm:h-4 sm:w-4 text-white fill-white" />
                   </div>
                 </>
               ) : (
@@ -129,7 +129,7 @@ const ProductGallery = ({ selectedColor }: ProductGalleryProps) => {
         </div>
 
         {/* Main Image/Video Display */}
-        <div className="relative flex-1 aspect-square overflow-hidden rounded-xl bg-white border border-gray-100 order-1 md:order-2">
+        <div className="relative flex-1 aspect-square overflow-hidden rounded-xl bg-white border border-gray-100">
           <div ref={emblaRef} className="overflow-hidden h-full">
             <div className="flex h-full">
               {mediaItems.map((item) => (
@@ -154,42 +154,6 @@ const ProductGallery = ({ selectedColor }: ProductGalleryProps) => {
               ))}
             </div>
           </div>
-        </div>
-
-        {/* Thumbnails Row - Bottom (Mobile Only) */}
-        <div className="flex md:hidden gap-2 overflow-x-auto scrollbar-hide order-2 pb-1">
-          {mediaItems.map((item, index) => (
-            <button
-              key={item.id}
-              onClick={() => scrollTo(index)}
-              className={`
-                relative flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all duration-200
-                ${currentIndex === index 
-                  ? "border-gray-900 shadow-md" 
-                  : "border-gray-200"
-                }
-              `}
-            >
-              {item.type === "video" ? (
-                <>
-                  <img
-                    src={item.thumbnail || tenisMain}
-                    alt={item.alt}
-                    className="h-full w-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
-                    <Play className="h-4 w-4 text-white fill-white" />
-                  </div>
-                </>
-              ) : (
-                <img
-                  src={item.src}
-                  alt={item.alt}
-                  className="h-full w-full object-cover"
-                />
-              )}
-            </button>
-          ))}
         </div>
       </div>
     </div>
