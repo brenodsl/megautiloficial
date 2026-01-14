@@ -17,7 +17,8 @@ import {
   Truck,
   Award,
   Clock,
-  AlertCircle
+  AlertCircle,
+  ArrowLeft
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -769,9 +770,18 @@ const Checkout = () => {
       {/* Header */}
       <header className="bg-white border-b border-gray-100 py-3 px-4">
         <div className="max-w-lg mx-auto flex items-center justify-between">
-          <Link to="/">
-            <img src={logo} alt="Max Runner" className="h-8 w-auto" />
-          </Link>
+          <div className="flex items-center gap-3">
+            <button 
+              onClick={() => navigate("/")}
+              className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors"
+              aria-label="Voltar"
+            >
+              <ArrowLeft className="h-5 w-5 text-gray-600" />
+            </button>
+            <Link to="/">
+              <img src={logo} alt="Max Runner" className="h-8 w-auto" />
+            </Link>
+          </div>
           <div className="flex items-center gap-1.5 text-xs text-gray-500 bg-gray-50 px-3 py-1.5 rounded-full">
             <Lock className="h-3 w-3 text-[#28af60]" />
             <span>Ambiente seguro</span>
