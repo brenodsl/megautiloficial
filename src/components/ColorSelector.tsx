@@ -39,67 +39,78 @@ const ColorSelector = ({ selectedColor, onColorSelect }: ColorSelectorProps) => 
   const selectedColorData = colors.find(c => c.id === selectedColor);
   
   return (
-    <div className="space-y-2">
-      <div className="flex items-center gap-2">
-        <span className="text-sm text-gray-500">Cor:</span>
-        {!selectedColor && (
-          <span className="text-sm text-red-500 font-medium">Selecione</span>
+    <div className="space-y-3">
+      <div className="flex items-center justify-between">
+        <span className="text-sm font-medium text-foreground">Cor</span>
+        {selectedColorData && (
+          <span className="text-sm text-muted-foreground">{selectedColorData.name}</span>
         )}
       </div>
       
       <Select value={selectedColor} onValueChange={onColorSelect}>
-        <SelectTrigger className="w-full h-14 bg-white border-gray-200">
+        <SelectTrigger className="w-full h-16 bg-card border border-border rounded-xl shadow-sm hover:border-primary/50 hover:shadow-md transition-all duration-200 focus:ring-2 focus:ring-primary/20 focus:border-primary">
           <SelectValue placeholder="Selecione a cor">
             {selectedColorData && (
-              <div className="flex items-center gap-3">
-                <img 
-                  src={selectedColorData.image} 
-                  alt={selectedColorData.name}
-                  className="w-10 h-10 rounded-lg object-cover"
-                />
-                <div className="flex items-center gap-2">
-                  <span className="font-medium">{selectedColorData.name}</span>
-                  <span className={`text-xs px-2 py-0.5 rounded-full ${
+              <div className="flex items-center gap-4">
+                <div className="relative">
+                  <img 
+                    src={selectedColorData.image} 
+                    alt={selectedColorData.name}
+                    className="w-12 h-12 rounded-xl object-cover ring-2 ring-border"
+                  />
+                  <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-primary rounded-full flex items-center justify-center">
+                    <svg className="w-2.5 h-2.5 text-primary-foreground" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                </div>
+                <div className="flex flex-col items-start gap-0.5">
+                  <span className="font-semibold text-foreground">{selectedColorData.name}</span>
+                  <span className={`text-xs font-medium ${
                     selectedColorData.stock <= 5 
-                      ? 'bg-red-50 text-red-600' 
+                      ? 'text-destructive' 
                       : selectedColorData.stock <= 10 
-                        ? 'bg-amber-50 text-amber-600' 
-                        : 'bg-emerald-50 text-emerald-600'
+                        ? 'text-warning' 
+                        : 'text-muted-foreground'
                   }`}>
                     {selectedColorData.stock <= 5 
-                      ? `Últimas ${selectedColorData.stock}` 
-                      : `${selectedColorData.stock} un.`}
+                      ? `⚡ Apenas ${selectedColorData.stock} restantes` 
+                      : `${selectedColorData.stock} em estoque`}
                   </span>
                 </div>
               </div>
             )}
           </SelectValue>
         </SelectTrigger>
-        <SelectContent className="bg-white z-50">
+        <SelectContent className="bg-card border border-border rounded-xl shadow-xl z-50 p-1">
           {colors.map((color) => (
             <SelectItem 
               key={color.id} 
               value={color.id}
-              className="cursor-pointer hover:bg-gray-50"
+              className="cursor-pointer rounded-lg hover:bg-muted/50 focus:bg-muted/50 transition-colors duration-150 my-0.5"
             >
-              <div className="flex items-center gap-3 py-1">
+              <div className="flex items-center gap-4 py-1.5">
                 <img 
                   src={color.image} 
                   alt={color.name}
-                  className="w-10 h-10 rounded-lg object-cover"
+                  className={`w-11 h-11 rounded-xl object-cover transition-all duration-200 ${
+                    selectedColor === color.id 
+                      ? 'ring-2 ring-primary ring-offset-2' 
+                      : 'ring-1 ring-border hover:ring-2 hover:ring-primary/50'
+                  }`}
                 />
-                <div className="flex items-center gap-2">
-                  <span className="font-medium">{color.name}</span>
-                  <span className={`text-xs px-2 py-0.5 rounded-full ${
+                <div className="flex flex-col gap-0.5">
+                  <span className="font-medium text-foreground">{color.name}</span>
+                  <span className={`text-xs ${
                     color.stock <= 5 
-                      ? 'bg-red-50 text-red-600' 
+                      ? 'text-destructive font-medium' 
                       : color.stock <= 10 
-                        ? 'bg-amber-50 text-amber-600' 
-                        : 'bg-emerald-50 text-emerald-600'
+                        ? 'text-warning' 
+                        : 'text-muted-foreground'
                   }`}>
                     {color.stock <= 5 
-                      ? `Últimas ${color.stock}` 
-                      : `${color.stock} un.`}
+                      ? `⚡ Apenas ${color.stock} restantes` 
+                      : `${color.stock} em estoque`}
                   </span>
                 </div>
               </div>
