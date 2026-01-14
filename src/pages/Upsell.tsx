@@ -754,43 +754,42 @@ const Upsell = () => {
     <div className="min-h-screen bg-white">
       {/* Header */}
       <header className="bg-white border-b border-gray-100 py-3 px-4">
-        <div className="max-w-lg mx-auto flex items-center justify-center">
+        <div className="max-w-md mx-auto flex items-center justify-center">
           <Link to="/">
             <img src={logo} alt="Max Runner" className="h-8 w-auto" />
           </Link>
         </div>
       </header>
 
-      {/* Success Banner - Simple */}
+      {/* Success Banner */}
       <div className="bg-[#28af60] text-white py-3 px-4">
-        <div className="max-w-lg mx-auto flex items-center justify-center gap-2">
-          <CheckCircle className="w-5 h-5" />
-          <span className="font-medium">Pedido confirmado! Aproveite esta oferta exclusiva:</span>
+        <div className="max-w-md mx-auto flex items-center justify-center gap-2">
+          <CheckCircle className="w-5 h-5 flex-shrink-0" />
+          <span className="font-medium text-sm">Pedido confirmado! Oferta exclusiva abaixo</span>
         </div>
       </div>
 
-      <main className="max-w-lg mx-auto px-4 py-8 space-y-6">
-        {/* Timer - Clean */}
-        <div className="flex items-center justify-center gap-2 text-gray-600">
+      <main className="max-w-md mx-auto px-4 py-6">
+        {/* Timer */}
+        <div className="flex items-center justify-center gap-2 text-gray-500 mb-6">
           <Clock className="w-4 h-4" />
-          <span className="text-sm">Oferta expira em</span>
-          <span className="font-mono font-bold text-gray-900">{formatTime(timeLeft)}</span>
+          <span className="text-sm">Expira em</span>
+          <span className="font-mono font-semibold text-gray-900 bg-gray-100 px-2 py-0.5 rounded">{formatTime(timeLeft)}</span>
         </div>
 
-        {/* Section Title */}
-        <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Complete seu Kit</h2>
-          <p className="text-gray-500">Desconto exclusivo para clientes Max Runner</p>
+        {/* Title */}
+        <div className="text-center mb-6">
+          <h1 className="text-xl font-bold text-gray-900">Complete seu Kit de Corrida</h1>
         </div>
 
-        {/* Individual Products */}
-        <div className="space-y-3">
+        {/* Products List */}
+        <div className="space-y-3 mb-6">
           {products.map((product) => (
             <div
               key={product.id}
-              className="bg-white rounded-xl p-4 border border-gray-200 flex gap-4 hover:border-gray-300 transition-colors"
+              className="bg-white rounded-lg p-3 border border-gray-200 flex items-center gap-3"
             >
-              <div className="w-20 h-20 flex-shrink-0 bg-gray-50 rounded-lg overflow-hidden">
+              <div className="w-16 h-16 flex-shrink-0 bg-gray-50 rounded-lg overflow-hidden">
                 <img
                   src={product.image}
                   alt={product.name}
@@ -798,59 +797,52 @@ const Upsell = () => {
                 />
               </div>
               <div className="flex-1 min-w-0">
-                <h3 className="font-semibold text-gray-900 text-sm mb-0.5">
-                  {product.shortName}
-                </h3>
-                <p className="text-xs text-gray-500 mb-2">
-                  {product.description}
-                </p>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs text-gray-400 line-through">
-                      R$ {product.originalPrice.toFixed(2).replace(".", ",")}
-                    </span>
-                    <span className="text-lg font-bold text-gray-900">
-                      R$ {product.price.toFixed(2).replace(".", ",")}
-                    </span>
-                  </div>
-                  <Button
-                    size="sm"
-                    onClick={() => handleSelectProduct(product.id)}
-                    className="h-9 bg-[#28af60] hover:bg-[#23994f] text-white text-sm px-4"
-                  >
-                    Adicionar
-                  </Button>
+                <h3 className="font-medium text-gray-900 text-sm">{product.shortName}</h3>
+                <p className="text-xs text-gray-500">{product.description}</p>
+                <div className="flex items-center gap-2 mt-1">
+                  <span className="text-xs text-gray-400 line-through">
+                    R$ {product.originalPrice.toFixed(2).replace(".", ",")}
+                  </span>
+                  <span className="font-bold text-gray-900">
+                    R$ {product.price.toFixed(2).replace(".", ",")}
+                  </span>
                 </div>
               </div>
+              <Button
+                size="sm"
+                onClick={() => handleSelectProduct(product.id)}
+                className="h-8 bg-[#28af60] hover:bg-[#23994f] text-white text-xs px-3 flex-shrink-0"
+              >
+                Adicionar
+              </Button>
             </div>
           ))}
         </div>
 
         {/* Divider */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3 mb-6">
           <div className="flex-1 h-px bg-gray-200"></div>
-          <span className="text-xs text-gray-400 font-medium">OU LEVE TUDO</span>
+          <span className="text-xs text-gray-400">ou</span>
           <div className="flex-1 h-px bg-gray-200"></div>
         </div>
 
         {/* Bundle Offer */}
-        <div className="bg-gray-50 rounded-xl p-5 border border-gray-200">
-          <div className="flex items-center justify-between mb-4">
+        <div className="bg-gray-50 rounded-lg p-4 border border-gray-200 mb-6">
+          <div className="flex items-start justify-between mb-3">
             <div>
               <h3 className="font-bold text-gray-900">Kit Completo</h3>
-              <p className="text-sm text-gray-500">Meias + Óculos + Pochete</p>
+              <p className="text-xs text-gray-500">Meias + Óculos + Pochete</p>
             </div>
             <span className="bg-[#28af60] text-white text-xs font-bold px-2 py-1 rounded">
               -{discount}%
             </span>
           </div>
 
-          {/* Bundle Products Preview */}
-          <div className="flex gap-2 mb-4">
+          <div className="flex gap-2 mb-3">
             {products.map((product) => (
               <div
                 key={product.id}
-                className="w-16 h-16 bg-white rounded-lg overflow-hidden border border-gray-200"
+                className="w-14 h-14 bg-white rounded overflow-hidden border border-gray-200"
               >
                 <img
                   src={product.image}
@@ -861,36 +853,31 @@ const Upsell = () => {
             ))}
           </div>
 
-          {/* Bundle Pricing */}
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <span className="text-sm text-gray-400 line-through mr-2">
-                R$ {bundleOriginalPrice.toFixed(2).replace(".", ",")}
-              </span>
-              <span className="text-2xl font-bold text-gray-900">
-                R$ {bundlePrice.toFixed(2).replace(".", ",")}
-              </span>
-            </div>
-            <div className="text-xs text-gray-500">Frete grátis</div>
+          <div className="flex items-center gap-2 mb-3">
+            <span className="text-sm text-gray-400 line-through">
+              R$ {bundleOriginalPrice.toFixed(2).replace(".", ",")}
+            </span>
+            <span className="text-xl font-bold text-gray-900">
+              R$ {bundlePrice.toFixed(2).replace(".", ",")}
+            </span>
+            <span className="text-xs text-gray-500 ml-auto">Frete grátis</span>
           </div>
 
-          {/* CTA Button */}
           <Button
-            size="lg"
             onClick={handleSelectBundle}
-            className="w-full h-12 bg-[#28af60] hover:bg-[#23994f] text-white font-semibold rounded-lg"
+            className="w-full h-11 bg-[#28af60] hover:bg-[#23994f] text-white font-medium"
           >
             Quero o Kit Completo
           </Button>
         </div>
 
-        {/* Skip Link */}
-        <div className="text-center pt-2">
+        {/* Skip */}
+        <div className="text-center">
           <button
             onClick={() => navigate("/obrigado")}
-            className="text-sm text-gray-400 hover:text-gray-600 transition-colors"
+            className="text-sm text-gray-400 hover:text-gray-500"
           >
-            Não, obrigado →
+            Não, obrigado
           </button>
         </div>
       </main>
