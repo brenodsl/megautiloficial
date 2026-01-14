@@ -81,7 +81,7 @@ const SizeSelector = forwardRef<SizeSelectorRef, SizeSelectorProps>(
                 <span className="underline">Tabela de tamanhos</span>
               </button>
             </DialogTrigger>
-            <DialogContent className="max-w-2xl p-0 overflow-hidden bg-transparent border-0">
+            <DialogContent className="max-w-2xl p-0 overflow-hidden bg-transparent border-0 [&>button]:bg-white [&>button]:rounded-full [&>button]:p-1 [&>button]:shadow-lg">
               <img 
                 src={tabelaTamanhos} 
                 alt="Tabela de Tamanhos Max Runner" 
