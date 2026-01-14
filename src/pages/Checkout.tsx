@@ -830,10 +830,6 @@ const Checkout = () => {
                 )}
               </div>
             </div>
-            <div className="flex items-center gap-2 mt-3 pt-3 border-t border-gray-100">
-              <AlertCircle className="h-4 w-4 text-orange-500" />
-              <span className="text-sm text-orange-600">Estoque limitado para este tamanho</span>
-            </div>
           </div>
         )}
 
