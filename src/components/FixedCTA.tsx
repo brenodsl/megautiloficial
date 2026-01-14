@@ -1,4 +1,5 @@
 import { RefObject } from "react";
+import { useNavigate } from "react-router-dom";
 import { ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SizeSelectorRef } from "@/components/SizeSelector";
@@ -22,9 +23,17 @@ interface FixedCTAProps {
 }
 
 const FixedCTA = ({ selectedSize, selectedColor, sizeSelectorRef }: FixedCTAProps) => {
+  const navigate = useNavigate();
   const { totalItems } = useCart();
   
   const handleClick = () => {
+    // If cart has items, go directly to checkout
+    if (totalItems > 0) {
+      navigate("/checkout");
+      return;
+    }
+    
+    // If cart is empty, user needs to select a size first
     if (!selectedSize) {
       sizeSelectorRef.current?.showError();
       return;
