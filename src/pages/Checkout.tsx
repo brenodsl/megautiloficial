@@ -806,23 +806,19 @@ const Checkout = () => {
                       R$ {(item.price * item.quantity).toFixed(2).replace(".", ",")}
                     </p>
                   </div>
-                  <div className="flex items-center border border-gray-200 rounded-lg overflow-hidden bg-gray-50">
+                  <div className="flex items-center gap-2">
                     <button
                       onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                      className="w-8 h-8 flex items-center justify-center text-gray-500 hover:bg-gray-100 hover:text-gray-700 active:bg-gray-200 transition-colors"
+                      className="w-7 h-7 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600 transition-colors"
                     >
-                      <svg width="12" height="2" viewBox="0 0 12 2" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M1 1H11" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                      </svg>
+                      <span className="text-lg font-medium leading-none">−</span>
                     </button>
-                    <span className="w-8 text-center text-sm font-semibold text-gray-900">{item.quantity}</span>
+                    <span className="text-sm font-medium w-5 text-center">{item.quantity}</span>
                     <button
                       onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                      className="w-8 h-8 flex items-center justify-center text-gray-500 hover:bg-[#28af60] hover:text-white active:bg-[#23994f] transition-colors"
+                      className="w-7 h-7 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600 transition-colors"
                     >
-                      <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M6 1V11M1 6H11" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                      </svg>
+                      <span className="text-lg font-medium leading-none">+</span>
                     </button>
                   </div>
                 </div>
