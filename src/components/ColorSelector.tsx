@@ -6,12 +6,12 @@ import colorPink from "@/assets/color-pink.webp";
 import colorSunset from "@/assets/color-sunset.webp";
 import colorCreamOrange from "@/assets/color-cream-orange.webp";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { ChevronDown } from "lucide-react";
 
 export interface ColorOption {
   id: string;
@@ -42,9 +42,9 @@ const ColorSelector = ({ selectedColor, onColorSelect }: ColorSelectorProps) => 
     <div className="space-y-2">
       <span className="text-sm font-medium text-foreground">Cor</span>
       
-      <Select value={selectedColor} onValueChange={onColorSelect}>
-        <SelectTrigger className="w-full h-14 bg-card border border-border rounded-lg">
-          <SelectValue placeholder="Selecione a cor">
+      <DropdownMenu modal={false}>
+        <DropdownMenuTrigger asChild>
+          <button className="w-full h-14 bg-card border border-border rounded-lg px-3 flex items-center justify-between">
             {selectedColorData && (
               <div className="flex items-center gap-3">
                 <img 
@@ -58,14 +58,19 @@ const ColorSelector = ({ selectedColor, onColorSelect }: ColorSelectorProps) => 
                 </span>
               </div>
             )}
-          </SelectValue>
-        </SelectTrigger>
-        <SelectContent className="bg-card border border-border rounded-lg shadow-lg z-50">
+            <ChevronDown className="h-4 w-4 opacity-50" />
+          </button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent 
+          className="w-[var(--radix-dropdown-menu-trigger-width)] bg-card border border-border rounded-lg shadow-lg z-50"
+          align="start"
+          sideOffset={4}
+        >
           {colors.map((color) => (
-            <SelectItem 
-              key={color.id} 
-              value={color.id}
-              className={`cursor-pointer rounded-md transition-colors focus:bg-muted focus:text-foreground ${
+            <DropdownMenuItem 
+              key={color.id}
+              onClick={() => onColorSelect(color.id)}
+              className={`cursor-pointer rounded-md focus:bg-muted focus:text-foreground ${
                 selectedColor === color.id 
                   ? 'bg-muted' 
                   : 'hover:bg-muted/50'
@@ -82,10 +87,10 @@ const ColorSelector = ({ selectedColor, onColorSelect }: ColorSelectorProps) => 
                   {color.stock} un.
                 </span>
               </div>
-            </SelectItem>
+            </DropdownMenuItem>
           ))}
-        </SelectContent>
-      </Select>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
   );
 };
