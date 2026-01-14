@@ -157,50 +157,32 @@ const Index = () => {
           </div>
 
           {/* Benefits */}
-          <div className="mt-5 space-y-3">
-            {/* Frete Grátis - Destacado */}
-            <div className="bg-emerald-50 rounded-xl p-3 border border-emerald-100">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-emerald-600 flex items-center justify-center flex-shrink-0">
-                  <Truck className="h-5 w-5 text-white" />
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center gap-1.5">
-                    <span className="font-semibold text-emerald-700">Frete Grátis</span>
-                    {userLocation.city && (
-                      <span className="text-xs bg-emerald-600 text-white px-1.5 py-0.5 rounded">
-                        para você
-                      </span>
-                    )}
-                  </div>
-                  <p className="text-sm text-emerald-600">
-                    {userLocation.loading ? (
-                      "Calculando sua localização..."
-                    ) : userLocation.city ? (
-                      <>
-                        <MapPin className="h-3 w-3 inline mr-1" />
-                        Entrega grátis para <span className="font-medium">{userLocation.city}, {userLocation.state}</span>
-                      </>
-                    ) : (
-                      "Para todo o Brasil"
-                    )}
-                  </p>
-                </div>
+          <div className="mt-5 space-y-2.5">
+            <div className="flex items-center gap-2.5 text-sm text-gray-600">
+              <div className="w-8 h-8 rounded-full bg-emerald-50 flex items-center justify-center flex-shrink-0">
+                <Truck className="h-4 w-4 text-emerald-600" />
+              </div>
+              <div>
+                <span className="font-medium text-emerald-600">Frete grátis</span>
+                {!userLocation.loading && userLocation.city && (
+                  <span className="text-gray-500"> para {userLocation.city}, {userLocation.state}</span>
+                )}
+                {!userLocation.loading && !userLocation.city && (
+                  <span className="text-gray-500"> para todo o Brasil</span>
+                )}
               </div>
             </div>
-
-            {/* Outros benefícios */}
-            <div className="flex items-center gap-3 text-sm text-gray-600 px-1">
+            <div className="flex items-center gap-2.5 text-sm text-gray-600">
               <div className="w-8 h-8 rounded-full bg-emerald-50 flex items-center justify-center flex-shrink-0">
                 <Zap className="h-4 w-4 text-emerald-600" />
               </div>
-              <span>Entrega expressa em até <span className="font-medium">2 dias</span></span>
+              <span>Entrega expressa em até 2 dias</span>
             </div>
-            <div className="flex items-center gap-3 text-sm text-gray-600 px-1">
+            <div className="flex items-center gap-2.5 text-sm text-gray-600">
               <div className="w-8 h-8 rounded-full bg-emerald-50 flex items-center justify-center flex-shrink-0">
                 <ShieldCheck className="h-4 w-4 text-emerald-600" />
               </div>
-              <span>Garantia de <span className="font-medium">90 dias</span></span>
+              <span>Garantia de 90 dias</span>
             </div>
           </div>
 
