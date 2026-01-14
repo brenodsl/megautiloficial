@@ -140,25 +140,45 @@ const CartDrawer = ({ open, onOpenChange }: CartDrawerProps) => {
 
             {/* Footer */}
             <div className="border-t border-border p-4 space-y-4">
-              {/* Promotion Banner */}
+              {/* Promotion Banner - Encourage 2nd pair */}
               {totalItems === 1 && (
-                <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-center">
-                  <p className="text-sm font-medium text-amber-800">
-                    🎉 Adicione mais 1 par e ganhe <span className="font-bold text-emerald-600">20% OFF</span> no segundo!
-                  </p>
-                </div>
-              )}
-              
-              {discount > 0 && (
-                <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-3">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm font-medium text-emerald-800">🎉 Desconto aplicado!</span>
-                    <span className="text-sm font-bold text-emerald-600">-R$ {discount.toFixed(2).replace(".", ",")}</span>
+                <div className="relative overflow-hidden bg-gradient-to-r from-emerald-600 to-emerald-500 rounded-xl p-3 shadow-md">
+                  <div className="absolute top-0 right-0 w-16 h-16 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2" />
+                  <div className="relative flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
+                      <span className="text-lg">👟</span>
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-semibold text-white text-sm">Adicione +1 par</p>
+                      <p className="text-emerald-100 text-xs">e ganhe <span className="font-bold text-white">20% OFF</span> no segundo!</p>
+                    </div>
                   </div>
                 </div>
               )}
               
-              <div className="space-y-2">
+              {/* Discount Applied Banner */}
+              {discount > 0 && (
+                <div className="relative overflow-hidden bg-gradient-to-r from-emerald-500 to-teal-500 rounded-xl p-3 shadow-md">
+                  <div className="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2" />
+                  <div className="relative flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
+                        <span className="text-base">✨</span>
+                      </div>
+                      <div>
+                        <p className="font-semibold text-white text-sm">Desconto aplicado!</p>
+                        <p className="text-emerald-100 text-xs">Você está economizando</p>
+                      </div>
+                    </div>
+                    <div className="bg-white/20 backdrop-blur-sm rounded-lg px-3 py-1.5">
+                      <p className="text-white font-bold text-base">-R$ {discount.toFixed(2).replace(".", ",")}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+              
+              {/* Price Summary */}
+              <div className="bg-muted/30 rounded-xl p-4 space-y-2">
                 {discount > 0 && (
                   <div className="flex justify-between items-center text-sm">
                     <span className="text-muted-foreground">Subtotal</span>
@@ -168,15 +188,16 @@ const CartDrawer = ({ open, onOpenChange }: CartDrawerProps) => {
                   </div>
                 )}
                 <div className="flex justify-between items-center">
-                  <span className="text-muted-foreground">Total</span>
-                  <span className="font-bold text-lg text-foreground">
+                  <span className="font-medium text-foreground">Total</span>
+                  <span className="font-bold text-xl text-foreground">
                     R$ {totalPrice.toFixed(2).replace(".", ",")}
                   </span>
                 </div>
               </div>
+              
               <Button
                 onClick={handleCheckout}
-                className="w-full h-12 bg-success hover:bg-success/90 text-white font-bold"
+                className="w-full h-12 bg-success hover:bg-success/90 text-white font-bold rounded-xl shadow-lg shadow-success/20"
               >
                 Finalizar Compra
               </Button>
