@@ -32,7 +32,7 @@ import { trackPixelEvent } from "@/hooks/usePixels";
 import ShippingOptions, { getShippingPrice } from "@/components/ShippingOptions";
 import CartDrawer from "@/components/CartDrawer";
 import CheckoutProgressBar from "@/components/CheckoutProgressBar";
-import LiveBuyersCounter from "@/components/LiveBuyersCounter";
+
 import ValidatedInput from "@/components/ValidatedInput";
 import FloatingCheckoutSummary from "@/components/FloatingCheckoutSummary";
 // PIX Icon Component
@@ -768,8 +768,6 @@ const Checkout = () => {
       <CheckoutProgressBar currentStep={currentStep} />
 
       <main className="max-w-lg mx-auto px-4 py-4 space-y-4">
-        {/* Live Buyers Counter */}
-        <LiveBuyersCounter />
 
         {/* Product Card */}
         {firstItem && (
