@@ -35,7 +35,7 @@ const PixIcon = () => (
 
 const Index = () => {
   const navigate = useNavigate();
-  const { addItem } = useCart();
+  const { addItem, totalItems } = useCart();
   const sizeSelectorRef = useRef<SizeSelectorRef>(null);
   const [selectedSize, setSelectedSize] = useState<number | null>(null);
   const userLocation = useUserLocation();
@@ -186,8 +186,8 @@ const Index = () => {
             </div>
           </div>
 
-          {/* Promotion Banner - Only shows when size is selected */}
-          {selectedSize && (
+          {/* Promotion Banner - Shows when size is selected OR cart has items */}
+          {(selectedSize || totalItems > 0) && (
             <div className="mt-5 relative overflow-hidden bg-gradient-to-r from-emerald-600 to-emerald-500 rounded-xl p-4 shadow-lg animate-fade-in">
               <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2" />
               <div className="absolute bottom-0 left-0 w-16 h-16 bg-white/10 rounded-full translate-y-1/2 -translate-x-1/2" />
@@ -234,7 +234,11 @@ const Index = () => {
               }}
               variant="outline"
               size="lg"
-              className="w-full h-12 font-medium text-sm rounded-xl border-2 border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300"
+              className={`w-full h-12 font-medium text-sm rounded-xl border-2 transition-all ${
+                selectedSize 
+                  ? 'border-emerald-500 text-emerald-700 hover:bg-emerald-50 hover:border-emerald-600' 
+                  : 'border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300'
+              }`}
             >
               Adicionar ao carrinho
             </Button>
