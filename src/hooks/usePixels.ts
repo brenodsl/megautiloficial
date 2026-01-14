@@ -11,6 +11,56 @@ interface Pixel {
 
 // Track which pixels have been loaded
 const loadedPixels = new Set<string>();
+let pixelsReady = false;
+let pendingEvents: Array<{ eventName: string; eventData?: Record<string, any> }> = [];
+
+// Initialize pixels immediately on module load
+const initializePixels = async () => {
+  try {
+    const { data, error } = await supabase
+      .from('pixels')
+      .select('*')
+      .eq('is_active', true);
+
+    if (error) {
+      console.error('Error fetching pixels:', error);
+      return;
+    }
+
+    if (data && data.length > 0) {
+      console.log(`🎯 Loading ${data.length} active pixels from database`);
+      
+      // Load each pixel
+      data.forEach((pixel) => {
+        if (pixel.platform === 'tiktok' && !loadedPixels.has(pixel.pixel_id)) {
+          loadTikTokPixel(pixel.pixel_id);
+          loadedPixels.add(pixel.pixel_id);
+          console.log(`✅ TikTok Pixel loaded: ${pixel.pixel_id} (${pixel.name || 'unnamed'})`);
+        }
+        if (pixel.platform === 'meta' && !loadedPixels.has(pixel.pixel_id)) {
+          loadMetaPixel(pixel.pixel_id);
+          loadedPixels.add(pixel.pixel_id);
+          console.log(`✅ Meta Pixel loaded: ${pixel.pixel_id} (${pixel.name || 'unnamed'})`);
+        }
+      });
+
+      // Mark pixels as ready and process pending events
+      pixelsReady = true;
+      if (pendingEvents.length > 0) {
+        console.log(`📤 Processing ${pendingEvents.length} pending events`);
+        pendingEvents.forEach(({ eventName, eventData }) => {
+          trackPixelEventInternal(eventName, eventData);
+        });
+        pendingEvents = [];
+      }
+    }
+  } catch (err) {
+    console.error('Failed to initialize pixels:', err);
+  }
+};
+
+// Start loading pixels immediately
+initializePixels();
 
 export const usePixels = () => {
   const [pixels, setPixels] = useState<Pixel[]>([]);
@@ -29,19 +79,6 @@ export const usePixels = () => {
 
       if (data) {
         setPixels(data);
-        
-        // Load TikTok pixels dynamically
-        data.forEach((pixel) => {
-          if (pixel.platform === 'tiktok' && !loadedPixels.has(pixel.pixel_id)) {
-            loadTikTokPixel(pixel.pixel_id);
-            loadedPixels.add(pixel.pixel_id);
-          }
-          // Add support for other platforms here (Meta, Google, etc.)
-          if (pixel.platform === 'meta' && !loadedPixels.has(pixel.pixel_id)) {
-            loadMetaPixel(pixel.pixel_id);
-            loadedPixels.add(pixel.pixel_id);
-          }
-        });
       }
     };
 
@@ -135,25 +172,43 @@ const loadMetaPixel = (pixelId: string) => {
   w.fbq('track', 'PageView');
 };
 
-// Track event for all active pixels
-export const trackPixelEvent = (eventName: string, eventData?: Record<string, any>) => {
+// Internal function to track events (used when pixels are ready)
+const trackPixelEventInternal = (eventName: string, eventData?: Record<string, any>) => {
   if (typeof window === 'undefined') return;
   
   const w = window as any;
   
-  // Track TikTok events
+  // Track TikTok events for all loaded TikTok pixels
   if (w.ttq) {
-    console.log(`Tracking TikTok event: ${eventName}`, eventData);
-    w.ttq.track(eventName, eventData);
+    loadedPixels.forEach((pixelId) => {
+      // Check if this is a TikTok pixel instance
+      if (w.ttq._i && w.ttq._i[pixelId]) {
+        console.log(`📊 TikTok Event [${pixelId}]: ${eventName}`, eventData);
+        w.ttq.instance(pixelId).track(eventName, eventData);
+      }
+    });
   }
   
   // Track Meta/Facebook events
   if (w.fbq) {
-    console.log(`Tracking Meta event: ${eventName}`, eventData);
-    // Map TikTok event names to Meta event names
+    console.log(`📊 Meta Event: ${eventName}`, eventData);
     const metaEventName = mapToMetaEvent(eventName);
     w.fbq('track', metaEventName, eventData);
   }
+};
+
+// Track event for all active pixels (queues if pixels not ready)
+export const trackPixelEvent = (eventName: string, eventData?: Record<string, any>) => {
+  if (typeof window === 'undefined') return;
+  
+  // If pixels aren't ready yet, queue the event
+  if (!pixelsReady) {
+    console.log(`⏳ Queueing event until pixels ready: ${eventName}`);
+    pendingEvents.push({ eventName, eventData });
+    return;
+  }
+  
+  trackPixelEventInternal(eventName, eventData);
 };
 
 // Map TikTok event names to Meta event names
