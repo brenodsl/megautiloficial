@@ -18,7 +18,9 @@ import {
   Award,
   Clock,
   AlertCircle,
-  ArrowLeft
+  ArrowLeft,
+  Plus,
+  Minus
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -811,14 +813,14 @@ const Checkout = () => {
                       onClick={() => updateQuantity(item.id, item.quantity - 1)}
                       className="w-7 h-7 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600 transition-colors"
                     >
-                      <span className="text-lg font-medium leading-none">−</span>
+                      <Minus className="h-3.5 w-3.5" strokeWidth={2.5} />
                     </button>
                     <span className="text-sm font-medium w-5 text-center">{item.quantity}</span>
                     <button
                       onClick={() => updateQuantity(item.id, item.quantity + 1)}
                       className="w-7 h-7 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600 transition-colors"
                     >
-                      <span className="text-lg font-medium leading-none">+</span>
+                      <Plus className="h-3.5 w-3.5" strokeWidth={2.5} />
                     </button>
                   </div>
                 </div>
