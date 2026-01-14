@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { 
   Lock, 
@@ -31,6 +31,10 @@ import { usePresence } from "@/hooks/usePresence";
 import { trackPixelEvent } from "@/hooks/usePixels";
 import ShippingOptions, { getShippingPrice } from "@/components/ShippingOptions";
 import CartDrawer from "@/components/CartDrawer";
+import CheckoutProgressBar from "@/components/CheckoutProgressBar";
+import LiveBuyersCounter from "@/components/LiveBuyersCounter";
+import ValidatedInput from "@/components/ValidatedInput";
+import FloatingCheckoutSummary from "@/components/FloatingCheckoutSummary";
 // PIX Icon Component
 const PixIcon = ({ className = "h-5 w-5" }: { className?: string }) => (
   <svg width="16" height="16" viewBox="0 0 512 512" fill="currentColor" className={className}>
@@ -465,17 +469,30 @@ const Checkout = () => {
     }
   };
 
-  const isFormComplete = 
-    customerData.name && 
-    customerData.document && 
-    customerData.phone && 
-    customerData.email &&
-    addressData.zipCode &&
-    addressData.street &&
-    addressData.number &&
-    addressData.neighborhood &&
-    addressData.city &&
-    addressData.state;
+  // Validation helpers
+  const isNameValid = customerData.name.trim().length >= 3;
+  const isCpfValid = validateCPF(customerData.document);
+  const isPhoneValid = customerData.phone.replace(/\D/g, "").length >= 10;
+  const isEmailValid = customerData.email.includes("@") && customerData.email.includes(".");
+  const isCepValid = addressData.zipCode.replace(/\D/g, "").length === 8;
+  const isStreetValid = addressData.street.trim().length >= 3;
+  const isNumberValid = addressData.number.trim().length >= 1;
+  const isNeighborhoodValid = addressData.neighborhood.trim().length >= 2;
+  const isCityValid = addressData.city.trim().length >= 2;
+  const isStateValid = addressData.state.length === 2;
+
+  // Check which step is complete
+  const isCustomerDataComplete = isNameValid && isCpfValid && isPhoneValid && isEmailValid;
+  const isAddressComplete = isCepValid && isStreetValid && isNumberValid && isNeighborhoodValid && isCityValid && isStateValid;
+
+  // Current step calculation
+  const currentStep: 1 | 2 | 3 = useMemo(() => {
+    if (!isCustomerDataComplete) return 1;
+    if (!isAddressComplete) return 2;
+    return 3;
+  }, [isCustomerDataComplete, isAddressComplete]);
+
+  const isFormComplete = isCustomerDataComplete && isAddressComplete;
 
   // Get first item for display
   const firstItem = items[0];
@@ -727,6 +744,13 @@ const Checkout = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 pb-24">
+      {/* Floating Summary for Mobile */}
+      <FloatingCheckoutSummary 
+        totalPrice={totalPrice} 
+        shippingPrice={shippingPrice}
+        itemCount={items.reduce((sum, i) => sum + i.quantity, 0)}
+      />
+
       {/* Header */}
       <header className="bg-white border-b border-gray-100 py-3 px-4">
         <div className="max-w-lg mx-auto flex items-center justify-between">
@@ -740,15 +764,13 @@ const Checkout = () => {
         </div>
       </header>
 
-      {/* Security Badge */}
-      <div className="bg-white border-b border-gray-100 py-3 px-4">
-        <div className="max-w-lg mx-auto flex items-center justify-center gap-2 text-sm text-gray-600">
-          <Lock className="h-4 w-4 text-gray-400" />
-          <span>Checkout seguro e criptografado</span>
-        </div>
-      </div>
+      {/* Progress Bar */}
+      <CheckoutProgressBar currentStep={currentStep} />
 
       <main className="max-w-lg mx-auto px-4 py-4 space-y-4">
+        {/* Live Buyers Counter */}
+        <LiveBuyersCounter />
+
         {/* Product Card */}
         {firstItem && (
           <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
@@ -790,133 +812,145 @@ const Checkout = () => {
 
         {/* Customer Data Section */}
         <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
-          <div className="flex items-center gap-2 mb-4">
-            <div className="w-6 h-6 rounded-full bg-green-50 flex items-center justify-center">
-              <User className="h-3.5 w-3.5 text-[#28af60]" />
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <div className={`w-6 h-6 rounded-full flex items-center justify-center ${isCustomerDataComplete ? 'bg-[#28af60]' : 'bg-green-50'}`}>
+                {isCustomerDataComplete ? (
+                  <CheckCircle className="h-4 w-4 text-white" />
+                ) : (
+                  <User className="h-3.5 w-3.5 text-[#28af60]" />
+                )}
+              </div>
+              <h2 className="font-semibold text-gray-900">Seus dados</h2>
             </div>
-            <h2 className="font-semibold text-gray-900">Seus dados</h2>
+            {isCustomerDataComplete && (
+              <span className="text-xs text-[#28af60] font-medium">Completo ✓</span>
+            )}
           </div>
           
           <div className="space-y-3">
-            <div className="relative">
-              <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-              <Input
-                placeholder="Nome completo"
-                value={customerData.name}
-                onChange={(e) => handleCustomerChange("name", e.target.value)}
-                className="pl-10 h-12 rounded-xl border-gray-200 bg-gray-50 focus:bg-white"
-              />
-            </div>
+            <ValidatedInput
+              placeholder="Nome completo"
+              value={customerData.name}
+              onChange={(e) => handleCustomerChange("name", e.target.value)}
+              icon={<User className="h-4 w-4" />}
+              isValid={isNameValid}
+            />
             
-            <div className="relative">
-              <Hash className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-              <Input
-                placeholder="CPF"
-                value={customerData.document}
-                onChange={(e) => handleCustomerChange("document", e.target.value)}
-                className="pl-10 h-12 rounded-xl border-gray-200 bg-gray-50 focus:bg-white"
-                maxLength={14}
-              />
-            </div>
+            <ValidatedInput
+              placeholder="CPF"
+              value={customerData.document}
+              onChange={(e) => handleCustomerChange("document", e.target.value)}
+              icon={<Hash className="h-4 w-4" />}
+              isValid={isCpfValid}
+              maxLength={14}
+              inputMode="numeric"
+            />
             
-            <div className="relative">
-              <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-              <Input
-                placeholder="Telefone"
-                value={customerData.phone}
-                onChange={(e) => handleCustomerChange("phone", e.target.value)}
-                className="pl-10 h-12 rounded-xl border-gray-200 bg-gray-50 focus:bg-white"
-                maxLength={15}
-              />
-            </div>
+            <ValidatedInput
+              placeholder="Telefone"
+              value={customerData.phone}
+              onChange={(e) => handleCustomerChange("phone", e.target.value)}
+              icon={<Phone className="h-4 w-4" />}
+              isValid={isPhoneValid}
+              maxLength={15}
+              inputMode="tel"
+            />
             
-            <div className="relative">
-              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-              <Input
-                type="email"
-                placeholder="E-mail"
-                value={customerData.email}
-                onChange={(e) => handleCustomerChange("email", e.target.value)}
-                className="pl-10 h-12 rounded-xl border-gray-200 bg-gray-50 focus:bg-white"
-              />
-            </div>
+            <ValidatedInput
+              type="email"
+              placeholder="E-mail"
+              value={customerData.email}
+              onChange={(e) => handleCustomerChange("email", e.target.value)}
+              icon={<Mail className="h-4 w-4" />}
+              isValid={isEmailValid}
+              inputMode="email"
+            />
           </div>
         </div>
 
         {/* Address Section */}
         <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
-          <div className="flex items-center gap-2 mb-4">
-            <div className="w-6 h-6 rounded-full bg-green-50 flex items-center justify-center">
-              <MapPin className="h-3.5 w-3.5 text-[#28af60]" />
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <div className={`w-6 h-6 rounded-full flex items-center justify-center ${isAddressComplete ? 'bg-[#28af60]' : 'bg-green-50'}`}>
+                {isAddressComplete ? (
+                  <CheckCircle className="h-4 w-4 text-white" />
+                ) : (
+                  <MapPin className="h-3.5 w-3.5 text-[#28af60]" />
+                )}
+              </div>
+              <h2 className="font-semibold text-gray-900">Endereço de entrega</h2>
             </div>
-            <h2 className="font-semibold text-gray-900">Endereço de entrega</h2>
+            {isAddressComplete && (
+              <span className="text-xs text-[#28af60] font-medium">Completo ✓</span>
+            )}
           </div>
           
           <div className="space-y-3">
             <div className="relative">
-              <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-              <Input
+              <ValidatedInput
                 placeholder="CEP"
                 value={addressData.zipCode}
                 onChange={(e) => handleAddressChange("zipCode", e.target.value)}
-                className="pl-10 h-12 rounded-xl border-gray-200 bg-gray-50 focus:bg-white"
+                icon={<MapPin className="h-4 w-4" />}
+                isValid={isCepValid && !isLoadingCep}
                 maxLength={9}
+                inputMode="numeric"
               />
               {isLoadingCep && (
                 <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin text-gray-400" />
               )}
             </div>
             
-            <div className="relative">
-              <Home className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-              <Input
-                placeholder="Rua / Avenida"
-                value={addressData.street}
-                onChange={(e) => handleAddressChange("street", e.target.value)}
-                className="pl-10 h-12 rounded-xl border-gray-200 bg-gray-50 focus:bg-white"
-              />
-            </div>
+            <ValidatedInput
+              placeholder="Rua / Avenida"
+              value={addressData.street}
+              onChange={(e) => handleAddressChange("street", e.target.value)}
+              icon={<Home className="h-4 w-4" />}
+              isValid={isStreetValid}
+            />
             
             <div className="grid grid-cols-2 gap-3">
-              <Input
+              <ValidatedInput
                 placeholder="Número"
                 value={addressData.number}
                 onChange={(e) => handleAddressChange("number", e.target.value)}
-                className="h-12 rounded-xl border-gray-200 bg-gray-50 focus:bg-white"
+                isValid={isNumberValid}
+                inputMode="numeric"
               />
               <Input
-                placeholder="Complemento"
+                placeholder="Complemento (opcional)"
                 value={addressData.complement}
                 onChange={(e) => handleAddressChange("complement", e.target.value)}
                 className="h-12 rounded-xl border-gray-200 bg-gray-50 focus:bg-white"
               />
             </div>
             
-            <div className="relative">
-              <Building className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-              <Input
-                placeholder="Bairro"
-                value={addressData.neighborhood}
-                onChange={(e) => handleAddressChange("neighborhood", e.target.value)}
-                className="pl-10 h-12 rounded-xl border-gray-200 bg-gray-50 focus:bg-white"
-              />
-            </div>
+            <ValidatedInput
+              placeholder="Bairro"
+              value={addressData.neighborhood}
+              onChange={(e) => handleAddressChange("neighborhood", e.target.value)}
+              icon={<Building className="h-4 w-4" />}
+              isValid={isNeighborhoodValid}
+            />
             
             <div className="grid grid-cols-3 gap-3">
               <div className="col-span-2">
-                <Input
+                <ValidatedInput
                   placeholder="Cidade"
                   value={addressData.city}
                   onChange={(e) => handleAddressChange("city", e.target.value)}
-                  className="h-12 rounded-xl border-gray-200 bg-gray-50 focus:bg-white"
+                  isValid={isCityValid}
                 />
               </div>
-              <Input
+              <ValidatedInput
                 placeholder="UF"
                 value={addressData.state}
                 onChange={(e) => handleAddressChange("state", e.target.value)}
-                className="h-12 rounded-xl border-gray-200 bg-gray-50 focus:bg-white text-center"
+                isValid={isStateValid}
                 maxLength={2}
+                className="text-center"
               />
             </div>
           </div>
