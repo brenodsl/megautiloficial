@@ -5,13 +5,8 @@ import {
   Clock, 
   ShieldCheck, 
   Truck, 
-  Package,
   Loader2,
-  Copy,
-  ArrowRight,
-  Sparkles,
-  Gift,
-  X
+  Copy
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -756,7 +751,7 @@ const Upsell = () => {
 
   // Main Upsell Page
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       {/* Header */}
       <header className="bg-white border-b border-gray-100 py-3 px-4">
         <div className="max-w-lg mx-auto flex items-center justify-center">
@@ -766,43 +761,26 @@ const Upsell = () => {
         </div>
       </header>
 
-      {/* Success Banner */}
-      <div className="bg-[#28af60] text-white py-4 px-4">
-        <div className="max-w-lg mx-auto text-center">
-          <div className="flex items-center justify-center gap-2 mb-1">
-            <CheckCircle className="w-6 h-6" />
-            <h1 className="text-lg font-bold">Pedido Confirmado!</h1>
-          </div>
-          <p className="text-green-100 text-sm">
-            Seu tênis está sendo preparado para envio
-          </p>
-        </div>
-      </div>
-
-      {/* Exclusive Offer Banner */}
-      <div className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white py-3 px-4">
+      {/* Success Banner - Simple */}
+      <div className="bg-[#28af60] text-white py-3 px-4">
         <div className="max-w-lg mx-auto flex items-center justify-center gap-2">
-          <Gift className="w-5 h-5" />
-          <span className="text-sm font-medium">Oferta exclusiva para clientes Max Runner!</span>
+          <CheckCircle className="w-5 h-5" />
+          <span className="font-medium">Pedido confirmado! Aproveite esta oferta exclusiva:</span>
         </div>
       </div>
 
-      {/* Timer Banner */}
-      <div className="bg-gray-900 text-white py-3 px-4">
-        <div className="max-w-lg mx-auto flex items-center justify-center gap-3">
-          <Sparkles className="w-4 h-4 text-yellow-400" />
-          <span className="text-sm">Esta oferta expira em</span>
-          <span className="bg-white/10 px-3 py-1 rounded font-mono font-bold">
-            {formatTime(timeLeft)}
-          </span>
+      <main className="max-w-lg mx-auto px-4 py-8 space-y-6">
+        {/* Timer - Clean */}
+        <div className="flex items-center justify-center gap-2 text-gray-600">
+          <Clock className="w-4 h-4" />
+          <span className="text-sm">Oferta expira em</span>
+          <span className="font-mono font-bold text-gray-900">{formatTime(timeLeft)}</span>
         </div>
-      </div>
 
-      <main className="max-w-lg mx-auto px-4 py-6 space-y-6">
         {/* Section Title */}
         <div className="text-center">
-          <h2 className="text-xl font-bold text-gray-900 mb-1">Complete seu Kit de Corrida</h2>
-          <p className="text-sm text-gray-500">Produtos selecionados com desconto especial só para você</p>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Complete seu Kit</h2>
+          <p className="text-gray-500">Desconto exclusivo para clientes Max Runner</p>
         </div>
 
         {/* Individual Products */}
@@ -810,9 +788,9 @@ const Upsell = () => {
           {products.map((product) => (
             <div
               key={product.id}
-              className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex gap-4"
+              className="bg-white rounded-xl p-4 border border-gray-200 flex gap-4 hover:border-gray-300 transition-colors"
             >
-              <div className="w-20 h-20 flex-shrink-0 bg-gray-50 rounded-xl overflow-hidden">
+              <div className="w-20 h-20 flex-shrink-0 bg-gray-50 rounded-lg overflow-hidden">
                 <img
                   src={product.image}
                   alt={product.name}
@@ -820,121 +798,99 @@ const Upsell = () => {
                 />
               </div>
               <div className="flex-1 min-w-0">
-                <h3 className="font-semibold text-gray-900 text-sm leading-tight mb-0.5 truncate">
+                <h3 className="font-semibold text-gray-900 text-sm mb-0.5">
                   {product.shortName}
                 </h3>
                 <p className="text-xs text-gray-500 mb-2">
                   {product.description}
                 </p>
-                <div className="flex items-center gap-2 mb-3">
-                  <span className="text-xs text-gray-400 line-through">
-                    R$ {product.originalPrice.toFixed(2).replace(".", ",")}
-                  </span>
-                  <span className="text-lg font-bold text-[#28af60]">
-                    R$ {product.price.toFixed(2).replace(".", ",")}
-                  </span>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-gray-400 line-through">
+                      R$ {product.originalPrice.toFixed(2).replace(".", ",")}
+                    </span>
+                    <span className="text-lg font-bold text-gray-900">
+                      R$ {product.price.toFixed(2).replace(".", ",")}
+                    </span>
+                  </div>
+                  <Button
+                    size="sm"
+                    onClick={() => handleSelectProduct(product.id)}
+                    className="h-9 bg-[#28af60] hover:bg-[#23994f] text-white text-sm px-4"
+                  >
+                    Adicionar
+                  </Button>
                 </div>
-                <Button
-                  size="sm"
-                  onClick={() => handleSelectProduct(product.id)}
-                  className="w-full h-9 bg-gray-900 hover:bg-gray-800 text-white text-sm"
-                >
-                  Adicionar
-                  <ArrowRight className="w-4 h-4 ml-1" />
-                </Button>
               </div>
             </div>
           ))}
         </div>
 
-        {/* Bundle Offer */}
-        <div className="relative pt-4">
-          <div className="absolute -top-0 left-1/2 -translate-x-1/2 bg-[#28af60] text-white px-4 py-1.5 rounded-full text-xs font-bold z-10 whitespace-nowrap">
-            MELHOR OFERTA • -{discount}%
-          </div>
-          
-          <div className="bg-white border-2 border-[#28af60] rounded-2xl p-5 shadow-sm">
-            <div className="text-center mb-4">
-              <h3 className="text-lg font-bold text-gray-900 mb-1">
-                Kit Completo do Corredor
-              </h3>
-              <p className="text-sm text-gray-500">
-                Leve os 3 produtos por um preço especial
-              </p>
-            </div>
-
-            {/* Bundle Products Preview */}
-            <div className="flex justify-center gap-2 mb-4">
-              {products.map((product) => (
-                <div
-                  key={product.id}
-                  className="w-16 h-16 bg-gray-50 rounded-xl overflow-hidden border border-gray-100"
-                >
-                  <img
-                    src={product.image}
-                    alt={product.name}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              ))}
-            </div>
-
-            {/* Bundle Items List */}
-            <div className="bg-gray-50 rounded-xl p-3 mb-4">
-              <ul className="text-sm space-y-1.5">
-                {products.map((product) => (
-                  <li key={product.id} className="flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-[#28af60] flex-shrink-0" />
-                    <span className="text-gray-700">{product.shortName}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Bundle Pricing */}
-            <div className="text-center mb-4">
-              <div className="flex items-center justify-center gap-3 mb-1">
-                <span className="text-gray-400 line-through">
-                  R$ {bundleOriginalPrice.toFixed(2).replace(".", ",")}
-                </span>
-              </div>
-              <div className="text-3xl font-bold text-[#28af60]">
-                R$ {bundlePrice.toFixed(2).replace(".", ",")}
-              </div>
-            </div>
-
-            {/* Benefits */}
-            <div className="flex justify-center gap-6 mb-4 text-xs text-gray-500">
-              <div className="flex items-center gap-1.5">
-                <Truck className="w-4 h-4 text-[#28af60]" />
-                <span>Frete grátis</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <ShieldCheck className="w-4 h-4 text-[#28af60]" />
-                <span>Garantia 30 dias</span>
-              </div>
-            </div>
-
-            {/* CTA Button */}
-            <Button
-              size="lg"
-              onClick={handleSelectBundle}
-              className="w-full h-14 bg-[#28af60] hover:bg-[#23994f] text-white text-base font-bold rounded-xl"
-            >
-              <Package className="w-5 h-5 mr-2" />
-              QUERO O KIT POR R$ 47,90
-            </Button>
-          </div>
+        {/* Divider */}
+        <div className="flex items-center gap-4">
+          <div className="flex-1 h-px bg-gray-200"></div>
+          <span className="text-xs text-gray-400 font-medium">OU LEVE TUDO</span>
+          <div className="flex-1 h-px bg-gray-200"></div>
         </div>
 
-        {/* Skip Link - go to thank you page */}
-        <div className="text-center pt-4">
+        {/* Bundle Offer */}
+        <div className="bg-gray-50 rounded-xl p-5 border border-gray-200">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h3 className="font-bold text-gray-900">Kit Completo</h3>
+              <p className="text-sm text-gray-500">Meias + Óculos + Pochete</p>
+            </div>
+            <span className="bg-[#28af60] text-white text-xs font-bold px-2 py-1 rounded">
+              -{discount}%
+            </span>
+          </div>
+
+          {/* Bundle Products Preview */}
+          <div className="flex gap-2 mb-4">
+            {products.map((product) => (
+              <div
+                key={product.id}
+                className="w-16 h-16 bg-white rounded-lg overflow-hidden border border-gray-200"
+              >
+                <img
+                  src={product.image}
+                  alt={product.name}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            ))}
+          </div>
+
+          {/* Bundle Pricing */}
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <span className="text-sm text-gray-400 line-through mr-2">
+                R$ {bundleOriginalPrice.toFixed(2).replace(".", ",")}
+              </span>
+              <span className="text-2xl font-bold text-gray-900">
+                R$ {bundlePrice.toFixed(2).replace(".", ",")}
+              </span>
+            </div>
+            <div className="text-xs text-gray-500">Frete grátis</div>
+          </div>
+
+          {/* CTA Button */}
+          <Button
+            size="lg"
+            onClick={handleSelectBundle}
+            className="w-full h-12 bg-[#28af60] hover:bg-[#23994f] text-white font-semibold rounded-lg"
+          >
+            Quero o Kit Completo
+          </Button>
+        </div>
+
+        {/* Skip Link */}
+        <div className="text-center pt-2">
           <button
             onClick={() => navigate("/obrigado")}
-            className="inline-flex items-center gap-2 text-sm text-gray-400 hover:text-gray-600 transition-colors"
+            className="text-sm text-gray-400 hover:text-gray-600 transition-colors"
           >
-            <X className="w-4 h-4" />
-            Não, obrigado. Finalizar minha compra.
+            Não, obrigado →
           </button>
         </div>
       </main>
