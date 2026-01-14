@@ -53,7 +53,7 @@ const QRCodeIcon = () => (
 
 const Checkout = () => {
   const navigate = useNavigate();
-  const { items, totalPrice, originalPrice, discount, clearCart } = useCart();
+  const { items, totalPrice, originalPrice, discount, clearCart, updateQuantity } = useCart();
   
   const [customerData, setCustomerData] = useState({
     name: "",
@@ -789,32 +789,46 @@ const Checkout = () => {
         <OfferTimer />
 
         {/* Product Card */}
-        {firstItem && (
-          <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
-            <div className="flex gap-3">
-              <div className="relative">
-                <img
-                  src={firstItem.colorImage}
-                  alt={firstItem.colorName}
-                  className="w-20 h-20 object-cover rounded-xl"
-                />
-                <div className="absolute -top-1 -left-1 w-5 h-5 bg-[#28af60] rounded-full flex items-center justify-center">
-                  <span className="text-white text-xs font-bold">{items.reduce((sum, i) => sum + i.quantity, 0)}</span>
+        {items.length > 0 && (
+          <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 space-y-3">
+            {items.map((item, index) => (
+              <div key={item.id} className={index > 0 ? "pt-3 border-t border-gray-100" : ""}>
+                <div className="flex gap-3">
+                  <img
+                    src={item.colorImage}
+                    alt={item.colorName}
+                    className="w-16 h-16 object-cover rounded-xl"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-semibold text-gray-900 text-sm">Tênis Carbon 3.0</h3>
+                    <p className="text-xs text-gray-500">{item.colorName} • Tam. {item.size}</p>
+                    <p className="text-sm font-bold text-[#28af60] mt-1">
+                      R$ {(item.price * item.quantity).toFixed(2).replace(".", ",")}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                      className="w-7 h-7 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600 transition-colors"
+                    >
+                      <span className="text-lg font-medium leading-none">−</span>
+                    </button>
+                    <span className="text-sm font-medium w-5 text-center">{item.quantity}</span>
+                    <button
+                      onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                      className="w-7 h-7 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600 transition-colors"
+                    >
+                      <span className="text-lg font-medium leading-none">+</span>
+                    </button>
+                  </div>
                 </div>
               </div>
-              <div className="flex-1">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <h3 className="font-semibold text-gray-900">Tênis Carbon 3.0</h3>
-                    <p className="text-sm text-gray-500">{firstItem.colorName} • Tam. {firstItem.size}</p>
-                  </div>
-                  <button 
-                    onClick={() => setIsCartOpen(true)}
-                    className="text-xs text-gray-400 hover:text-[#28af60] underline transition-colors"
-                  >
-                    Editar
-                  </button>
-                </div>
+            ))}
+            
+            {/* Total and Discount Summary */}
+            <div className="pt-3 border-t border-gray-100">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-500">Subtotal ({items.reduce((sum, i) => sum + i.quantity, 0)} {items.reduce((sum, i) => sum + i.quantity, 0) === 1 ? 'item' : 'itens'})</span>
                 <div className="flex items-center gap-2">
                   {discount > 0 && (
                     <span className="text-sm text-gray-400 line-through">
@@ -825,14 +839,14 @@ const Checkout = () => {
                     R$ {totalPrice.toFixed(2).replace(".", ",")}
                   </span>
                 </div>
-                {discount > 0 && (
-                  <div className="flex items-center gap-1.5 mt-1">
-                    <span className="text-xs font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
-                      Economizando R$ {discount.toFixed(2).replace(".", ",")}
-                    </span>
-                  </div>
-                )}
               </div>
+              {discount > 0 && (
+                <div className="flex justify-end mt-1">
+                  <span className="text-xs font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
+                    Economizando R$ {discount.toFixed(2).replace(".", ",")}
+                  </span>
+                </div>
+              )}
             </div>
           </div>
         )}
