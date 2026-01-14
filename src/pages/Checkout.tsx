@@ -143,19 +143,16 @@ const Checkout = () => {
           setPaymentStatus('paid');
           toast.success("Pagamento confirmado!");
           
-          // Auto-redirect to thank you page
+          // Redirect to upsell page instead of thank you page
           setTimeout(() => {
-            navigate("/obrigado", {
+            navigate("/upsell", {
               state: {
-                items: items.map(item => ({
-                  colorName: item.colorName,
-                  size: item.size,
-                  quantity: item.quantity,
-                  price: item.price,
-                })),
+                fromCheckout: true,
                 customer: {
                   name: customerData.name,
                   email: customerData.email,
+                  phone: customerData.phone,
+                  document: customerData.document,
                 },
                 address: {
                   street: addressData.street,
@@ -166,9 +163,6 @@ const Checkout = () => {
                   state: addressData.state,
                   zipCode: addressData.zipCode,
                 },
-                totalAmount: finalTotal,
-                shippingPrice: shippingPrice,
-                transactionId: pixData.transactionId,
               },
             });
             clearCart();
