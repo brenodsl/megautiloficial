@@ -750,8 +750,10 @@ const Upsell = () => {
   }
 
   // Main Upsell Page
+  const savings = bundleOriginalPrice - bundlePrice;
+
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="bg-white border-b border-gray-100 py-3 px-4">
         <div className="max-w-md mx-auto flex items-center justify-center">
@@ -765,31 +767,112 @@ const Upsell = () => {
       <div className="bg-[#28af60] text-white py-3 px-4">
         <div className="max-w-md mx-auto flex items-center justify-center gap-2">
           <CheckCircle className="w-5 h-5 flex-shrink-0" />
-          <span className="font-medium text-sm">Pedido confirmado! Oferta exclusiva abaixo</span>
+          <span className="font-medium text-sm">Compra confirmada!</span>
         </div>
       </div>
 
       <main className="max-w-md mx-auto px-4 py-6">
+        {/* Title */}
+        <div className="text-center mb-2">
+          <h1 className="text-lg font-bold text-gray-900">Oferta Exclusiva</h1>
+          <p className="text-sm text-gray-500">Só para quem acabou de comprar</p>
+        </div>
+
         {/* Timer */}
         <div className="flex items-center justify-center gap-2 text-gray-500 mb-6">
           <Clock className="w-4 h-4" />
-          <span className="text-sm">Expira em</span>
-          <span className="font-mono font-semibold text-gray-900 bg-gray-100 px-2 py-0.5 rounded">{formatTime(timeLeft)}</span>
+          <span className="text-xs">Expira em</span>
+          <span className="font-mono text-sm font-semibold text-gray-900 bg-white border border-gray-200 px-2 py-0.5 rounded">{formatTime(timeLeft)}</span>
         </div>
 
-        {/* Title */}
-        <div className="text-center mb-6">
-          <h1 className="text-xl font-bold text-gray-900">Complete seu Kit de Corrida</h1>
+        {/* Bundle Offer - DESTACADO */}
+        <div className="relative mb-6">
+          <div className="absolute -top-3 left-4 bg-[#28af60] text-white text-xs font-bold px-3 py-1 rounded-full z-10">
+            MELHOR OFERTA
+          </div>
+          <div className="bg-white rounded-xl p-4 border-2 border-[#28af60] shadow-sm">
+            <div className="flex items-start justify-between mb-3">
+              <div>
+                <h3 className="font-bold text-gray-900">Kit Completo do Corredor</h3>
+                <p className="text-xs text-gray-500">Tudo que você precisa em um só pacote</p>
+              </div>
+            </div>
+
+            <div className="flex gap-2 mb-4">
+              {products.map((product, index) => (
+                <div
+                  key={product.id}
+                  className="flex-1 bg-gray-50 rounded-lg p-2 text-center"
+                  style={{ animationDelay: `${index * 100}ms` }}
+                >
+                  <div className="w-12 h-12 mx-auto mb-1 bg-white rounded overflow-hidden">
+                    <img
+                      src={product.image}
+                      alt={product.name}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <p className="text-[10px] text-gray-600 leading-tight">{product.shortName}</p>
+                </div>
+              ))}
+            </div>
+
+            <div className="bg-[#28af60]/5 rounded-lg p-3 mb-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <span className="text-xs text-gray-400 line-through block">
+                    De R$ {bundleOriginalPrice.toFixed(2).replace(".", ",")}
+                  </span>
+                  <span className="text-2xl font-bold text-[#28af60]">
+                    R$ {bundlePrice.toFixed(2).replace(".", ",")}
+                  </span>
+                </div>
+                <div className="text-right">
+                  <span className="bg-[#28af60] text-white text-xs font-bold px-2 py-1 rounded">
+                    -{discount}%
+                  </span>
+                  <p className="text-xs text-[#28af60] font-medium mt-1">
+                    Economia de R$ {savings.toFixed(2).replace(".", ",")}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-center gap-4 text-xs text-gray-500 mb-4">
+              <div className="flex items-center gap-1">
+                <Truck className="w-3.5 h-3.5 text-[#28af60]" />
+                <span>Frete grátis</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <ShieldCheck className="w-3.5 h-3.5 text-[#28af60]" />
+                <span>Garantia 30 dias</span>
+              </div>
+            </div>
+
+            <Button
+              onClick={handleSelectBundle}
+              className="w-full h-12 bg-[#28af60] hover:bg-[#23994f] text-white font-semibold text-base rounded-lg"
+            >
+              Quero o Kit Completo
+            </Button>
+          </div>
         </div>
 
-        {/* Products List */}
-        <div className="space-y-3 mb-6">
+        {/* Divider */}
+        <div className="flex items-center gap-3 mb-4">
+          <div className="flex-1 h-px bg-gray-200"></div>
+          <span className="text-xs text-gray-400">ou escolha um produto</span>
+          <div className="flex-1 h-px bg-gray-200"></div>
+        </div>
+
+        {/* Individual Products - Menor destaque */}
+        <div className="space-y-2 mb-6">
           {products.map((product) => (
             <div
               key={product.id}
-              className="bg-white rounded-lg p-3 border border-gray-200 flex items-center gap-3"
+              className="bg-white rounded-lg p-3 border border-gray-200 flex items-center gap-3 hover:border-gray-300 transition-colors"
             >
-              <div className="w-16 h-16 flex-shrink-0 bg-gray-50 rounded-lg overflow-hidden">
+              <div className="w-14 h-14 flex-shrink-0 bg-gray-50 rounded-lg overflow-hidden">
                 <img
                   src={product.image}
                   alt={product.name}
@@ -798,77 +881,25 @@ const Upsell = () => {
               </div>
               <div className="flex-1 min-w-0">
                 <h3 className="font-medium text-gray-900 text-sm">{product.shortName}</h3>
-                <p className="text-xs text-gray-500">{product.description}</p>
-                <div className="flex items-center gap-2 mt-1">
+                <div className="flex items-center gap-2">
                   <span className="text-xs text-gray-400 line-through">
                     R$ {product.originalPrice.toFixed(2).replace(".", ",")}
                   </span>
-                  <span className="font-bold text-gray-900">
+                  <span className="font-bold text-gray-900 text-sm">
                     R$ {product.price.toFixed(2).replace(".", ",")}
                   </span>
                 </div>
               </div>
               <Button
                 size="sm"
+                variant="outline"
                 onClick={() => handleSelectProduct(product.id)}
-                className="h-8 bg-[#28af60] hover:bg-[#23994f] text-white text-xs px-3 flex-shrink-0"
+                className="h-8 text-xs px-3 flex-shrink-0 border-gray-300 hover:bg-gray-50"
               >
                 Adicionar
               </Button>
             </div>
           ))}
-        </div>
-
-        {/* Divider */}
-        <div className="flex items-center gap-3 mb-6">
-          <div className="flex-1 h-px bg-gray-200"></div>
-          <span className="text-xs text-gray-400">ou</span>
-          <div className="flex-1 h-px bg-gray-200"></div>
-        </div>
-
-        {/* Bundle Offer */}
-        <div className="bg-gray-50 rounded-lg p-4 border border-gray-200 mb-6">
-          <div className="flex items-start justify-between mb-3">
-            <div>
-              <h3 className="font-bold text-gray-900">Kit Completo</h3>
-              <p className="text-xs text-gray-500">Meias + Óculos + Pochete</p>
-            </div>
-            <span className="bg-[#28af60] text-white text-xs font-bold px-2 py-1 rounded">
-              -{discount}%
-            </span>
-          </div>
-
-          <div className="flex gap-2 mb-3">
-            {products.map((product) => (
-              <div
-                key={product.id}
-                className="w-14 h-14 bg-white rounded overflow-hidden border border-gray-200"
-              >
-                <img
-                  src={product.image}
-                  alt={product.name}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            ))}
-          </div>
-
-          <div className="flex items-center gap-2 mb-3">
-            <span className="text-sm text-gray-400 line-through">
-              R$ {bundleOriginalPrice.toFixed(2).replace(".", ",")}
-            </span>
-            <span className="text-xl font-bold text-gray-900">
-              R$ {bundlePrice.toFixed(2).replace(".", ",")}
-            </span>
-            <span className="text-xs text-gray-500 ml-auto">Frete grátis</span>
-          </div>
-
-          <Button
-            onClick={handleSelectBundle}
-            className="w-full h-11 bg-[#28af60] hover:bg-[#23994f] text-white font-medium"
-          >
-            Quero o Kit Completo
-          </Button>
         </div>
 
         {/* Skip */}
