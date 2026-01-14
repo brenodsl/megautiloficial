@@ -65,7 +65,7 @@ const ColorSelector = ({ selectedColor, onColorSelect }: ColorSelectorProps) => 
             <SelectItem 
               key={color.id} 
               value={color.id}
-              className={`cursor-pointer rounded-md transition-colors ${
+              className={`cursor-pointer rounded-md transition-colors focus:bg-muted focus:text-foreground ${
                 selectedColor === color.id 
                   ? 'bg-muted' 
                   : 'hover:bg-muted/50'
