@@ -32,24 +32,12 @@ const OfferTimer = () => {
   const formatNumber = (num: number) => num.toString().padStart(2, '0');
 
   return (
-    <div className="bg-gradient-to-r from-gray-900 to-gray-800 text-white py-3 px-4">
-      <div className="max-w-lg mx-auto flex items-center justify-center gap-3">
-        <Clock className="h-4 w-4 text-[#28af60]" />
-        <span className="text-sm font-medium">Oferta encerra hoje em</span>
-        <div className="flex items-center gap-1">
-          <div className="bg-white/10 backdrop-blur-sm rounded px-2 py-1">
-            <span className="text-sm font-bold font-mono">{formatNumber(timeLeft.hours)}</span>
-          </div>
-          <span className="text-[#28af60] font-bold">:</span>
-          <div className="bg-white/10 backdrop-blur-sm rounded px-2 py-1">
-            <span className="text-sm font-bold font-mono">{formatNumber(timeLeft.minutes)}</span>
-          </div>
-          <span className="text-[#28af60] font-bold">:</span>
-          <div className="bg-white/10 backdrop-blur-sm rounded px-2 py-1">
-            <span className="text-sm font-bold font-mono">{formatNumber(timeLeft.seconds)}</span>
-          </div>
-        </div>
-      </div>
+    <div className="flex items-center justify-center gap-2 py-2">
+      <Clock className="h-3.5 w-3.5 text-gray-400" />
+      <span className="text-xs text-gray-500">Oferta encerra hoje em</span>
+      <span className="text-xs font-medium text-gray-700 font-mono">
+        {formatNumber(timeLeft.hours)}:{formatNumber(timeLeft.minutes)}:{formatNumber(timeLeft.seconds)}
+      </span>
     </div>
   );
 };

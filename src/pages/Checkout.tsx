@@ -758,9 +758,6 @@ const Checkout = () => {
         itemCount={items.reduce((sum, i) => sum + i.quantity, 0)}
       />
 
-      {/* Offer Timer */}
-      <OfferTimer />
-
       {/* Header */}
       <header className="bg-white border-b border-gray-100 py-3 px-4">
         <div className="max-w-lg mx-auto flex items-center justify-between">
@@ -787,6 +784,9 @@ const Checkout = () => {
       <CheckoutProgressBar currentStep={currentStep} />
 
       <main className="max-w-lg mx-auto px-4 py-4 space-y-4">
+
+        {/* Offer Timer */}
+        <OfferTimer />
 
         {/* Product Card */}
         {firstItem && (
