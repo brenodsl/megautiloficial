@@ -220,7 +220,7 @@ const Index = () => {
                   : 'bg-gray-200 text-gray-400 cursor-default hover:bg-gray-200 shadow-none'
               }`}
             >
-              Comprar agora
+              {totalItems > 0 ? 'Finalizar compra' : 'Comprar agora'}
             </Button>
 
             <Button

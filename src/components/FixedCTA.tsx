@@ -2,6 +2,7 @@ import { RefObject } from "react";
 import { ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SizeSelectorRef } from "@/components/SizeSelector";
+import { useCart } from "@/contexts/CartContext";
 
 // Checkout URLs per color
 const CHECKOUT_URLS: Record<string, string> = {
@@ -21,6 +22,8 @@ interface FixedCTAProps {
 }
 
 const FixedCTA = ({ selectedSize, selectedColor, sizeSelectorRef }: FixedCTAProps) => {
+  const { totalItems } = useCart();
+  
   const handleClick = () => {
     if (!selectedSize) {
       sizeSelectorRef.current?.showError();
@@ -50,7 +53,7 @@ const FixedCTA = ({ selectedSize, selectedColor, sizeSelectorRef }: FixedCTAProp
           className="font-bold px-6 h-12 bg-black hover:bg-black/90 text-white"
         >
           <ShoppingBag className="h-5 w-5 mr-2" />
-          COMPRAR AGORA
+          {totalItems > 0 ? 'FINALIZAR COMPRA' : 'COMPRAR AGORA'}
         </Button>
       </div>
     </div>
