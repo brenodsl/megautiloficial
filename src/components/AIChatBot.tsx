@@ -12,7 +12,6 @@ interface Message {
 
 const AIChatBot = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [showBubble, setShowBubble] = useState(true);
   const [messages, setMessages] = useState<Message[]>([
     { role: 'assistant', content: 'Olá! 👋 Sou o João Lucas, atendente da Max Runner. Como posso ajudar você hoje?' }
   ]);
@@ -28,15 +27,6 @@ const AIChatBot = () => {
     scrollToBottom();
   }, [messages]);
 
-  // Hide bubble after 10 seconds or when chat is opened
-  useEffect(() => {
-    if (isOpen) {
-      setShowBubble(false);
-      return;
-    }
-    const timer = setTimeout(() => setShowBubble(false), 10000);
-    return () => clearTimeout(timer);
-  }, [isOpen]);
 
   const sendMessage = async () => {
     if (!input.trim() || isLoading) return;
@@ -77,16 +67,6 @@ const AIChatBot = () => {
 
   return (
     <>
-      {/* Speech Bubble */}
-      {showBubble && !isOpen && (
-        <div className="fixed bottom-[88px] right-4 z-50 animate-in fade-in slide-in-from-bottom-2 duration-300">
-          <div className="relative bg-white text-gray-800 text-sm font-medium px-4 py-2 rounded-xl shadow-lg border border-gray-200">
-            Alguma dúvida? 💬
-            <div className="absolute -bottom-2 right-6 w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-t-[8px] border-t-white" />
-          </div>
-        </div>
-      )}
-
       {/* Floating Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
