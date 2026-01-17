@@ -6,6 +6,13 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+interface GatewaySettings {
+  gateway_name: string;
+  api_token: string;
+  product_id: string;
+  is_active: boolean;
+}
+
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
@@ -13,7 +20,45 @@ serve(async (req) => {
   }
 
   try {
-    const SIGMA_API_KEY = "hLVd9EOMkYj9NJ47LzcIJHAMxU9mxfwZaSwhBpPurAiLXNCN8cTyZHLFsWk7";
+    // Initialize Supabase client
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const supabase = createClient(supabaseUrl, supabaseKey);
+
+    // Fetch active gateway settings from database
+    console.log('Fetching active gateway settings from database...');
+    const { data: gatewayData, error: gatewayError } = await supabase
+      .from('gateway_settings')
+      .select('*')
+      .eq('is_active', true)
+      .single();
+
+    if (gatewayError || !gatewayData) {
+      console.error('Error fetching gateway settings:', gatewayError);
+      return new Response(
+        JSON.stringify({ 
+          error: 'Nenhum gateway de pagamento ativo configurado',
+          isPaid: false,
+          status: 'error'
+        }),
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const gateway: GatewaySettings = gatewayData;
+    console.log(`Using gateway: ${gateway.gateway_name}`);
+
+    if (!gateway.api_token) {
+      console.error('Gateway API token not configured');
+      return new Response(
+        JSON.stringify({ 
+          error: 'API Token do gateway não configurado',
+          isPaid: false,
+          status: 'error'
+        }),
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
 
     let body;
     try {
@@ -38,13 +83,27 @@ serve(async (req) => {
 
     console.log("Checking payment status for transaction:", transactionId);
 
-    // Check payment status on SigmaPay - Using the correct endpoint format
-    // The SigmaPay API uses the transaction hash directly in the URL
-    const SIGMA_CHECK_URL = `https://api.goatpayments.com.br/api/public/v1/transactions/${transactionId}?api_token=${SIGMA_API_KEY}`;
+    // Determine API URL based on gateway
+    let CHECK_URL: string;
+    if (gateway.gateway_name === 'sigmapay') {
+      CHECK_URL = `https://api.sigmapay.com.br/api/public/v1/transactions/${transactionId}?api_token=${gateway.api_token}`;
+    } else if (gateway.gateway_name === 'goatpay') {
+      CHECK_URL = `https://api.goatpayments.com.br/api/public/v1/transactions/${transactionId}?api_token=${gateway.api_token}`;
+    } else {
+      console.error('Unknown gateway:', gateway.gateway_name);
+      return new Response(
+        JSON.stringify({ 
+          error: 'Gateway de pagamento desconhecido',
+          isPaid: false,
+          status: 'error'
+        }),
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
 
-    console.log("Calling SigmaPay API:", SIGMA_CHECK_URL.replace(SIGMA_API_KEY, "***"));
+    console.log(`Calling ${gateway.gateway_name} API:`, CHECK_URL.replace(gateway.api_token, "***"));
 
-    const response = await fetch(SIGMA_CHECK_URL, {
+    const response = await fetch(CHECK_URL, {
       method: 'GET',
       headers: {
         'Accept': 'application/json',
@@ -53,14 +112,14 @@ serve(async (req) => {
     });
 
     const responseText = await response.text();
-    console.log('SigmaPay raw response status:', response.status);
-    console.log('SigmaPay raw response:', responseText);
+    console.log(`${gateway.gateway_name} raw response status:`, response.status);
+    console.log(`${gateway.gateway_name} raw response:`, responseText);
 
     let responseData;
     try {
       responseData = JSON.parse(responseText);
     } catch {
-      console.error('Invalid JSON response from SigmaPay:', responseText);
+      console.error(`Invalid JSON response from ${gateway.gateway_name}:`, responseText);
       return new Response(
         JSON.stringify({ 
           error: 'Resposta inválida do gateway de pagamento',
@@ -72,8 +131,7 @@ serve(async (req) => {
     }
 
     if (!response.ok) {
-      console.error('SigmaPay API error:', responseData);
-      // Return a valid response even on error, so frontend can continue polling
+      console.error(`${gateway.gateway_name} API error:`, responseData);
       return new Response(
         JSON.stringify({ 
           error: responseData.message || 'Erro ao verificar status',
@@ -85,21 +143,16 @@ serve(async (req) => {
       );
     }
 
-    // SigmaPay returns data in a 'data' object
-    const sigmaData = responseData.data || responseData;
+    // Extract data from response
+    const gatewayResponseData = responseData.data || responseData;
     
-    // SigmaPay status values: pending, waiting_payment, paid, refused, refunded, chargedback, expired, failed
-    const status = sigmaData.status || sigmaData.payment_status || 'unknown';
+    // Status values: pending, waiting_payment, paid, refused, refunded, chargedback, expired, failed
+    const status = gatewayResponseData.status || gatewayResponseData.payment_status || 'unknown';
     const isPaid = status === 'paid' || status === 'approved' || status === 'completed';
     const isFailed = status === 'failed' || status === 'refused' || status === 'expired' || status === 'chargedback';
     
     console.log('Payment status:', status, 'isPaid:', isPaid, 'isFailed:', isFailed);
-    console.log('Full SigmaPay data:', JSON.stringify(sigmaData, null, 2));
-
-    // Initialize Supabase client
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    const supabase = createClient(supabaseUrl, supabaseKey);
+    console.log(`Full ${gateway.gateway_name} data:`, JSON.stringify(gatewayResponseData, null, 2));
 
     // If paid, update the order in the database
     if (isPaid) {
@@ -146,7 +199,8 @@ serve(async (req) => {
         status: status,
         isPaid: isPaid,
         isFailed: isFailed,
-        paidAt: isPaid ? (sigmaData.paid_at || new Date().toISOString()) : null
+        paidAt: isPaid ? (gatewayResponseData.paid_at || new Date().toISOString()) : null,
+        gateway: gateway.gateway_name
       }),
       { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
