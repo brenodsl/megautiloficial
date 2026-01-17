@@ -24,7 +24,9 @@ import {
   TrendingUp,
   Users,
   Package,
-  Radio
+  Radio,
+  CreditCard,
+  Save
 } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
@@ -61,6 +63,16 @@ interface PresenceCount {
   count: number;
 }
 
+interface GatewaySetting {
+  id: string;
+  gateway_name: string;
+  api_token: string;
+  product_id: string;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const [orders, setOrders] = useState<Order[]>([]);
@@ -72,6 +84,8 @@ const AdminDashboard = () => {
   const [newPixelPlatform, setNewPixelPlatform] = useState("tiktok");
   const [isAddingPixel, setIsAddingPixel] = useState(false);
   const [liveVisitors, setLiveVisitors] = useState<PresenceCount[]>([]);
+  const [gatewaySettings, setGatewaySettings] = useState<GatewaySetting[]>([]);
+  const [isSavingGateway, setIsSavingGateway] = useState(false);
 
   // Cleanup old presence entries
   usePresenceCleanup();
@@ -122,8 +136,75 @@ const AdminDashboard = () => {
 
   const fetchData = async () => {
     setIsLoading(true);
-    await Promise.all([fetchOrders(), fetchPixels(), fetchLiveVisitors()]);
+    await Promise.all([fetchOrders(), fetchPixels(), fetchLiveVisitors(), fetchGatewaySettings()]);
     setIsLoading(false);
+  };
+
+  const fetchGatewaySettings = async () => {
+    const { data, error } = await supabase
+      .from('gateway_settings')
+      .select('*')
+      .order('gateway_name', { ascending: true });
+
+    if (error) {
+      console.error('Erro ao carregar configurações de gateway:', error);
+    } else {
+      setGatewaySettings(data || []);
+    }
+  };
+
+  const handleUpdateGatewayToken = (gatewayName: string, value: string) => {
+    setGatewaySettings(prev => 
+      prev.map(g => g.gateway_name === gatewayName ? { ...g, api_token: value } : g)
+    );
+  };
+
+  const handleUpdateGatewayProductId = (gatewayName: string, value: string) => {
+    setGatewaySettings(prev => 
+      prev.map(g => g.gateway_name === gatewayName ? { ...g, product_id: value } : g)
+    );
+  };
+
+  const handleToggleGateway = async (selectedGateway: GatewaySetting) => {
+    // Set selected gateway as active and others as inactive
+    const updates = gatewaySettings.map(g => ({
+      id: g.id,
+      is_active: g.gateway_name === selectedGateway.gateway_name
+    }));
+
+    for (const update of updates) {
+      await supabase
+        .from('gateway_settings')
+        .update({ is_active: update.is_active })
+        .eq('id', update.id);
+    }
+
+    toast.success(`Gateway ${selectedGateway.gateway_name.toUpperCase()} ativado!`);
+    fetchGatewaySettings();
+  };
+
+  const handleSaveGatewaySettings = async (gateway: GatewaySetting) => {
+    if (!gateway.api_token.trim() || !gateway.product_id.trim()) {
+      toast.error("Preencha o API Token e o ID do Produto");
+      return;
+    }
+
+    setIsSavingGateway(true);
+    const { error } = await supabase
+      .from('gateway_settings')
+      .update({
+        api_token: gateway.api_token.trim(),
+        product_id: gateway.product_id.trim()
+      })
+      .eq('id', gateway.id);
+
+    if (error) {
+      toast.error("Erro ao salvar configurações");
+      console.error(error);
+    } else {
+      toast.success(`Configurações do ${gateway.gateway_name.toUpperCase()} salvas!`);
+    }
+    setIsSavingGateway(false);
   };
 
   const fetchLiveVisitors = async () => {
@@ -439,6 +520,10 @@ const AdminDashboard = () => {
               <Eye className="w-4 h-4 mr-2" />
               Pixels
             </TabsTrigger>
+            <TabsTrigger value="gateway" className="data-[state=active]:bg-slate-700">
+              <CreditCard className="w-4 h-4 mr-2" />
+              Gateway
+            </TabsTrigger>
           </TabsList>
 
           {/* Orders Tab */}
@@ -710,9 +795,118 @@ const AdminDashboard = () => {
                           </Button>
                         </div>
                       </div>
-                    ))
+                ))
                   )}
                 </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Gateway Tab */}
+          <TabsContent value="gateway">
+            <Card className="bg-slate-800/50 border-slate-700">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <CreditCard className="w-5 h-5" />
+                  Configuração de Gateway de Pagamento
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <p className="text-slate-400 text-sm">
+                  Selecione o gateway ativo e configure as credenciais de cada um. Apenas um gateway pode estar ativo por vez.
+                </p>
+
+                {gatewaySettings.length === 0 ? (
+                  <div className="text-center py-12 text-slate-400">
+                    <CreditCard className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                    <p>Nenhum gateway configurado</p>
+                  </div>
+                ) : (
+                  <div className="grid gap-6">
+                    {gatewaySettings.map((gateway) => (
+                      <div
+                        key={gateway.id}
+                        className={`p-6 rounded-xl border-2 transition-all ${
+                          gateway.is_active 
+                            ? 'bg-emerald-500/10 border-emerald-500' 
+                            : 'bg-slate-700/30 border-slate-600 hover:border-slate-500'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between mb-4">
+                          <div className="flex items-center gap-3">
+                            <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
+                              gateway.gateway_name === 'sigmapay' ? 'bg-blue-500/20' : 'bg-purple-500/20'
+                            }`}>
+                              <CreditCard className={`w-6 h-6 ${
+                                gateway.gateway_name === 'sigmapay' ? 'text-blue-400' : 'text-purple-400'
+                              }`} />
+                            </div>
+                            <div>
+                              <h3 className="text-white font-bold text-lg uppercase">
+                                {gateway.gateway_name}
+                              </h3>
+                              <p className="text-slate-400 text-sm">
+                                {gateway.gateway_name === 'sigmapay' 
+                                  ? 'SigmaPay - Gateway Principal'
+                                  : 'GoatPay - Gateway Alternativo'}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            {gateway.is_active ? (
+                              <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/30">
+                                <CheckCircle2 className="w-3 h-3 mr-1" />
+                                Ativo
+                              </Badge>
+                            ) : (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleToggleGateway(gateway)}
+                                className="border-slate-600 text-slate-300 hover:bg-slate-700"
+                              >
+                                Ativar este gateway
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="grid md:grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <Label className="text-slate-400 text-sm">API Token</Label>
+                            <Input
+                              type="password"
+                              value={gateway.api_token}
+                              onChange={(e) => handleUpdateGatewayToken(gateway.gateway_name, e.target.value)}
+                              placeholder="Cole o token da API aqui"
+                              className="bg-slate-700/50 border-slate-600 text-white font-mono"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label className="text-slate-400 text-sm">ID do Produto</Label>
+                            <Input
+                              value={gateway.product_id}
+                              onChange={(e) => handleUpdateGatewayProductId(gateway.gateway_name, e.target.value)}
+                              placeholder="Ex: nufdla4nza"
+                              className="bg-slate-700/50 border-slate-600 text-white font-mono"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="mt-4 flex justify-end">
+                          <Button
+                            onClick={() => handleSaveGatewaySettings(gateway)}
+                            disabled={isSavingGateway}
+                            className="bg-emerald-500 hover:bg-emerald-600 text-white"
+                          >
+                            <Save className="w-4 h-4 mr-2" />
+                            Salvar Credenciais
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>

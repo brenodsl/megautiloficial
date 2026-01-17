@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      gateway_settings: {
+        Row: {
+          api_token: string
+          created_at: string
+          gateway_name: string
+          id: string
+          is_active: boolean
+          product_id: string
+          updated_at: string
+        }
+        Insert: {
+          api_token: string
+          created_at?: string
+          gateway_name: string
+          id?: string
+          is_active?: boolean
+          product_id: string
+          updated_at?: string
+        }
+        Update: {
+          api_token?: string
+          created_at?: string
+          gateway_name?: string
+          id?: string
+          is_active?: boolean
+          product_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       orders: {
         Row: {
           address_cep: string | null
