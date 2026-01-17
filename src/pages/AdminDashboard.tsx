@@ -26,7 +26,9 @@ import {
   Package,
   Radio,
   CreditCard,
-  Save
+  Save,
+  Gift,
+  ExternalLink
 } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
@@ -73,6 +75,11 @@ interface GatewaySetting {
   updated_at: string;
 }
 
+interface UpsellConfig {
+  enabled: boolean;
+  redirect_url: string;
+}
+
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const [orders, setOrders] = useState<Order[]>([]);
@@ -86,6 +93,8 @@ const AdminDashboard = () => {
   const [liveVisitors, setLiveVisitors] = useState<PresenceCount[]>([]);
   const [gatewaySettings, setGatewaySettings] = useState<GatewaySetting[]>([]);
   const [isSavingGateway, setIsSavingGateway] = useState(false);
+  const [upsellConfig, setUpsellConfig] = useState<UpsellConfig>({ enabled: true, redirect_url: '/upsell' });
+  const [isSavingUpsell, setIsSavingUpsell] = useState(false);
 
   // Cleanup old presence entries
   usePresenceCleanup();
@@ -136,8 +145,37 @@ const AdminDashboard = () => {
 
   const fetchData = async () => {
     setIsLoading(true);
-    await Promise.all([fetchOrders(), fetchPixels(), fetchLiveVisitors(), fetchGatewaySettings()]);
+    await Promise.all([fetchOrders(), fetchPixels(), fetchLiveVisitors(), fetchGatewaySettings(), fetchUpsellConfig()]);
     setIsLoading(false);
+  };
+
+  const fetchUpsellConfig = async () => {
+    const { data, error } = await supabase
+      .from('app_settings')
+      .select('setting_value')
+      .eq('setting_key', 'upsell_config')
+      .single();
+
+    if (!error && data) {
+      const value = data.setting_value as unknown as UpsellConfig;
+      setUpsellConfig(value);
+    }
+  };
+
+  const handleSaveUpsellConfig = async () => {
+    setIsSavingUpsell(true);
+    const { error } = await supabase
+      .from('app_settings')
+      .update({ setting_value: JSON.parse(JSON.stringify(upsellConfig)) })
+      .eq('setting_key', 'upsell_config');
+
+    if (error) {
+      toast.error("Erro ao salvar configurações de upsell");
+      console.error(error);
+    } else {
+      toast.success("Configurações de upsell salvas!");
+    }
+    setIsSavingUpsell(false);
   };
 
   const fetchGatewaySettings = async () => {
@@ -524,6 +562,10 @@ const AdminDashboard = () => {
               <CreditCard className="w-4 h-4 mr-2" />
               Gateway
             </TabsTrigger>
+            <TabsTrigger value="upsell" className="data-[state=active]:bg-slate-700">
+              <Gift className="w-4 h-4 mr-2" />
+              Upsell
+            </TabsTrigger>
           </TabsList>
 
           {/* Orders Tab */}
@@ -907,6 +949,111 @@ const AdminDashboard = () => {
                     ))}
                   </div>
                 )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Upsell Tab */}
+          <TabsContent value="upsell">
+            <Card className="bg-slate-800/50 border-slate-700">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <Gift className="w-5 h-5" />
+                  Configuração de Upsell
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <p className="text-slate-400 text-sm">
+                  Configure o redirecionamento após o pagamento ser confirmado. Quando ativado, o cliente será redirecionado para a página de upsell informada. Quando desativado, irá direto para a página de obrigado.
+                </p>
+
+                <div className={`p-6 rounded-xl border-2 transition-all ${
+                  upsellConfig.enabled 
+                    ? 'bg-emerald-500/10 border-emerald-500' 
+                    : 'bg-slate-700/30 border-slate-600'
+                }`}>
+                  <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center gap-3">
+                      <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
+                        upsellConfig.enabled ? 'bg-emerald-500/20' : 'bg-slate-600/20'
+                      }`}>
+                        <Gift className={`w-6 h-6 ${
+                          upsellConfig.enabled ? 'text-emerald-400' : 'text-slate-400'
+                        }`} />
+                      </div>
+                      <div>
+                        <h3 className="text-white font-bold text-lg">
+                          Página de Upsell
+                        </h3>
+                        <p className="text-slate-400 text-sm">
+                          {upsellConfig.enabled 
+                            ? 'O cliente verá ofertas adicionais após o pagamento'
+                            : 'O cliente irá direto para a página de obrigado'}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Label className="text-slate-400">Ativar Upsell</Label>
+                      <Switch
+                        checked={upsellConfig.enabled}
+                        onCheckedChange={(checked) => setUpsellConfig(prev => ({ ...prev, enabled: checked }))}
+                      />
+                    </div>
+                  </div>
+
+                  {upsellConfig.enabled && (
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <Label className="text-slate-400 text-sm flex items-center gap-2">
+                          <ExternalLink className="w-4 h-4" />
+                          URL de Redirecionamento
+                        </Label>
+                        <Input
+                          value={upsellConfig.redirect_url}
+                          onChange={(e) => setUpsellConfig(prev => ({ ...prev, redirect_url: e.target.value }))}
+                          placeholder="/upsell ou URL externa"
+                          className="bg-slate-700/50 border-slate-600 text-white"
+                        />
+                        <p className="text-slate-500 text-xs">
+                          Use "/upsell" para a página interna ou informe uma URL externa completa (ex: https://exemplo.com/oferta)
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="mt-6 flex justify-end">
+                    <Button
+                      onClick={handleSaveUpsellConfig}
+                      disabled={isSavingUpsell}
+                      className="bg-emerald-500 hover:bg-emerald-600 text-white"
+                    >
+                      <Save className="w-4 h-4 mr-2" />
+                      Salvar Configurações
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Info boxes */}
+                <div className="grid md:grid-cols-2 gap-4 mt-6">
+                  <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-4">
+                    <h4 className="text-emerald-400 font-medium flex items-center gap-2 mb-2">
+                      <CheckCircle2 className="w-4 h-4" />
+                      Upsell Ativado
+                    </h4>
+                    <p className="text-slate-400 text-sm">
+                      Após o pagamento, o cliente será redirecionado para a URL configurada onde poderá ver ofertas adicionais.
+                    </p>
+                  </div>
+                  <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-4">
+                    <h4 className="text-amber-400 font-medium flex items-center gap-2 mb-2">
+                      <XCircle className="w-4 h-4" />
+                      Upsell Desativado
+                    </h4>
+                    <p className="text-slate-400 text-sm">
+                      Após o pagamento, o cliente será direcionado diretamente para a página de obrigado (/obrigado).
+                    </p>
+                  </div>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
