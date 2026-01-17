@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,9 @@ import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { cn } from "@/lib/utils";
 import { 
   LogOut, 
   ShoppingCart, 
@@ -28,10 +31,12 @@ import {
   CreditCard,
   Save,
   Gift,
-  ExternalLink
+  ExternalLink,
+  CalendarIcon,
+  X
 } from "lucide-react";
 import { toast } from "sonner";
-import { format } from "date-fns";
+import { format, startOfDay, endOfDay, isWithinInterval } from "date-fns";
 import { usePresenceCleanup } from "@/hooks/usePresence";
 import { ptBR } from "date-fns/locale";
 
@@ -95,6 +100,7 @@ const AdminDashboard = () => {
   const [isSavingGateway, setIsSavingGateway] = useState(false);
   const [upsellConfig, setUpsellConfig] = useState<UpsellConfig>({ enabled: true, redirect_url: '/upsell' });
   const [isSavingUpsell, setIsSavingUpsell] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
 
   // Cleanup old presence entries
   usePresenceCleanup();
@@ -393,10 +399,23 @@ const AdminDashboard = () => {
     }
   };
 
-  // Stats calculations
-  const totalOrders = orders.length;
-  const paidOrders = orders.filter(o => o.payment_status === 'paid');
-  const pendingOrders = orders.filter(o => o.payment_status === 'pending');
+  // Filter orders by selected date
+  const filteredOrders = useMemo(() => {
+    if (!selectedDate) return orders;
+    
+    const dayStart = startOfDay(selectedDate);
+    const dayEnd = endOfDay(selectedDate);
+    
+    return orders.filter(order => {
+      const orderDate = new Date(order.created_at);
+      return isWithinInterval(orderDate, { start: dayStart, end: dayEnd });
+    });
+  }, [orders, selectedDate]);
+
+  // Stats calculations based on filtered orders
+  const totalOrders = filteredOrders.length;
+  const paidOrders = filteredOrders.filter(o => o.payment_status === 'paid');
+  const pendingOrders = filteredOrders.filter(o => o.payment_status === 'pending');
   const totalRevenue = paidOrders.reduce((sum, o) => sum + Number(o.total_amount), 0);
   const conversionRate = totalOrders > 0 ? ((paidOrders.length / totalOrders) * 100).toFixed(1) : 0;
 
@@ -572,16 +591,55 @@ const AdminDashboard = () => {
           <TabsContent value="orders">
             <Card className="bg-slate-800/50 border-slate-700">
               <CardHeader>
-                <CardTitle className="text-white flex items-center gap-2">
-                  <ShoppingCart className="w-5 h-5" />
-                  Pedidos Recentes
-                </CardTitle>
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                  <CardTitle className="text-white flex items-center gap-2">
+                    <ShoppingCart className="w-5 h-5" />
+                    Pedidos {selectedDate ? `- ${format(selectedDate, "dd/MM/yyyy", { locale: ptBR })}` : '- Todos'}
+                  </CardTitle>
+                  <div className="flex items-center gap-2">
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className={cn(
+                            "w-[200px] justify-start text-left font-normal bg-slate-700 border-slate-600 text-white hover:bg-slate-600",
+                            !selectedDate && "text-slate-400"
+                          )}
+                        >
+                          <CalendarIcon className="mr-2 h-4 w-4" />
+                          {selectedDate ? format(selectedDate, "dd/MM/yyyy", { locale: ptBR }) : "Selecionar data"}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0 bg-slate-800 border-slate-700" align="end">
+                        <Calendar
+                          mode="single"
+                          selected={selectedDate}
+                          onSelect={setSelectedDate}
+                          initialFocus
+                          locale={ptBR}
+                          className="p-3 pointer-events-auto"
+                        />
+                      </PopoverContent>
+                    </Popover>
+                    {selectedDate && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => setSelectedDate(undefined)}
+                        className="text-slate-400 hover:text-white hover:bg-slate-700"
+                        title="Limpar filtro"
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </div>
+                </div>
               </CardHeader>
               <CardContent>
-                {orders.length === 0 ? (
+                {filteredOrders.length === 0 ? (
                   <div className="text-center py-12 text-slate-400">
                     <ShoppingCart className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                    <p>Nenhum pedido encontrado</p>
+                    <p>{selectedDate ? `Nenhum pedido em ${format(selectedDate, "dd/MM/yyyy", { locale: ptBR })}` : 'Nenhum pedido encontrado'}</p>
                   </div>
                 ) : (
                   <div className="overflow-x-auto">
@@ -596,7 +654,7 @@ const AdminDashboard = () => {
                         </tr>
                       </thead>
                       <tbody>
-                        {orders.map((order) => (
+                        {filteredOrders.map((order) => (
                           <tr key={order.id} className="border-b border-slate-700/50 hover:bg-slate-700/30">
                             <td className="py-4 px-4">
                               <div>
