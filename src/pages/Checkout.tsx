@@ -457,6 +457,7 @@ const Checkout = () => {
           payment_status: 'pending',
           payment_method: 'pix',
           pix_code: data.qrCodeText || null,
+          gateway_used: data.gateway || null,
         });
 
         setPixData({

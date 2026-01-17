@@ -54,6 +54,7 @@ interface Order {
   payment_status: string;
   created_at: string;
   paid_at: string | null;
+  gateway_used: string | null;
 }
 
 interface Pixel {
@@ -649,6 +650,7 @@ const AdminDashboard = () => {
                           <th className="text-left py-3 px-4 text-slate-400 font-medium text-sm">Cliente</th>
                           <th className="text-left py-3 px-4 text-slate-400 font-medium text-sm">Valor</th>
                           <th className="text-left py-3 px-4 text-slate-400 font-medium text-sm">Status</th>
+                          <th className="text-left py-3 px-4 text-slate-400 font-medium text-sm">Gateway</th>
                           <th className="text-left py-3 px-4 text-slate-400 font-medium text-sm">Data</th>
                           <th className="text-right py-3 px-4 text-slate-400 font-medium text-sm">Ações</th>
                         </tr>
@@ -669,6 +671,20 @@ const AdminDashboard = () => {
                             </td>
                             <td className="py-4 px-4">
                               {getStatusBadge(order.payment_status)}
+                            </td>
+                            <td className="py-4 px-4">
+                              {order.gateway_used ? (
+                                <Badge variant="outline" className={cn(
+                                  "text-xs",
+                                  order.gateway_used === 'goatpay' 
+                                    ? "border-purple-500/50 text-purple-400 bg-purple-500/10"
+                                    : "border-blue-500/50 text-blue-400 bg-blue-500/10"
+                                )}>
+                                  {order.gateway_used.toUpperCase()}
+                                </Badge>
+                              ) : (
+                                <span className="text-slate-500 text-sm">-</span>
+                              )}
                             </td>
                             <td className="py-4 px-4 text-slate-400 text-sm">
                               {format(new Date(order.created_at), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
@@ -717,6 +733,21 @@ const AdminDashboard = () => {
                                           <p className="text-emerald-400 font-bold">
                                             R$ {Number(selectedOrder.total_amount).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                                           </p>
+                                        </div>
+                                        <div>
+                                          <Label className="text-slate-400">Gateway</Label>
+                                          {selectedOrder.gateway_used ? (
+                                            <Badge variant="outline" className={cn(
+                                              "mt-1",
+                                              selectedOrder.gateway_used === 'goatpay' 
+                                                ? "border-purple-500/50 text-purple-400 bg-purple-500/10"
+                                                : "border-blue-500/50 text-blue-400 bg-blue-500/10"
+                                            )}>
+                                              {selectedOrder.gateway_used.toUpperCase()}
+                                            </Badge>
+                                          ) : (
+                                            <p className="text-slate-500">Não identificado</p>
+                                          )}
                                         </div>
                                       </div>
 
