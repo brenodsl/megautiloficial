@@ -148,28 +148,46 @@ const Checkout = () => {
           setPaymentStatus('paid');
           toast.success("Pagamento confirmado!");
           
-          // Redirect to upsell page instead of thank you page
+          // Fetch upsell config to determine redirect
+          const { data: settingsData } = await supabase
+            .from('app_settings')
+            .select('setting_value')
+            .eq('setting_key', 'upsell_config')
+            .single();
+
+          const upsellConfig = settingsData?.setting_value as { enabled: boolean; redirect_url: string } | null;
+          
           setTimeout(() => {
-            navigate("/upsell", {
-              state: {
-                fromCheckout: true,
-                customer: {
-                  name: customerData.name,
-                  email: customerData.email,
-                  phone: customerData.phone,
-                  document: customerData.document,
-                },
-                address: {
-                  street: addressData.street,
-                  number: addressData.number,
-                  complement: addressData.complement,
-                  neighborhood: addressData.neighborhood,
-                  city: addressData.city,
-                  state: addressData.state,
-                  zipCode: addressData.zipCode,
-                },
-              },
-            });
+            if (upsellConfig?.enabled && upsellConfig?.redirect_url) {
+              // Check if it's an external URL or internal route
+              if (upsellConfig.redirect_url.startsWith('http')) {
+                window.location.href = upsellConfig.redirect_url;
+              } else {
+                navigate(upsellConfig.redirect_url, {
+                  state: {
+                    fromCheckout: true,
+                    customer: {
+                      name: customerData.name,
+                      email: customerData.email,
+                      phone: customerData.phone,
+                      document: customerData.document,
+                    },
+                    address: {
+                      street: addressData.street,
+                      number: addressData.number,
+                      complement: addressData.complement,
+                      neighborhood: addressData.neighborhood,
+                      city: addressData.city,
+                      state: addressData.state,
+                      zipCode: addressData.zipCode,
+                    },
+                  },
+                });
+              }
+            } else {
+              // Upsell disabled - go to thank you page
+              navigate("/obrigado");
+            }
             clearCart();
           }, 2000);
         }
