@@ -25,7 +25,6 @@ interface MediaItem {
 
 const baseImages: MediaItem[] = [
   { id: 0, type: "video", src: tenisVideo, alt: "Max Runner - Vídeo", thumbnail: tenisMain },
-  { id: 1, type: "image", src: tenisMain, alt: "Max Runner - Principal" },
   { id: 2, type: "image", src: tenis2, alt: "Max Runner - Vista Lateral" },
   { id: 3, type: "image", src: tenis3, alt: "Max Runner - Vista Traseira" },
   { id: 4, type: "image", src: tenis4, alt: "Max Runner - Detalhe" },
