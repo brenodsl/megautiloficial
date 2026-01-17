@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -33,6 +34,13 @@ interface PaymentRequest {
   totalAmount: number;
 }
 
+interface GatewaySettings {
+  gateway_name: string;
+  api_token: string;
+  product_id: string;
+  is_active: boolean;
+}
+
 // Validation helpers
 function validateEmail(email: string): boolean {
   const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -65,11 +73,52 @@ serve(async (req) => {
   }
 
   try {
-    const SIGMA_API_KEY = "hLVd9EOMkYj9NJ47LzcIJHAMxU9mxfwZaSwhBpPurAiLXNCN8cTyZHLFsWk7";
-    const OFFER_HASH = "nufdla4nza";
-    const PRODUCT_HASH = "nufdla4nza";
+    // Initialize Supabase client to fetch gateway settings
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const supabase = createClient(supabaseUrl, supabaseKey);
 
-    const SIGMA_API_URL = `https://api.goatpayments.com.br/api/public/v1/transactions?api_token=${SIGMA_API_KEY}`;
+    // Fetch active gateway settings from database
+    console.log('Fetching active gateway settings from database...');
+    const { data: gatewayData, error: gatewayError } = await supabase
+      .from('gateway_settings')
+      .select('*')
+      .eq('is_active', true)
+      .single();
+
+    if (gatewayError || !gatewayData) {
+      console.error('Error fetching gateway settings:', gatewayError);
+      return new Response(
+        JSON.stringify({ error: 'Nenhum gateway de pagamento ativo configurado' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const gateway: GatewaySettings = gatewayData;
+    console.log(`Using gateway: ${gateway.gateway_name}`);
+    console.log(`Product ID: ${gateway.product_id}`);
+
+    if (!gateway.api_token || !gateway.product_id) {
+      console.error('Gateway credentials incomplete');
+      return new Response(
+        JSON.stringify({ error: 'Credenciais do gateway incompletas. Configure o API Token e ID do Produto.' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Determine API URL based on gateway
+    let API_URL: string;
+    if (gateway.gateway_name === 'sigmapay') {
+      API_URL = `https://api.sigmapay.com.br/api/public/v1/transactions?api_token=${gateway.api_token}`;
+    } else if (gateway.gateway_name === 'goatpay') {
+      API_URL = `https://api.goatpayments.com.br/api/public/v1/transactions?api_token=${gateway.api_token}`;
+    } else {
+      console.error('Unknown gateway:', gateway.gateway_name);
+      return new Response(
+        JSON.stringify({ error: 'Gateway de pagamento desconhecido' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
 
     let body: PaymentRequest;
     try {
@@ -144,9 +193,9 @@ serve(async (req) => {
       );
     }
 
-    // Build cart items for SigmaPay
+    // Build cart items using product_id from gateway settings
     const cartItems = items.map(item => ({
-      product_hash: PRODUCT_HASH,
+      product_hash: gateway.product_id,
       title: `Tênis Carbon 3.0 - ${item.colorName} - Tam ${item.size}`,
       price: Math.round(item.price * 100),
       quantity: item.quantity,
@@ -155,12 +204,12 @@ serve(async (req) => {
       cover: null
     }));
 
-    // Build SigmaPay payload according to official documentation
-    const sigmaPayload = {
+    // Build payload according to API structure
+    const payload = {
       amount: Math.round(totalAmount * 100), // Convert to cents
-      offer_hash: OFFER_HASH,
+      offer_hash: gateway.product_id,
       payment_method: 'pix',
-      installments: 1, // Required field for SigmaPay
+      installments: 1,
       customer: {
         name: sanitizeString(customer.name, 100),
         email: sanitizeString(customer.email, 255),
@@ -179,26 +228,26 @@ serve(async (req) => {
       transaction_origin: 'api'
     };
 
-    console.log('Payload enviado para SigmaPay:', JSON.stringify(sigmaPayload, null, 2));
+    console.log(`Payload enviado para ${gateway.gateway_name}:`, JSON.stringify(payload, null, 2));
 
-    // Call SigmaPay API
-    const response = await fetch(SIGMA_API_URL, {
+    // Call Gateway API
+    const response = await fetch(API_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json'
       },
-      body: JSON.stringify(sigmaPayload),
+      body: JSON.stringify(payload),
     });
 
     const responseText = await response.text();
-    console.log('Resposta CRUA da SigmaPay:', responseText);
+    console.log(`Resposta CRUA do ${gateway.gateway_name}:`, responseText);
     
     let responseData;
     try {
       responseData = JSON.parse(responseText);
     } catch {
-      console.error('Invalid JSON response from SigmaPay:', responseText);
+      console.error(`Invalid JSON response from ${gateway.gateway_name}:`, responseText);
       return new Response(
         JSON.stringify({ 
           error: 'Resposta inválida do gateway de pagamento' 
@@ -207,11 +256,11 @@ serve(async (req) => {
       );
     }
 
-    console.log('SigmaPay response status:', response.status);
-    console.log('SigmaPay response data:', responseData);
+    console.log(`${gateway.gateway_name} response status:`, response.status);
+    console.log(`${gateway.gateway_name} response data:`, responseData);
 
     if (!response.ok) {
-      console.error('SigmaPay API error:', responseData);
+      console.error(`${gateway.gateway_name} API error:`, responseData);
       return new Response(
         JSON.stringify({ 
           error: responseData.message || responseData.error || 'Não foi possível processar o pagamento. Tente novamente.' 
@@ -220,31 +269,24 @@ serve(async (req) => {
       );
     }
 
-    // Extract data from response - SigmaPay returns pix data inside a 'pix' object
-    const sigmaData = responseData.data || responseData;
+    // Extract data from response
+    const gatewayResponseData = responseData.data || responseData;
     
-    // Extract PIX data from nested pix object according to SigmaPay API structure
-    const pixInfo = sigmaData.pix || {};
+    // Extract PIX data from nested pix object
+    const pixInfo = gatewayResponseData.pix || {};
     
-    // Format response for PIX payment
-    // SigmaPay returns: 
-    // - pix.qr_code_base64: base64 image (may be null)
-    // - pix.pix_qr_code: the actual PIX code string (like "00020126580014BR.GOV.BCB.PIX...")
-    // - pix.pix_url: URL for payment page (NOT the pix code)
-    // Per documentation: qr_code is base64 image, pix_code is the text code
-    
-    // The pix_qr_code field IS the pix_code (EMV format), not an image
-    const pixCode = pixInfo.pix_qr_code || sigmaData.pix_code || null;
-    const qrCodeImage = pixInfo.qr_code_base64 || sigmaData.qr_code || null;
+    const pixCode = pixInfo.pix_qr_code || gatewayResponseData.pix_code || null;
+    const qrCodeImage = pixInfo.qr_code_base64 || gatewayResponseData.qr_code || null;
     
     const formattedResponse = {
       success: true,
-      transactionId: sigmaData.hash || sigmaData.id,
-      qrCode: qrCodeImage, // Base64 image if available
-      qrCodeText: pixCode, // The actual PIX copia e cola code
-      pixUrl: pixInfo.pix_url || null, // Payment URL (separate from pix code)
-      expiresAt: sigmaData.expires_at,
-      status: sigmaData.status || sigmaData.payment_status
+      transactionId: gatewayResponseData.hash || gatewayResponseData.id,
+      qrCode: qrCodeImage,
+      qrCodeText: pixCode,
+      pixUrl: pixInfo.pix_url || null,
+      expiresAt: gatewayResponseData.expires_at,
+      status: gatewayResponseData.status || gatewayResponseData.payment_status,
+      gateway: gateway.gateway_name
     };
     
     console.log('Resposta PIX formatada:', JSON.stringify(formattedResponse, null, 2));
