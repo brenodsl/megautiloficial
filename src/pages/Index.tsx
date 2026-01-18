@@ -25,6 +25,7 @@ import { usePresence } from "@/hooks/usePresence";
 import { trackPixelEvent } from "@/hooks/usePixels";
 import { useUserLocation } from "@/hooks/useUserLocation";
 import AIChatBot from "@/components/AIChatBot";
+import FloatingGiftBanner from "@/components/FloatingGiftBanner";
 
 // PIX Icon Component
 const PixIcon = () => (
@@ -289,6 +290,9 @@ const Index = () => {
 
       {/* AI ChatBot */}
       <AIChatBot />
+
+      {/* Floating Gift Banner */}
+      <FloatingGiftBanner />
     </div>
   );
 };
