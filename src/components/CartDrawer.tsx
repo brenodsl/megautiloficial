@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { ShoppingCart, Plus, Minus, Trash2 } from "lucide-react";
+import { ShoppingCart, Plus, Minus, Trash2, Gift } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { useCart } from "@/contexts/CartContext";
@@ -15,6 +15,7 @@ import colorLime from "@/assets/color-lime.webp";
 import colorSunset from "@/assets/color-sunset.webp";
 import colorCreamOrange from "@/assets/color-cream-orange.webp";
 import colorOrangeHd from "@/assets/color-orange-hd.webp";
+import oculosBrinde from "@/assets/oculos-brinde.jpg";
 
 const colorImages: Record<string, string> = {
   gradient: colorGradient,
@@ -136,6 +137,36 @@ const CartDrawer = ({ open, onOpenChange }: CartDrawerProps) => {
                   </div>
                 </div>
               ))}
+
+              {/* Gift Item - Óculos de Brinde */}
+              <div className="flex gap-3 p-3 bg-gradient-to-r from-amber-50 to-orange-50 rounded-lg border border-amber-200/50">
+                <div className="w-20 h-20 rounded-lg overflow-hidden bg-white flex-shrink-0 relative">
+                  <img
+                    src={oculosBrinde}
+                    alt="Óculos Esportivo UV"
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute top-0 right-0 bg-amber-500 text-white text-[8px] font-bold px-1.5 py-0.5 rounded-bl-lg">
+                    BRINDE
+                  </div>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-1.5">
+                    <Gift className="h-3.5 w-3.5 text-amber-600" />
+                    <span className="text-[10px] font-semibold text-amber-600 uppercase">Só hoje!</span>
+                  </div>
+                  <h3 className="font-medium text-sm text-foreground mt-0.5">
+                    Óculos Esportivo UV
+                  </h3>
+                  <p className="text-xs text-muted-foreground">
+                    Proteção UV • Unissex
+                  </p>
+                  <div className="flex items-center gap-2 mt-1">
+                    <span className="text-xs text-gray-400 line-through">R$ 89,90</span>
+                    <span className="text-sm font-bold text-emerald-600">GRÁTIS</span>
+                  </div>
+                </div>
+              </div>
             </div>
 
             {/* Footer */}
