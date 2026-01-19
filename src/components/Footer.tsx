@@ -1,10 +1,38 @@
-import { Shield, Lock, Mail, Clock } from "lucide-react";
+import { Shield, Lock, Mail, Clock, Store } from "lucide-react";
 import { Link } from "react-router-dom";
+import fachadaLoja from "@/assets/fachada-loja.png";
 
 const Footer = () => {
   return (
     <footer className="bg-white border-t border-gray-200 mt-8">
       <div className="max-w-lg mx-auto px-4 py-8">
+        {/* Nossa História */}
+        <div className="mb-8">
+          <div className="flex items-center gap-2 mb-4">
+            <Store className="h-5 w-5 text-gray-700" />
+            <h4 className="font-bold text-gray-900">Nossa História</h4>
+          </div>
+          <div className="rounded-xl overflow-hidden mb-4">
+            <img 
+              src={fachadaLoja} 
+              alt="Fachada da loja Max Runner" 
+              className="w-full h-48 object-cover"
+            />
+          </div>
+          <div className="space-y-2 text-sm text-gray-600">
+            <p>
+              <span className="font-semibold text-gray-900">Desde 2015</span>, a Max Runner nasceu com um propósito: 
+              apoiar os <span className="font-medium text-gray-800">corredores brasileiros</span> com produtos de qualidade 
+              e os <span className="font-medium text-emerald-600">melhores preços do mercado</span>.
+            </p>
+            <p>
+              São quase <span className="font-semibold text-gray-900">10 anos</span> de experiência, 
+              milhares de clientes satisfeitos e o compromisso de levar o melhor para você, 
+              direto da nossa loja no Brás, São Paulo, para todo o Brasil.
+            </p>
+          </div>
+        </div>
+
         {/* Grid Sections */}
         <div className="space-y-8 text-sm">
           {/* Institucional */}
