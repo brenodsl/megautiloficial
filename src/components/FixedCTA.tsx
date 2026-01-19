@@ -50,7 +50,7 @@ const FixedCTA = ({ selectedSize, selectedColor, sizeSelectorRef }: FixedCTAProp
         <div className="flex-1">
           <p className="text-xs text-muted-foreground line-through">R$ 239,80</p>
           <p className="text-lg font-bold text-foreground">
-            R$ 78,90
+            R$ 77,98
             <span className="ml-2 text-[10px] font-bold text-white bg-destructive px-1.5 py-0.5 rounded">
               -67%
             </span>

@@ -50,7 +50,7 @@ const Index = () => {
       content_type: 'product',
       content_id: 'carbon-3-0',
       content_name: 'Tênis de Corrida Chunta Carbon 3.0',
-      value: 77.80,
+      value: 77.98,
       currency: 'BRL',
     });
   }, []);
@@ -74,7 +74,7 @@ const Index = () => {
       content_id: 'carbon-3-0',
       content_name: 'Tênis de Corrida Chunta Carbon 3.0',
       quantity: 1,
-      value: 77.80,
+      value: 77.98,
       currency: 'BRL',
     });
     
@@ -158,7 +158,7 @@ const Index = () => {
             <span className="text-sm text-gray-400 line-through">R$ 239,80</span>
             <span className="text-xs font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">-67%</span>
           </div>
-          <div className="text-3xl font-bold text-gray-900">R$ 77,80</div>
+          <div className="text-3xl font-bold text-gray-900">R$ 77,98</div>
           <div className="flex items-center gap-1.5 text-sm text-emerald-600 mt-1">
             <PixIcon />
             <span className="font-medium">À vista no PIX</span>

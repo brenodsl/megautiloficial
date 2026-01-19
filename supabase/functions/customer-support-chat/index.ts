@@ -12,7 +12,7 @@ const systemPrompt = `Você é o assistente virtual da Max Runner, uma loja espe
 
 SOBRE A MAX RUNNER:
 - Vendemos tênis de corrida com tecnologia de placa de carbono
-- Preço: R$ 219,90 (com desconto de R$ 329,90)
+- Preço: R$ 77,98 à vista no PIX
 - Parcelamento: até 12x sem juros
 - Frete grátis para todo Brasil
 - Garantia de 90 dias
