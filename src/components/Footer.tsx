@@ -17,6 +17,8 @@ const Footer = () => {
               src={fachadaLoja} 
               alt="Fachada da loja Max Runner" 
               className="w-full h-48 object-cover"
+              loading="lazy"
+              decoding="async"
             />
           </div>
           <div className="space-y-2 text-sm text-gray-600">

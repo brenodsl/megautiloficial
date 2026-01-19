@@ -80,6 +80,8 @@ const AIChatBot = () => {
             src={perfilAtendente} 
             alt="João Lucas" 
             className="w-full h-full object-cover"
+            loading="lazy"
+            decoding="async"
           />
         )}
       </button>

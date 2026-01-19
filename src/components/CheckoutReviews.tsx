@@ -189,6 +189,8 @@ const CheckoutReviews = () => {
                 src={review.media.type === 'video' ? review.media.thumbnail : review.media.src}
                 alt={`Foto de ${review.name}`}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                loading="lazy"
+                decoding="async"
               />
               {review.media.type === 'video' && (
                 <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
@@ -245,6 +247,8 @@ const CheckoutReviews = () => {
               src={selectedMedia?.src}
               alt="Avaliação do cliente"
               className="w-full max-h-[80vh] object-contain"
+              loading="eager"
+              decoding="async"
             />
           )}
         </DialogContent>

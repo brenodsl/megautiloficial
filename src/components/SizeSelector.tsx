@@ -77,6 +77,8 @@ const SizeSelector = forwardRef<SizeSelectorRef, SizeSelectorProps>(
                 src={tabelaTamanhos} 
                 alt="Tabela de Tamanhos Max Runner" 
                 className="w-full h-auto rounded-lg"
+                loading="lazy"
+                decoding="async"
               />
             </DialogContent>
           </Dialog>
