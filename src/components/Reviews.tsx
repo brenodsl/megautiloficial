@@ -319,6 +319,8 @@ const Reviews = () => {
                       src={media.type === 'video' ? media.thumbnail : media.src}
                       alt={`Mídia do cliente ${review.name}`}
                       className="h-full w-full object-cover group-hover:scale-105 transition-transform"
+                      loading="lazy"
+                      decoding="async"
                     />
                     {media.type === 'video' && (
                       <div className="absolute inset-0 bg-black/30 flex items-center justify-center">

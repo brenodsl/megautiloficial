@@ -111,6 +111,8 @@ const ProductGallery = ({ selectedColor }: ProductGalleryProps) => {
                     src={item.thumbnail || tenisMain}
                     alt={item.alt}
                     className="h-full w-full object-cover"
+                    loading="lazy"
+                    decoding="async"
                   />
                   <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
                     <Play className="h-3 w-3 sm:h-4 sm:w-4 text-white fill-white" />
@@ -121,6 +123,8 @@ const ProductGallery = ({ selectedColor }: ProductGalleryProps) => {
                   src={item.src}
                   alt={item.alt}
                   className="h-full w-full object-cover"
+                  loading="lazy"
+                  decoding="async"
                 />
               )}
             </button>
@@ -140,6 +144,7 @@ const ProductGallery = ({ selectedColor }: ProductGalleryProps) => {
                       loop
                       muted
                       playsInline
+                      preload="metadata"
                       className="h-full w-full object-cover"
                     />
                   ) : (
@@ -147,6 +152,9 @@ const ProductGallery = ({ selectedColor }: ProductGalleryProps) => {
                       src={item.src}
                       alt={item.alt}
                       className="h-full w-full object-cover"
+                      loading={item.id === -1 ? "eager" : "lazy"}
+                      decoding="async"
+                      fetchPriority={item.id === -1 ? "high" : "auto"}
                     />
                   )}
                 </div>

@@ -548,7 +548,7 @@ const Checkout = () => {
         <header className="bg-white border-b border-gray-100 py-3 px-4">
           <div className="max-w-lg mx-auto flex items-center justify-center">
             <Link to="/">
-              <img src={logo} alt="Max Runner" className="h-8 w-auto" />
+              <img src={logo} alt="Max Runner" className="h-8 w-auto" loading="eager" decoding="async" />
             </Link>
           </div>
         </header>
@@ -605,6 +605,8 @@ const Checkout = () => {
                   src={pixData.qrCode.startsWith("data:") ? pixData.qrCode : `data:image/png;base64,${pixData.qrCode}`}
                   alt="QR Code PIX"
                   className="w-64 h-64 rounded-lg"
+                  loading="eager"
+                  decoding="async"
                 />
               ) : (
                 <div className="w-64 h-64 bg-gray-100 flex flex-col items-center justify-center rounded-lg">
@@ -796,7 +798,7 @@ const Checkout = () => {
               <ArrowLeft className="h-5 w-5 text-gray-600" />
             </button>
             <Link to="/">
-              <img src={logo} alt="Max Runner" className="h-8 w-auto" />
+              <img src={logo} alt="Max Runner" className="h-8 w-auto" loading="eager" decoding="async" />
             </Link>
           </div>
           <div className="flex items-center gap-1.5 text-xs text-gray-500 bg-gray-50 px-3 py-1.5 rounded-full">
@@ -824,6 +826,8 @@ const Checkout = () => {
                     src={item.colorImage}
                     alt={item.colorName}
                     className="w-16 h-16 object-cover rounded-xl"
+                    loading="lazy"
+                    decoding="async"
                   />
                   <div className="flex-1 min-w-0">
                     <h3 className="font-semibold text-gray-900 text-sm">Tênis Carbon 3.0</h3>

@@ -480,7 +480,7 @@ const Upsell = () => {
         <header className="bg-white border-b border-gray-100 py-3 px-4">
           <div className="max-w-lg mx-auto flex items-center justify-center">
             <Link to="/">
-              <img src={logo} alt="Max Runner" className="h-8 w-auto" />
+              <img src={logo} alt="Max Runner" className="h-8 w-auto" loading="eager" decoding="async" />
             </Link>
           </div>
         </header>
@@ -565,7 +565,7 @@ const Upsell = () => {
         <header className="bg-white border-b border-gray-100 py-3 px-4">
           <div className="max-w-lg mx-auto flex items-center justify-between">
             <Link to="/">
-              <img src={logo} alt="Max Runner" className="h-8 w-auto" />
+              <img src={logo} alt="Max Runner" className="h-8 w-auto" loading="eager" decoding="async" />
             </Link>
             <button onClick={() => setShowCheckout(false)} className="text-sm text-gray-500 hover:text-gray-700">
               Voltar
@@ -758,7 +758,7 @@ const Upsell = () => {
       <header className="bg-white border-b border-gray-100 py-3 px-4">
         <div className="max-w-md mx-auto flex items-center justify-center">
           <Link to="/">
-            <img src={logo} alt="Max Runner" className="h-8 w-auto" />
+            <img src={logo} alt="Max Runner" className="h-8 w-auto" loading="eager" decoding="async" />
           </Link>
         </div>
       </header>
@@ -797,6 +797,8 @@ const Upsell = () => {
                   src={product.image}
                   alt={product.name}
                   className="w-full h-full object-cover"
+                  loading="lazy"
+                  decoding="async"
                 />
               </div>
               <div className="flex-1 min-w-0">
@@ -857,6 +859,8 @@ const Upsell = () => {
                         src={product.image}
                         alt={product.name}
                         className="w-full h-full object-cover"
+                        loading="lazy"
+                        decoding="async"
                       />
                     </div>
                     <p className="text-[10px] text-gray-600 leading-tight">{product.shortName}</p>

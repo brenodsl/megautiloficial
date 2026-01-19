@@ -88,6 +88,8 @@ const CartDrawer = ({ open, onOpenChange }: CartDrawerProps) => {
                       src={colorImages[item.colorId] || colorGradient}
                       alt={item.colorName}
                       className="w-full h-full object-cover"
+                      loading="lazy"
+                      decoding="async"
                     />
                   </div>
 
