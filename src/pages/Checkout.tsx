@@ -41,7 +41,6 @@ import PaymentProgressBar from "@/components/PaymentProgressBar";
 import ValidatedInput from "@/components/ValidatedInput";
 import FloatingCheckoutSummary from "@/components/FloatingCheckoutSummary";
 import OfferTimer from "@/components/OfferTimer";
-import oculosBrinde from "@/assets/oculos-brinde.jpg";
 // PIX Icon Component
 const PixIcon = ({ className = "h-5 w-5" }: { className?: string }) => (
   <svg width="16" height="16" viewBox="0 0 512 512" fill="currentColor" className={className}>
@@ -852,38 +851,6 @@ const Checkout = () => {
               </div>
             ))}
 
-            {/* Gift Item - Óculos de Brinde */}
-            <div className="pt-3 border-t border-gray-100">
-              <div className="flex gap-3 p-3 bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl border border-amber-200/50">
-                <div className="w-16 h-16 rounded-xl overflow-hidden bg-white flex-shrink-0 relative">
-                  <img
-                    src={oculosBrinde}
-                    alt="Óculos Esportivo UV"
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute top-0 right-0 bg-amber-500 text-white text-[8px] font-bold px-1.5 py-0.5 rounded-bl-lg">
-                    BRINDE
-                  </div>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-1.5">
-                    <Gift className="h-3.5 w-3.5 text-amber-600" />
-                    <span className="text-[10px] font-semibold text-amber-600 uppercase">Só hoje!</span>
-                  </div>
-                  <h3 className="font-semibold text-gray-900 text-sm mt-0.5">
-                    Óculos Esportivo UV
-                  </h3>
-                  <p className="text-xs text-gray-500">
-                    Proteção UV • Unissex
-                  </p>
-                  <div className="flex items-center gap-2 mt-1">
-                    <span className="text-xs text-gray-400 line-through">R$ 89,90</span>
-                    <span className="text-sm font-bold text-emerald-600">GRÁTIS</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
             {/* Total and Discount Summary */}
             <div className="pt-3 border-t border-gray-100">
               <div className="flex items-center justify-between">

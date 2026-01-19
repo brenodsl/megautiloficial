@@ -25,7 +25,6 @@ import { usePresence } from "@/hooks/usePresence";
 import { trackPixelEvent } from "@/hooks/usePixels";
 import { useUserLocation } from "@/hooks/useUserLocation";
 import AIChatBot from "@/components/AIChatBot";
-import oculosBrinde from "@/assets/oculos-brinde.jpg";
 
 // PIX Icon Component
 const PixIcon = () => (
@@ -150,22 +149,6 @@ const Index = () => {
               />
             </div>
 
-            {/* Gift Notice */}
-            <div className="mt-4 flex items-center gap-3 bg-amber-50 border border-amber-200 rounded-xl p-3">
-              <img 
-                src={oculosBrinde} 
-                alt="Óculos Esportivo UV" 
-                className="w-12 h-12 object-cover rounded-lg flex-shrink-0"
-              />
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-bold text-white bg-amber-500 px-1.5 py-0.5 rounded uppercase">Brinde</span>
-                  <span className="text-[10px] text-amber-600 font-medium">Só hoje!</span>
-                </div>
-                <p className="text-xs font-medium text-gray-800 mt-0.5">Óculos Esportivo UV - Proteção UV - Unissex</p>
-                <p className="text-[10px] text-emerald-600 font-semibold">GRÁTIS na sua compra</p>
-              </div>
-            </div>
           </div>
         </div>
 
