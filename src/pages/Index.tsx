@@ -35,7 +35,7 @@ const PixIcon = () => (
 
 const Index = () => {
   const navigate = useNavigate();
-  const { addItem, totalItems } = useCart();
+  const { addItem, totalItems, unitPrice, displayOriginalPrice } = useCart();
   const sizeSelectorRef = useRef<SizeSelectorRef>(null);
   const [selectedSize, setSelectedSize] = useState<number | null>(null);
   const userLocation = useUserLocation();
@@ -44,16 +44,21 @@ const Index = () => {
   usePresence("/");
   const [selectedColor, setSelectedColor] = useState<string>("gradient");
 
+  // Calculate discount percentage
+  const discountPercent = displayOriginalPrice > 0 
+    ? Math.round(((displayOriginalPrice - unitPrice) / displayOriginalPrice) * 100) 
+    : 0;
+
   // Track ViewContent event for all pixels
   useEffect(() => {
     trackPixelEvent('ViewContent', {
       content_type: 'product',
       content_id: 'carbon-3-0',
       content_name: 'Tênis de Corrida Chunta Carbon 3.0',
-      value: 77.98,
+      value: unitPrice,
       currency: 'BRL',
     });
-  }, []);
+  }, [unitPrice]);
 
   const handleBuyClick = () => {
     // If cart has items, go directly to checkout (user is finishing their purchase)
@@ -74,7 +79,7 @@ const Index = () => {
       content_id: 'carbon-3-0',
       content_name: 'Tênis de Corrida Chunta Carbon 3.0',
       quantity: 1,
-      value: 77.98,
+      value: unitPrice,
       currency: 'BRL',
     });
     
@@ -155,10 +160,10 @@ const Index = () => {
         {/* Price Card */}
         <div className="bg-white mt-2 px-4 py-5">
           <div className="flex items-baseline gap-3 mb-1">
-            <span className="text-sm text-gray-400 line-through">R$ 239,80</span>
-            <span className="text-xs font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">-67%</span>
+            <span className="text-sm text-gray-400 line-through">R$ {displayOriginalPrice.toFixed(2).replace(".", ",")}</span>
+            <span className="text-xs font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">-{discountPercent}%</span>
           </div>
-          <div className="text-3xl font-bold text-gray-900">R$ 77,98</div>
+          <div className="text-3xl font-bold text-gray-900">R$ {unitPrice.toFixed(2).replace(".", ",")}</div>
           <div className="flex items-center gap-1.5 text-sm text-emerald-600 mt-1">
             <PixIcon />
             <span className="font-medium">À vista no PIX</span>
