@@ -33,7 +33,8 @@ import {
   Gift,
   ExternalLink,
   CalendarIcon,
-  X
+  X,
+  Tag
 } from "lucide-react";
 import { toast } from "sonner";
 import { format, startOfDay, endOfDay, isWithinInterval } from "date-fns";
@@ -86,6 +87,11 @@ interface UpsellConfig {
   redirect_url: string;
 }
 
+interface ProductPriceConfig {
+  unit_price: number;
+  original_price: number;
+}
+
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const [orders, setOrders] = useState<Order[]>([]);
@@ -102,6 +108,8 @@ const AdminDashboard = () => {
   const [upsellConfig, setUpsellConfig] = useState<UpsellConfig>({ enabled: true, redirect_url: '/upsell' });
   const [isSavingUpsell, setIsSavingUpsell] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
+  const [productPrice, setProductPrice] = useState<ProductPriceConfig>({ unit_price: 77.98, original_price: 239.80 });
+  const [isSavingPrice, setIsSavingPrice] = useState(false);
 
   // Cleanup old presence entries
   usePresenceCleanup();
@@ -152,8 +160,40 @@ const AdminDashboard = () => {
 
   const fetchData = async () => {
     setIsLoading(true);
-    await Promise.all([fetchOrders(), fetchPixels(), fetchLiveVisitors(), fetchGatewaySettings(), fetchUpsellConfig()]);
+    await Promise.all([fetchOrders(), fetchPixels(), fetchLiveVisitors(), fetchGatewaySettings(), fetchUpsellConfig(), fetchProductPrice()]);
     setIsLoading(false);
+  };
+
+  const fetchProductPrice = async () => {
+    const { data, error } = await supabase
+      .from('app_settings')
+      .select('setting_value')
+      .eq('setting_key', 'product_price')
+      .maybeSingle();
+
+    if (!error && data) {
+      const value = data.setting_value as unknown as ProductPriceConfig;
+      setProductPrice(value);
+    }
+  };
+
+  const handleSaveProductPrice = async () => {
+    setIsSavingPrice(true);
+    const { error } = await supabase
+      .from('app_settings')
+      .upsert([{ 
+        setting_key: 'product_price',
+        setting_value: JSON.parse(JSON.stringify(productPrice)),
+        updated_at: new Date().toISOString()
+      }], { onConflict: 'setting_key' });
+
+    if (error) {
+      toast.error("Erro ao salvar preço do produto");
+      console.error(error);
+    } else {
+      toast.success("Preço do produto atualizado! Recarregue a página para ver as alterações.");
+    }
+    setIsSavingPrice(false);
   };
 
   const fetchUpsellConfig = async () => {
@@ -569,7 +609,7 @@ const AdminDashboard = () => {
 
         {/* Main Content */}
         <Tabs defaultValue="orders" className="space-y-6">
-          <TabsList className="bg-slate-800/50 border border-slate-700">
+          <TabsList className="bg-slate-800/50 border border-slate-700 flex-wrap">
             <TabsTrigger value="orders" className="data-[state=active]:bg-slate-700">
               <ShoppingCart className="w-4 h-4 mr-2" />
               Pedidos
@@ -581,6 +621,10 @@ const AdminDashboard = () => {
             <TabsTrigger value="gateway" className="data-[state=active]:bg-slate-700">
               <CreditCard className="w-4 h-4 mr-2" />
               Gateway
+            </TabsTrigger>
+            <TabsTrigger value="pricing" className="data-[state=active]:bg-slate-700">
+              <Tag className="w-4 h-4 mr-2" />
+              Preço
             </TabsTrigger>
             <TabsTrigger value="upsell" className="data-[state=active]:bg-slate-700">
               <Gift className="w-4 h-4 mr-2" />
@@ -1038,6 +1082,113 @@ const AdminDashboard = () => {
                     ))}
                   </div>
                 )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Pricing Tab */}
+          <TabsContent value="pricing">
+            <Card className="bg-slate-800/50 border-slate-700">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <Tag className="w-5 h-5" />
+                  Configuração de Preço do Produto
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <p className="text-slate-400 text-sm">
+                  Configure o preço do tênis que será exibido em todo o site. O preço será atualizado automaticamente na página do produto, checkout, PIX gerado e todos os cálculos.
+                </p>
+
+                <div className={`p-6 rounded-xl border-2 transition-all bg-emerald-500/10 border-emerald-500`}>
+                  <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-emerald-500/20">
+                        <DollarSign className="w-6 h-6 text-emerald-400" />
+                      </div>
+                      <div>
+                        <h3 className="text-white font-bold text-lg">
+                          Tênis Carbon 3.0
+                        </h3>
+                        <p className="text-slate-400 text-sm">
+                          Preço atual: R$ {productPrice.unit_price.toFixed(2).replace(".", ",")}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <Label className="text-slate-400 text-sm">Preço de Venda (R$)</Label>
+                      <Input
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        value={productPrice.unit_price}
+                        onChange={(e) => setProductPrice(prev => ({ ...prev, unit_price: parseFloat(e.target.value) || 0 }))}
+                        placeholder="77.98"
+                        className="bg-slate-700/50 border-slate-600 text-white text-lg font-bold"
+                      />
+                      <p className="text-slate-500 text-xs">
+                        Este é o valor que o cliente pagará no PIX
+                      </p>
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-slate-400 text-sm">Preço Original / Riscado (R$)</Label>
+                      <Input
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        value={productPrice.original_price}
+                        onChange={(e) => setProductPrice(prev => ({ ...prev, original_price: parseFloat(e.target.value) || 0 }))}
+                        placeholder="239.80"
+                        className="bg-slate-700/50 border-slate-600 text-white"
+                      />
+                      <p className="text-slate-500 text-xs">
+                        Valor de referência para mostrar o desconto (preço riscado)
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Preview */}
+                  <div className="mt-6 p-4 bg-slate-900/50 rounded-xl">
+                    <p className="text-slate-400 text-sm mb-2">Prévia:</p>
+                    <div className="flex items-baseline gap-3">
+                      <span className="text-slate-500 line-through">
+                        R$ {productPrice.original_price.toFixed(2).replace(".", ",")}
+                      </span>
+                      <span className="text-2xl font-bold text-emerald-400">
+                        R$ {productPrice.unit_price.toFixed(2).replace(".", ",")}
+                      </span>
+                      <span className="text-xs font-semibold text-emerald-400 bg-emerald-500/20 px-2 py-0.5 rounded-full">
+                        -{productPrice.original_price > 0 ? Math.round(((productPrice.original_price - productPrice.unit_price) / productPrice.original_price) * 100) : 0}%
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="mt-6 flex justify-end">
+                    <Button
+                      onClick={handleSaveProductPrice}
+                      disabled={isSavingPrice}
+                      className="bg-emerald-500 hover:bg-emerald-600 text-white"
+                    >
+                      <Save className="w-4 h-4 mr-2" />
+                      {isSavingPrice ? 'Salvando...' : 'Salvar Preço'}
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Info box */}
+                <div className="bg-blue-500/10 border border-blue-500/30 rounded-xl p-4">
+                  <h4 className="text-blue-400 font-medium flex items-center gap-2 mb-2">
+                    <CheckCircle2 className="w-4 h-4" />
+                    Alterações Automáticas
+                  </h4>
+                  <p className="text-slate-400 text-sm">
+                    Ao salvar, o novo preço será aplicado automaticamente em toda a loja: página do produto, carrinho, checkout, valor do PIX gerado e rastreamento de pixels. 
+                    Recarregue a página após salvar para ver as alterações.
+                  </p>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>

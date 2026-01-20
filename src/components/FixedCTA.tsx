@@ -24,7 +24,12 @@ interface FixedCTAProps {
 
 const FixedCTA = ({ selectedSize, selectedColor, sizeSelectorRef }: FixedCTAProps) => {
   const navigate = useNavigate();
-  const { totalItems } = useCart();
+  const { totalItems, unitPrice, displayOriginalPrice } = useCart();
+  
+  // Calculate discount percentage
+  const discountPercent = displayOriginalPrice > 0 
+    ? Math.round(((displayOriginalPrice - unitPrice) / displayOriginalPrice) * 100) 
+    : 0;
   
   const handleClick = () => {
     // If cart has items, go directly to checkout
@@ -48,11 +53,11 @@ const FixedCTA = ({ selectedSize, selectedColor, sizeSelectorRef }: FixedCTAProp
     <div className="fixed bottom-0 left-0 right-0 z-50 p-3 bg-white border-t border-border lg:hidden shadow-lg">
       <div className="flex items-center gap-3">
         <div className="flex-1">
-          <p className="text-xs text-muted-foreground line-through">R$ 239,80</p>
+          <p className="text-xs text-muted-foreground line-through">R$ {displayOriginalPrice.toFixed(2).replace(".", ",")}</p>
           <p className="text-lg font-bold text-foreground">
-            R$ 77,98
+            R$ {unitPrice.toFixed(2).replace(".", ",")}
             <span className="ml-2 text-[10px] font-bold text-white bg-destructive px-1.5 py-0.5 rounded">
-              -67%
+              -{discountPercent}%
             </span>
           </p>
         </div>

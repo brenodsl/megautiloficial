@@ -1,5 +1,6 @@
-import React, { createContext, useContext, useState, ReactNode } from "react";
+import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { colors, ColorOption } from "@/components/ColorSelector";
+import { fetchProductPrice } from "@/hooks/useProductPrice";
 
 export interface CartItem {
   id: string;
@@ -22,14 +23,29 @@ interface CartContextType {
   originalPrice: number;
   discount: number;
   discountPercentage: number;
+  unitPrice: number;
+  displayOriginalPrice: number;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
-const UNIT_PRICE = 77.98;
+const DEFAULT_UNIT_PRICE = 77.98;
+const DEFAULT_ORIGINAL_PRICE = 239.80;
 
 export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [items, setItems] = useState<CartItem[]>([]);
+  const [unitPrice, setUnitPrice] = useState(DEFAULT_UNIT_PRICE);
+  const [displayOriginalPrice, setDisplayOriginalPrice] = useState(DEFAULT_ORIGINAL_PRICE);
+
+  // Fetch price from database on mount
+  useEffect(() => {
+    const loadPrice = async () => {
+      const priceData = await fetchProductPrice();
+      setUnitPrice(priceData.unitPrice);
+      setDisplayOriginalPrice(priceData.originalPrice);
+    };
+    loadPrice();
+  }, []);
 
   const addItem = (colorId: string, size: number, quantity: number = 1) => {
     const color = colors.find(c => c.id === colorId);
@@ -53,7 +69,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         colorImage: color.image,
         size,
         quantity,
-        price: UNIT_PRICE,
+        price: unitPrice,
       };
       setItems([...items, newItem]);
     }
@@ -78,14 +94,14 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
-  const originalPrice = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  const originalPrice = items.reduce((sum, item) => sum + (unitPrice * item.quantity), 0);
   
   // Calculate progressive discount: 2nd pair onwards gets 20% off
   const calculateDiscount = () => {
     if (totalItems < 2) return 0;
     // First item is full price, remaining items get 20% off
     const discountedItems = totalItems - 1;
-    return discountedItems * UNIT_PRICE * 0.20;
+    return discountedItems * unitPrice * 0.20;
   };
   
   const discount = calculateDiscount();
@@ -104,6 +120,8 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       originalPrice,
       discount,
       discountPercentage,
+      unitPrice,
+      displayOriginalPrice,
     }}>
       {children}
     </CartContext.Provider>
