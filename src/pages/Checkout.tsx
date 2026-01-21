@@ -21,15 +21,16 @@ import {
   ArrowLeft,
   Plus,
   Minus,
-  Gift
+  Gift,
+  Camera
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { useCart } from "@/contexts/CartContext";
+import { useCameraCart } from "@/contexts/CameraCartContext";
 import { supabase } from "@/integrations/supabase/client";
 import { QRCodeSVG } from "qrcode.react";
-import logo from "@/assets/logo-max-runner.png";
+import cameraMain from "@/assets/camera-main.webp";
 import CheckoutReviews from "@/components/CheckoutReviews";
 import { usePresence } from "@/hooks/usePresence";
 import { trackPixelEvent } from "@/hooks/usePixels";
@@ -57,7 +58,7 @@ const QRCodeIcon = () => (
 
 const Checkout = () => {
   const navigate = useNavigate();
-  const { items, totalPrice, originalPrice, discount, clearCart, updateQuantity } = useCart();
+  const { items, totalPrice, originalPrice, discount, clearCart, updateQuantity } = useCameraCart();
   
   const [customerData, setCustomerData] = useState({
     name: "",
@@ -395,9 +396,7 @@ const Checkout = () => {
       const { data, error } = await supabase.functions.invoke("create-pix-payment", {
         body: {
           items: items.map(item => ({
-            colorId: item.colorId,
-            colorName: item.colorName,
-            size: item.size,
+            name: item.name,
             quantity: item.quantity,
             price: item.price,
           })),
@@ -431,9 +430,7 @@ const Checkout = () => {
       if (data?.success) {
         // Save order to database
         const orderItems = items.map(item => ({
-          name: `Tênis Carbon 3.0 - ${item.colorName}`,
-          color: item.colorName,
-          size: item.size,
+          name: `Câmera P11 6MP`,
           quantity: item.quantity,
           price: item.price,
         }));
@@ -547,8 +544,9 @@ const Checkout = () => {
         {/* Header */}
         <header className="bg-white border-b border-gray-100 py-3 px-4">
           <div className="max-w-lg mx-auto flex items-center justify-center">
-            <Link to="/">
-              <img src={logo} alt="Max Runner" className="h-8 w-auto" loading="eager" decoding="async" />
+            <Link to="/" className="flex items-center gap-2">
+              <Camera className="h-6 w-6 text-blue-500" />
+              <span className="font-bold text-gray-900">Câmera P11</span>
             </Link>
           </div>
         </header>
@@ -711,8 +709,7 @@ const Checkout = () => {
                     navigate("/obrigado", {
                       state: {
                         items: items.map(item => ({
-                          colorName: item.colorName,
-                          size: item.size,
+                          name: item.name,
                           quantity: item.quantity,
                           price: item.price,
                         })),
@@ -797,8 +794,9 @@ const Checkout = () => {
             >
               <ArrowLeft className="h-5 w-5 text-gray-600" />
             </button>
-            <Link to="/">
-              <img src={logo} alt="Max Runner" className="h-8 w-auto" loading="eager" decoding="async" />
+            <Link to="/" className="flex items-center gap-2">
+              <Camera className="h-6 w-6 text-blue-500" />
+              <span className="font-bold text-gray-900">Câmera P11</span>
             </Link>
           </div>
           <div className="flex items-center gap-1.5 text-xs text-gray-500 bg-gray-50 px-3 py-1.5 rounded-full">
@@ -823,15 +821,15 @@ const Checkout = () => {
               <div key={item.id} className={index > 0 ? "pt-3 border-t border-gray-100" : ""}>
                 <div className="flex gap-3">
                   <img
-                    src={item.colorImage}
-                    alt={item.colorName}
+                    src={cameraMain}
+                    alt="Câmera P11"
                     className="w-16 h-16 object-cover rounded-xl"
                     loading="lazy"
                     decoding="async"
                   />
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-gray-900 text-sm">Tênis Carbon 3.0</h3>
-                    <p className="text-xs text-gray-500">{item.colorName} • Tam. {item.size}</p>
+                    <h3 className="font-semibold text-gray-900 text-sm">Câmera P11 6MP</h3>
+                    <p className="text-xs text-gray-500">Wi-Fi • Lente Dupla</p>
                     <p className="text-sm font-bold text-[#28af60] mt-1">
                       R$ {(item.price * item.quantity).toFixed(2).replace(".", ",")}
                     </p>
