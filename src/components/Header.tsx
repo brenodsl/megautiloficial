@@ -1,11 +1,10 @@
 import { useState } from "react";
-import { Menu, ShoppingCart, Star, Search, X, Home, Package, MessageSquare, Shield, FileText, Truck, RefreshCw, ArrowLeftRight } from "lucide-react";
+import { Menu, ShoppingCart, Star, Search, X, Home, Package, MessageSquare, Shield, FileText, Truck, RefreshCw, ArrowLeftRight, Camera } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import logo from "@/assets/logo-max-runner.png";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Input } from "@/components/ui/input";
-import { useCart } from "@/contexts/CartContext";
+import { useCameraCart } from "@/contexts/CameraCartContext";
 import CartDrawer from "@/components/CartDrawer";
 
 const menuItems = [
@@ -25,7 +24,7 @@ const policyItems = [
 
 const Header = () => {
   const navigate = useNavigate();
-  const { totalItems } = useCart();
+  const { totalItems } = useCameraCart();
   const [isOpen, setIsOpen] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -85,12 +84,15 @@ const Header = () => {
                     <div className="flex flex-col h-full">
                       {/* Menu Header */}
                       <div className="p-4 border-b border-gray-100 bg-gray-50">
-                        <span className="text-lg font-semibold text-gray-900">
-                          Max Runner
-                        </span>
+                        <div className="flex items-center gap-2">
+                          <Camera className="h-5 w-5 text-blue-500" />
+                          <span className="text-lg font-semibold text-gray-900">
+                            Câmera P11
+                          </span>
+                        </div>
                         <div className="flex items-center gap-1 text-xs text-gray-500 mt-0.5">
                           <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
-                          <span>4.9 (578 avaliações)</span>
+                          <span>4.8 (80 avaliações)</span>
                         </div>
                       </div>
                       
@@ -164,12 +166,9 @@ const Header = () => {
 
                 {/* Logo - Centered */}
                 <div className="absolute left-1/2 -translate-x-1/2">
-                  <Link to="/">
-                    <img
-                      src={logo}
-                      alt="Max Runner"
-                      className="h-9 w-auto object-contain"
-                    />
+                  <Link to="/" className="flex items-center gap-2">
+                    <Camera className="h-6 w-6 text-blue-500" />
+                    <span className="font-bold text-gray-900">Câmera P11</span>
                   </Link>
                 </div>
 
