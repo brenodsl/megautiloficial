@@ -1,9 +1,46 @@
 import { useNavigate } from "react-router-dom";
-import { ShoppingCart, Plus, Minus, Trash2, Camera } from "lucide-react";
+import { ShoppingCart, Plus, Minus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { useCameraCart } from "@/contexts/CameraCartContext";
-import cameraMain from "@/assets/camera-main.webp";
+import { useCart } from "@/contexts/CartContext";
+
+// Import color images
+import colorGradient from "@/assets/color-gradient.webp";
+import colorOrange from "@/assets/color-orange.webp";
+import colorMint from "@/assets/color-mint.webp";
+import colorPink from "@/assets/color-pink.webp";
+import colorPurple from "@/assets/color-purple.webp";
+import colorGreen from "@/assets/color-green.webp";
+import colorLime from "@/assets/color-lime.webp";
+import colorSunset from "@/assets/color-sunset.webp";
+import colorCreamOrange from "@/assets/color-cream-orange.webp";
+import colorOrangeHd from "@/assets/color-orange-hd.webp";
+
+const colorImages: Record<string, string> = {
+  gradient: colorGradient,
+  orange: colorOrange,
+  mint: colorMint,
+  pink: colorPink,
+  purple: colorPurple,
+  green: colorGreen,
+  lime: colorLime,
+  sunset: colorSunset,
+  "cream-orange": colorCreamOrange,
+  "orange-hd": colorOrangeHd,
+};
+
+const colorNames: Record<string, string> = {
+  gradient: "Gradient",
+  orange: "Orange",
+  mint: "Mint",
+  pink: "Pink",
+  purple: "Purple",
+  green: "Green",
+  lime: "Lime",
+  sunset: "Sunset",
+  "cream-orange": "Cream Orange",
+  "orange-hd": "Orange HD",
+};
 
 interface CartDrawerProps {
   open: boolean;
@@ -12,7 +49,7 @@ interface CartDrawerProps {
 
 const CartDrawer = ({ open, onOpenChange }: CartDrawerProps) => {
   const navigate = useNavigate();
-  const { items, updateQuantity, removeItem, totalPrice, totalItems, originalPrice, discount } = useCameraCart();
+  const { items, updateQuantity, removeItem, totalPrice, totalItems, originalPrice, discount } = useCart();
 
   const handleCheckout = () => {
     onOpenChange(false);
@@ -48,8 +85,8 @@ const CartDrawer = ({ open, onOpenChange }: CartDrawerProps) => {
                   {/* Product Image */}
                   <div className="w-20 h-20 rounded-lg overflow-hidden bg-white flex-shrink-0">
                     <img
-                      src={cameraMain}
-                      alt="Câmera P11"
+                      src={colorImages[item.colorId] || colorGradient}
+                      alt={item.colorName}
                       className="w-full h-full object-cover"
                       loading="lazy"
                       decoding="async"
@@ -59,10 +96,10 @@ const CartDrawer = ({ open, onOpenChange }: CartDrawerProps) => {
                   {/* Product Info */}
                   <div className="flex-1 min-w-0">
                     <h3 className="font-medium text-sm text-foreground truncate">
-                      Câmera P11 6MP
+                      Tênis Carbon 3.0
                     </h3>
                     <p className="text-xs text-muted-foreground">
-                      Wi-Fi • Lente Dupla
+                      {colorNames[item.colorId] || item.colorName} • Tam. {item.size}
                     </p>
                     <p className="text-sm font-bold text-success mt-1">
                       R$ {item.price.toFixed(2).replace(".", ",")}
@@ -106,9 +143,25 @@ const CartDrawer = ({ open, onOpenChange }: CartDrawerProps) => {
 
             {/* Footer */}
             <div className="border-t border-border p-4 space-y-4">
+              {/* Promotion Banner - Encourage 2nd pair */}
+              {totalItems === 1 && (
+                <div className="relative overflow-hidden bg-gradient-to-r from-emerald-600 to-emerald-500 rounded-xl p-3 shadow-md">
+                  <div className="absolute top-0 right-0 w-16 h-16 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2" />
+                  <div className="relative flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
+                      <span className="text-lg">👟</span>
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-semibold text-white text-sm">Adicione +1 par</p>
+                      <p className="text-emerald-100 text-xs">e ganhe <span className="font-bold text-white">20% OFF</span> no segundo!</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+              
               {/* Discount Applied Banner */}
               {discount > 0 && (
-                <div className="relative overflow-hidden bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl p-3 shadow-md">
+                <div className="relative overflow-hidden bg-gradient-to-r from-emerald-500 to-teal-500 rounded-xl p-3 shadow-md">
                   <div className="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2" />
                   <div className="relative flex items-center justify-between">
                     <div className="flex items-center gap-2">
@@ -117,7 +170,7 @@ const CartDrawer = ({ open, onOpenChange }: CartDrawerProps) => {
                       </div>
                       <div>
                         <p className="font-semibold text-white text-sm">Desconto aplicado!</p>
-                        <p className="text-blue-100 text-xs">Você está economizando</p>
+                        <p className="text-emerald-100 text-xs">Você está economizando</p>
                       </div>
                     </div>
                     <div className="bg-white/20 backdrop-blur-sm rounded-lg px-3 py-1.5">
@@ -147,7 +200,7 @@ const CartDrawer = ({ open, onOpenChange }: CartDrawerProps) => {
               
               <Button
                 onClick={handleCheckout}
-                className="w-full h-12 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-xl shadow-lg shadow-blue-500/20"
+                className="w-full h-12 bg-success hover:bg-success/90 text-white font-bold rounded-xl shadow-lg shadow-success/20"
               >
                 Finalizar Compra
               </Button>
