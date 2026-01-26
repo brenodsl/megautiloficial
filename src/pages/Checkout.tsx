@@ -41,6 +41,8 @@ import reviewCamera2 from "@/assets/review-camera-2.webp";
 import reviewCamera3 from "@/assets/review-camera-3.webp";
 import reviewCamera4 from "@/assets/review-camera-4.webp";
 import reviewCamera5 from "@/assets/review-camera-5.webp";
+import seloSiteBlindado from "@/assets/selo-site-blindado.png";
+import seloReclameAqui from "@/assets/selo-reclame-aqui.png";
 import { usePresence } from "@/hooks/usePresence";
 import { trackPixelEvent } from "@/hooks/usePixels";
 import PaymentProgressBar from "@/components/PaymentProgressBar";
@@ -767,7 +769,7 @@ const Checkout = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-32">
+    <div className="min-h-screen bg-gray-50 pb-8">
       {/* Header - CASAFORT Style */}
       <header className="bg-primary py-3 px-4">
         <div className="max-w-lg mx-auto flex items-center justify-between">
@@ -1077,7 +1079,7 @@ const Checkout = () => {
               <span className="text-gray-900">R$ {displayOriginalPrice.toFixed(2).replace(".", ",")}</span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-gray-600">Desconto PIX (64%)</span>
+              <span className="text-[#28af60]">Desconto PIX (64%)</span>
               <span className="text-[#28af60] font-medium">- R$ {totalPixDiscount.toFixed(2).replace(".", ",")}</span>
             </div>
             <div className="flex justify-between text-sm">
@@ -1097,6 +1099,56 @@ const Checkout = () => {
                 </div>
               </div>
             </div>
+          </div>
+
+          {/* CTA Button */}
+          <Button
+            onClick={handleCreatePixPayment}
+            disabled={isLoading || !isFormComplete}
+            className={`w-full h-14 font-bold text-lg rounded-xl mt-4 transition-colors gap-2 ${
+              isFormComplete && !isLoading
+                ? 'bg-accent hover:bg-accent/90 text-white'
+                : 'bg-gray-300 text-gray-500'
+            }`}
+          >
+            {isLoading ? (
+              <>
+                <Loader2 className="h-5 w-5 animate-spin" />
+                Processando...
+              </>
+            ) : (
+              "Finalizar Compra"
+            )}
+          </Button>
+          
+          {/* Security message */}
+          <div className="flex items-center justify-center gap-2 text-xs text-gray-500 mt-3">
+            <Lock className="h-3 w-3" />
+            <span>Pagamento 100% seguro e criptografado</span>
+          </div>
+
+          {/* Site Blindado Badge */}
+          <div className="flex flex-col items-center mt-4 pt-4 border-t border-gray-100">
+            <img 
+              src={seloSiteBlindado} 
+              alt="Site Blindado" 
+              className="h-10 object-contain"
+            />
+            <p className="text-xs text-gray-500 text-center mt-2">
+              Sua navegação é protegida com criptografia de ponta a ponta
+            </p>
+          </div>
+
+          {/* Reclame Aqui Badge */}
+          <div className="flex flex-col items-center mt-4 pt-4 border-t border-gray-100">
+            <img 
+              src={seloReclameAqui} 
+              alt="RA1000 Reclame Aqui" 
+              className="h-16 object-contain"
+            />
+            <p className="text-xs text-gray-500 text-center mt-2">
+              Nota máxima no Reclame Aqui por excelência no atendimento
+            </p>
           </div>
         </div>
 
@@ -1201,33 +1253,6 @@ const Checkout = () => {
         </div>
       </main>
 
-      {/* Fixed Bottom CTA */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 safe-area-inset-bottom">
-        <div className="max-w-lg mx-auto space-y-2">
-          <Button
-            onClick={handleCreatePixPayment}
-            disabled={isLoading || !isFormComplete}
-            className={`w-full h-14 font-bold text-base rounded-xl transition-colors gap-2 ${
-              isFormComplete && !isLoading
-                ? 'bg-accent hover:bg-accent/90 text-white'
-                : 'bg-gray-300 text-gray-500'
-            }`}
-          >
-            {isLoading ? (
-              <>
-                <Loader2 className="h-5 w-5 animate-spin" />
-                Processando...
-              </>
-            ) : (
-              "Finalizar Compra"
-            )}
-          </Button>
-          <div className="flex items-center justify-center gap-2 text-xs text-gray-500">
-            <Lock className="h-3 w-3" />
-            <span>Pagamento 100% seguro e criptografado</span>
-          </div>
-        </div>
-      </div>
     </div>
   );
 };
