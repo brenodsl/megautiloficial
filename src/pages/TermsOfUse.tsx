@@ -26,7 +26,7 @@ const TermsOfUse = () => {
 
           <section>
             <h2 className="text-lg font-semibold text-foreground mb-2">4. Propriedade Intelectual</h2>
-            <p>Todo o conteúdo do site, incluindo textos, imagens, logos e marcas, são de propriedade da Max Runner ou licenciados para nós. É proibida a reprodução sem autorização prévia.</p>
+            <p>Todo o conteúdo do site, incluindo textos, imagens, logos e marcas, são de propriedade da MegaUtil ou licenciados para nós. É proibida a reprodução sem autorização prévia.</p>
           </section>
 
           <section>

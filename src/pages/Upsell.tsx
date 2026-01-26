@@ -16,7 +16,7 @@ import { QRCodeSVG } from "qrcode.react";
 import meiasImg from "@/assets/upsell-meias.png";
 import oculosImg from "@/assets/upsell-oculos.png";
 import pocheteImg from "@/assets/upsell-pochete.png";
-import logo from "@/assets/logo-max-runner.png";
+import logo from "@/assets/logo-megautil.png";
 import { usePresence } from "@/hooks/usePresence";
 import ValidatedInput from "@/components/ValidatedInput";
 
@@ -480,7 +480,7 @@ const Upsell = () => {
         <header className="bg-white border-b border-gray-100 py-3 px-4">
           <div className="max-w-lg mx-auto flex items-center justify-center">
             <Link to="/">
-              <img src={logo} alt="Max Runner" className="h-8 w-auto" loading="eager" decoding="async" />
+              <img src={logo} alt="MegaUtil" className="h-8 w-auto" loading="eager" decoding="async" />
             </Link>
           </div>
         </header>
@@ -565,7 +565,7 @@ const Upsell = () => {
         <header className="bg-white border-b border-gray-100 py-3 px-4">
           <div className="max-w-lg mx-auto flex items-center justify-between">
             <Link to="/">
-              <img src={logo} alt="Max Runner" className="h-8 w-auto" loading="eager" decoding="async" />
+              <img src={logo} alt="MegaUtil" className="h-8 w-auto" loading="eager" decoding="async" />
             </Link>
             <button onClick={() => setShowCheckout(false)} className="text-sm text-gray-500 hover:text-gray-700">
               Voltar
@@ -758,7 +758,7 @@ const Upsell = () => {
       <header className="bg-white border-b border-gray-100 py-3 px-4">
         <div className="max-w-md mx-auto flex items-center justify-center">
           <Link to="/">
-            <img src={logo} alt="Max Runner" className="h-8 w-auto" loading="eager" decoding="async" />
+            <img src={logo} alt="MegaUtil" className="h-8 w-auto" loading="eager" decoding="async" />
           </Link>
         </div>
       </header>
