@@ -40,6 +40,10 @@ import reviewCamera1 from "@/assets/review-camera-1.webp";
 import reviewCamera2 from "@/assets/review-camera-2.webp";
 import reviewCamera3 from "@/assets/review-camera-3.webp";
 import reviewCamera4 from "@/assets/review-camera-4.webp";
+import reviewCamera5 from "@/assets/review-camera-5.webp";
+import reviewCamera6 from "@/assets/review-camera-6.webp";
+import reviewCamera7 from "@/assets/review-camera-7.webp";
+import reviewCamera8 from "@/assets/review-camera-8.webp";
 import { usePresence } from "@/hooks/usePresence";
 import { trackPixelEvent } from "@/hooks/usePixels";
 import PaymentProgressBar from "@/components/PaymentProgressBar";
@@ -95,24 +99,64 @@ const customerReviews = [
     name: "Maria S.",
     location: "São Paulo, SP",
     rating: 5,
-    comment: "Entrega rápida, produto excelente! As 3 câmeras chegaram bem embaladas e funcionam perfeitamente.",
-    images: [reviewCamera1, reviewCamera2],
+    comment: "Entrega rápida, produto excelente! As 3 câmeras chegaram bem embaladas e funcionam perfeitamente. A qualidade da imagem é incrível!",
+    images: [reviewCamera1],
   },
   {
     id: 2,
-    name: "Carlos R.",
+    name: "Carlos M.",
     location: "Rio de Janeiro, RJ",
     rating: 5,
-    comment: "Muito satisfeito com a qualidade. Instalação super fácil pelo app.",
-    images: [reviewCamera3],
+    comment: "Qualidade impressionante! Instalei em casa e a imagem é muito nítida, mesmo à noite. Super recomendo!",
+    images: [reviewCamera2],
   },
   {
     id: 3,
-    name: "Ana L.",
+    name: "Ana Paula S.",
     location: "Belo Horizonte, MG",
     rating: 5,
-    comment: "Excelente custo-benefício! Câmeras funcionando perfeitamente, visão noturna muito boa.",
+    comment: "Super recomendo! O app funciona muito bem e consigo ver tudo pelo celular de qualquer lugar.",
+    images: [reviewCamera3],
+  },
+  {
+    id: 4,
+    name: "Roberto F.",
+    location: "Curitiba, PR",
+    rating: 5,
+    comment: "Chegou antes do prazo! Produto bem embalado e de ótima qualidade. As 3 câmeras funcionam perfeitamente.",
     images: [reviewCamera4],
+  },
+  {
+    id: 5,
+    name: "Fernanda L.",
+    location: "Salvador, BA",
+    rating: 5,
+    comment: "Excelente custo-benefício! Câmeras funcionando perfeitamente, homologadas pela Anatel. Compra segura!",
+    images: [reviewCamera5],
+  },
+  {
+    id: 6,
+    name: "João Pedro",
+    location: "Fortaleza, CE",
+    rating: 5,
+    comment: "Produto original! Veio lacrado e com nota fiscal. Instalação super fácil pelo app iCSee.",
+    images: [reviewCamera6],
+  },
+  {
+    id: 7,
+    name: "Luciana R.",
+    location: "Porto Alegre, RS",
+    rating: 5,
+    comment: "Embalagem perfeita! Tudo organizado e bem protegido. Câmeras de excelente qualidade!",
+    images: [reviewCamera7],
+  },
+  {
+    id: 8,
+    name: "Pedro H.",
+    location: "Brasília, DF",
+    rating: 5,
+    comment: "Kit completo! Veio com todas as 3 câmeras conforme anunciado. Qualidade top, recomendo!",
+    images: [reviewCamera8],
   },
 ];
 
