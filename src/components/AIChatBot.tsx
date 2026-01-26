@@ -12,6 +12,7 @@ interface Message {
 
 const AIChatBot = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [showBalloon, setShowBalloon] = useState(true);
   const [messages, setMessages] = useState<Message[]>([
     { role: 'assistant', content: 'Olá! 👋 Sou a Ana, especialista em câmeras de segurança da GIGATEC. Como posso ajudar você hoje?' }
   ]);
@@ -26,6 +27,14 @@ const AIChatBot = () => {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  // Auto-hide balloon after 8 seconds
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowBalloon(false);
+    }, 8000);
+    return () => clearTimeout(timer);
+  }, []);
 
 
   const sendMessage = async () => {
@@ -81,7 +90,7 @@ const AIChatBot = () => {
       </button>
 
       {/* Floating Label */}
-      {!isOpen && (
+      {!isOpen && showBalloon && (
         <div className="fixed bottom-[88px] right-4 z-40 bg-white rounded-lg shadow-lg px-3 py-2 text-sm font-medium text-foreground animate-bounce">
           👋 Dúvidas sobre as câmeras?
           <br />
