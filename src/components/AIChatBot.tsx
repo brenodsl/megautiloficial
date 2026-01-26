@@ -14,7 +14,7 @@ const AIChatBot = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [showBalloon, setShowBalloon] = useState(true);
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'assistant', content: 'Olá! 👋 Sou a Ana, especialista em câmeras de segurança da GIGATEC. Como posso ajudar você hoje?' }
+    { role: 'assistant', content: 'Olá! 👋 Sou a Ana, especialista em câmeras de segurança da MegaUtil. Como posso ajudar você hoje?' }
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -60,7 +60,7 @@ const AIChatBot = () => {
       console.error('Error sending message:', error);
       setMessages(prev => [...prev, { 
         role: 'assistant', 
-        content: 'Desculpe, tive um problema. Tente novamente ou envie um e-mail para contato@gigatec.com.br - respondemos em menos de 10 min! 📧' 
+        content: 'Desculpe, tive um problema. Tente novamente ou envie um e-mail para contato@megautil.com.br - respondemos em menos de 10 min! 📧' 
       }]);
     } finally {
       setIsLoading(false);
@@ -107,7 +107,7 @@ const AIChatBot = () => {
               📹
             </div>
             <div>
-              <h3 className="font-bold text-lg">Suporte GIGATEC</h3>
+              <h3 className="font-bold text-lg">Suporte MegaUtil</h3>
               <p className="text-sm text-white/80">Especialista em segurança</p>
             </div>
           </div>

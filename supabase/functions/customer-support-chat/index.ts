@@ -8,9 +8,9 @@ const corsHeaders = {
 
 const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
 
-const systemPrompt = `Você é a assistente virtual da GIGATEC, uma loja especializada em câmeras de segurança e tecnologia para residências e empresas.
+const systemPrompt = `Você é a assistente virtual da MegaUtil, uma loja especializada em câmeras de segurança e tecnologia para residências e empresas.
 
-SOBRE A GIGATEC:
+SOBRE A MEGAUTIL:
 - Vendemos Kit 3 Câmeras Wi-Fi Full HD com tecnologia avançada
 - Preço: R$ 99,00 à vista no PIX (64% de desconto)
 - Preço original: R$ 279,80

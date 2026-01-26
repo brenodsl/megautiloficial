@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { CheckCircle, Package, Mail, Truck, Clock, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import logo from "@/assets/logo-max-runner.png";
+import logo from "@/assets/logo-megautil.png";
 import { usePresence } from "@/hooks/usePresence";
 import { trackPixelEvent } from "@/hooks/usePixels";
 
@@ -46,8 +46,8 @@ const ThankYou = () => {
     if (orderData) {
       trackPixelEvent('CompletePayment', {
         content_type: 'product',
-        content_id: 'carbon-3-0',
-        content_name: 'Tênis de Corrida Chunta Carbon 3.0',
+        content_id: 'camera-kit',
+        content_name: 'Kit 3 Câmeras Wi-Fi MegaUtil',
         quantity: orderData.items.reduce((sum, item) => sum + item.quantity, 0),
         value: orderData.totalAmount,
         currency: 'BRL',
@@ -93,7 +93,7 @@ const ThankYou = () => {
       <header className="bg-white border-b border-gray-100 py-3 px-4">
         <div className="max-w-lg mx-auto flex items-center justify-center">
           <Link to="/">
-            <img src={logo} alt="Max Runner" className="h-8 w-auto" />
+            <img src={logo} alt="MegaUtil" className="h-8 w-auto" />
           </Link>
         </div>
       </header>
@@ -135,7 +135,7 @@ const ThankYou = () => {
             {orderData.items.map((item, index) => (
               <div key={index} className="flex justify-between items-center py-2 border-b border-gray-50 last:border-0">
                 <div>
-                  <p className="font-medium text-gray-900">Tênis Carbon 3.0</p>
+                  <p className="font-medium text-gray-900">Kit 3 Câmeras Wi-Fi</p>
                   <p className="text-sm text-gray-500">
                     {item.colorName} • Tam. {item.size} • Qtd: {item.quantity}
                   </p>
@@ -251,7 +251,7 @@ const ThankYou = () => {
 
         {/* Support */}
         <p className="text-center text-sm text-gray-500">
-          Dúvidas? Respondemos via e-mail em menos de 10 minutos: contato@maxrunner.com.br
+          Dúvidas? Respondemos via e-mail em menos de 10 minutos: contato@megautil.com.br
         </p>
       </main>
     </div>

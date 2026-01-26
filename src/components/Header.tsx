@@ -128,10 +128,8 @@ const Header = () => {
                   <SheetContent side="left" className="w-72 bg-white p-0 border-0">
                     <div className="flex flex-col h-full">
                       {/* Menu Header */}
-                      <div className="p-4 border-b border-border bg-primary">
-                        <span className="text-lg font-black text-white">
-                          GIGA<span className="text-accent">TEC</span>
-                        </span>
+                      <div className="p-4 border-b border-border bg-primary flex items-center">
+                        <img src="/logo-megautil.png" alt="MegaUtil" className="h-8 w-auto" />
                       </div>
                       
                       {/* Menu Items */}
@@ -201,9 +199,7 @@ const Header = () => {
 
                 {/* Logo */}
                 <Link to="/" className="flex-shrink-0">
-                  <span className="text-white font-black text-xl tracking-tight">
-                    GIGA<span className="text-accent">TEC</span>
-                  </span>
+                  <img src="/logo-megautil.png" alt="MegaUtil" className="h-8 w-auto" />
                 </Link>
 
                 {/* Search Bar - Desktop */}

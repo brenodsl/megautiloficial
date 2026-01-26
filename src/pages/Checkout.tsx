@@ -216,7 +216,7 @@ const Checkout = () => {
       trackPixelEvent('InitiateCheckout', {
         content_type: 'product',
         content_id: 'camera-kit',
-        content_name: 'Kit 3 Câmeras Wi-Fi GIGATEC',
+        content_name: 'Kit 3 Câmeras Wi-Fi MegaUtil',
         quantity: totalQuantity,
         value: totalPrice,
         currency: 'BRL',
@@ -544,7 +544,7 @@ const Checkout = () => {
         trackPixelEvent('Purchase', {
           content_type: 'product',
           content_id: 'camera-kit',
-          content_name: 'Kit 3 Câmeras Wi-Fi GIGATEC',
+          content_name: 'Kit 3 Câmeras Wi-Fi MegaUtil',
           currency: 'BRL',
           value: finalTotal,
           num_items: totalQuantity,
@@ -777,7 +777,7 @@ const Checkout = () => {
             <ArrowLeft className="h-5 w-5" />
           </button>
           <Link to="/">
-            <span className="text-white font-bold text-xl">GIGA<span className="text-accent">TEC</span></span>
+            <img src="/logo-megautil.png" alt="MegaUtil" className="h-8 w-auto" />
           </Link>
           <div className="flex items-center gap-1 text-white text-sm">
             <Lock className="h-4 w-4" />

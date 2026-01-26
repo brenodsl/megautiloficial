@@ -113,7 +113,7 @@ const Index = () => {
 
           {/* Seller */}
           <p className="text-xs text-muted-foreground mt-2">
-            Vendido e entregue por <span className="text-primary font-semibold">GIGATEC</span>
+            Vendido e entregue por <span className="text-primary font-semibold">MegaUtil</span>
           </p>
 
           {/* Price Section */}
