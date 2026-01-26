@@ -777,7 +777,7 @@ const Checkout = () => {
             <ArrowLeft className="h-5 w-5" />
           </button>
           <Link to="/">
-            <span className="text-white font-bold text-xl">CASA<span className="text-accent">FORT</span></span>
+            <span className="text-white font-bold text-xl">GIGA<span className="text-accent">TEC</span></span>
           </Link>
           <div className="flex items-center gap-1 text-white text-sm">
             <Lock className="h-4 w-4" />
