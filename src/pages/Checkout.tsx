@@ -1247,7 +1247,7 @@ const Checkout = () => {
         {/* Footer */}
         <div className="text-center pt-4 border-t border-gray-200">
           <p className="text-sm font-medium text-gray-900">
-            CASA <span className="text-accent">FORT</span> - CNPJ: 13.865.865/0001-62
+            MEGA<span className="text-accent">UTIL</span> - CNPJ: 13.865.865/0001-62
           </p>
           <p className="text-xs text-gray-500 mt-1">Todos os direitos reservados © 2025</p>
         </div>
