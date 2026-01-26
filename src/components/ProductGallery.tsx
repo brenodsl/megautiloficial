@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { Star, Play } from "lucide-react";
+import { Play } from "lucide-react";
 import useEmblaCarousel from "embla-carousel-react";
 import tenisMain from "@/assets/tenis-main.webp";
 import tenis2 from "@/assets/tenis-2.webp";
@@ -75,9 +75,9 @@ const ProductGallery = ({ selectedColor }: ProductGalleryProps) => {
   return (
     <div id="produto" className="space-y-3">
       {/* Main Image/Video Display with Discount Badge */}
-      <div className="relative aspect-square overflow-hidden rounded-xl bg-white border border-border">
+      <div className="relative aspect-square overflow-hidden rounded-2xl bg-white">
         {/* Discount Badge */}
-        <div className="absolute top-3 left-3 z-10 bg-accent text-white text-sm font-bold px-3 py-1 rounded-lg shadow-lg">
+        <div className="absolute top-4 left-4 z-10 bg-accent text-white text-sm font-bold px-3 py-1.5 rounded-lg shadow-lg">
           -64%
         </div>
 
@@ -93,13 +93,13 @@ const ProductGallery = ({ selectedColor }: ProductGalleryProps) => {
                     muted
                     playsInline
                     preload="metadata"
-                    className="h-full w-full object-cover"
+                    className="h-full w-full object-contain bg-gradient-to-b from-gray-50 to-white"
                   />
                 ) : (
                   <img
                     src={item.src}
                     alt={item.alt}
-                    className="h-full w-full object-cover"
+                    className="h-full w-full object-contain bg-gradient-to-b from-gray-50 to-white"
                     loading={item.id === -1 ? "eager" : "lazy"}
                     decoding="async"
                     fetchPriority={item.id === -1 ? "high" : "auto"}
@@ -112,16 +112,16 @@ const ProductGallery = ({ selectedColor }: ProductGalleryProps) => {
       </div>
 
       {/* Thumbnails Row - Bottom */}
-      <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
+      <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1 px-1">
         {mediaItems.map((item, index) => (
           <button
             key={item.id}
             onClick={() => scrollTo(index)}
             className={`
-              relative flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all duration-200
+              relative flex-shrink-0 w-16 h-16 rounded-xl overflow-hidden border-2 transition-all duration-200
               ${currentIndex === index 
-                ? "border-primary shadow-md" 
-                : "border-border hover:border-primary/50"
+                ? "border-primary ring-2 ring-primary/20" 
+                : "border-transparent hover:border-primary/30"
               }
             `}
           >
@@ -134,7 +134,7 @@ const ProductGallery = ({ selectedColor }: ProductGalleryProps) => {
                   loading="lazy"
                   decoding="async"
                 />
-                <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+                <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
                   <Play className="h-4 w-4 text-white fill-white" />
                 </div>
               </>

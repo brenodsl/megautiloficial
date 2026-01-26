@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { Menu, ShoppingCart, Search, X, Home, Package, MessageSquare, Shield, FileText, Truck, RefreshCw, ArrowLeftRight, Zap } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import logo from "@/assets/logo-max-runner.png";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Input } from "@/components/ui/input";
@@ -64,22 +63,22 @@ const Header = () => {
     <>
       <header className="sticky top-0 z-40">
         {/* Top Promo Bar - Orange with Timer */}
-        <div className="bg-accent py-2 px-4">
+        <div className="bg-accent py-2.5 px-4">
           <div className="container mx-auto flex items-center justify-center gap-3">
             <div className="flex items-center gap-1.5 text-white">
               <Zap className="h-4 w-4 fill-current" />
               <span className="text-xs sm:text-sm font-bold">Oferta Relâmpago</span>
             </div>
             <div className="flex items-center gap-1">
-              <span className="bg-white/20 text-white font-bold text-xs sm:text-sm px-2 py-0.5 rounded">
+              <span className="bg-white/20 backdrop-blur text-white font-bold text-xs sm:text-sm px-2 py-1 rounded-md min-w-[32px] text-center">
                 {formatTime(timeLeft.hours)}
               </span>
               <span className="text-white font-bold">:</span>
-              <span className="bg-white/20 text-white font-bold text-xs sm:text-sm px-2 py-0.5 rounded">
+              <span className="bg-white/20 backdrop-blur text-white font-bold text-xs sm:text-sm px-2 py-1 rounded-md min-w-[32px] text-center">
                 {formatTime(timeLeft.minutes)}
               </span>
               <span className="text-white font-bold">:</span>
-              <span className="bg-white/20 text-white font-bold text-xs sm:text-sm px-2 py-0.5 rounded">
+              <span className="bg-white/20 backdrop-blur text-white font-bold text-xs sm:text-sm px-2 py-1 rounded-md min-w-[32px] text-center">
                 {formatTime(timeLeft.seconds)}
               </span>
             </div>
@@ -92,21 +91,19 @@ const Header = () => {
             {/* Search Bar - Expanded */}
             {showSearch ? (
               <div className="flex items-center gap-2">
-                <div className="flex-1 relative">
+                <div className="flex-1 flex">
                   <Input
                     type="text"
                     placeholder="Buscar produtos..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="bg-white border-0 h-10 rounded-l-lg rounded-r-none pr-10"
+                    className="bg-white border-0 h-10 rounded-l-lg rounded-r-none flex-1"
                     autoFocus
                   />
+                  <Button className="bg-accent hover:bg-accent/90 h-10 rounded-l-none rounded-r-lg px-4">
+                    <Search className="h-5 w-5 text-white" />
+                  </Button>
                 </div>
-                <Button
-                  className="bg-accent hover:bg-accent/90 h-10 rounded-l-none rounded-r-lg px-4"
-                >
-                  <Search className="h-5 w-5 text-white" />
-                </Button>
                 <Button
                   variant="ghost"
                   size="icon"
@@ -132,8 +129,8 @@ const Header = () => {
                     <div className="flex flex-col h-full">
                       {/* Menu Header */}
                       <div className="p-4 border-b border-border bg-primary">
-                        <span className="text-lg font-bold text-white">
-                          Max Runner
+                        <span className="text-lg font-black text-white">
+                          MAX<span className="text-accent">RUNNER</span>
                         </span>
                       </div>
                       
@@ -193,7 +190,7 @@ const Header = () => {
                             setIsOpen(false);
                             navigate("/");
                           }}
-                          className="w-full bg-accent hover:bg-accent/90 text-white font-bold h-12 rounded-xl"
+                          className="w-full gradient-cta text-white font-bold h-12 rounded-xl"
                         >
                           Ver Produto
                         </Button>
@@ -244,7 +241,7 @@ const Header = () => {
                   >
                     <ShoppingCart className="h-5 w-5" />
                     {totalItems > 0 && (
-                      <span className="absolute -top-0.5 -right-0.5 h-5 w-5 rounded-full bg-accent text-white text-[10px] flex items-center justify-center font-bold">
+                      <span className="absolute -top-0.5 -right-0.5 h-5 w-5 rounded-full bg-accent text-white text-[10px] flex items-center justify-center font-bold border-2 border-primary">
                         {totalItems}
                       </span>
                     )}

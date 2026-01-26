@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
-import { Star, ThumbsUp, X, Play } from "lucide-react";
+import { Star, ThumbsUp, X, Play, MapPin, CheckCircle } from "lucide-react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import ReviewForm from "@/components/ReviewForm";
 import { supabase } from "@/integrations/supabase/client";
@@ -21,7 +21,6 @@ import avaliacao04Img2 from "@/assets/avaliacao04-img2.webp";
 import avaliacao05Video from "@/assets/avaliacao05-video.mp4";
 import avaliacao05Img from "@/assets/avaliacao05-img.webp";
 
-// Helper to generate dynamic dates based on offset from today
 const getDynamicDate = (daysAgo: number): string => {
   const date = new Date();
   date.setDate(date.getDate() - daysAgo);
@@ -37,6 +36,7 @@ interface ReviewMedia {
 interface Review {
   id: number;
   name: string;
+  location: string;
   daysAgo: number;
   rating: number;
   comment: string;
@@ -47,11 +47,12 @@ interface Review {
 const reviewsData: Review[] = [
   {
     id: 1,
-    name: "Mariana L.",
+    name: "Maria S.",
+    location: "São Paulo, SP",
     daysAgo: 1,
     rating: 5,
-    comment: "Um custo x benefício maravilhoso! Já usei para correr e está mais que aprovado!!",
-    helpful: 52,
+    comment: "Entrega rápida, produto excelente! Os tênis chegaram bem embalados e funcionam perfeitamente. A qualidade da...",
+    helpful: 127,
     media: [
       { type: 'video', src: avaliacao01Video, thumbnail: avaliacao01Img },
       { type: 'image', src: avaliacao01Img },
@@ -60,10 +61,11 @@ const reviewsData: Review[] = [
   {
     id: 2,
     name: "Bruno R.",
+    location: "Rio de Janeiro, RJ",
     daysAgo: 2,
     rating: 5,
-    comment: "Tênis leve, material resistente, respirável, bom acabamento, macio, te impulsiona pra frente, excelente tênis! Recomendo. Chegou no primeiro dia do prazo de entrega.",
-    helpful: 47,
+    comment: "Tênis leve, material resistente, respirável, bom acabamento, macio, te impulsiona pra frente, excelente tênis! Recomendo.",
+    helpful: 89,
     media: [
       { type: 'image', src: avaliacao02Img1 },
       { type: 'image', src: avaliacao02Img2 },
@@ -72,10 +74,11 @@ const reviewsData: Review[] = [
   {
     id: 3,
     name: "Juliana M.",
+    location: "Belo Horizonte, MG",
     daysAgo: 3,
     rating: 5,
     comment: "Surpreendeu as minhas expectativas, chegou rápido a numeração bate, é leve, confortável, adorei.",
-    helpful: 38,
+    helpful: 76,
     media: [
       { type: 'video', src: avaliacao03Video, thumbnail: avaliacao03Img },
       { type: 'image', src: avaliacao03Img },
@@ -84,10 +87,11 @@ const reviewsData: Review[] = [
   {
     id: 4,
     name: "Carlos E.",
+    location: "Curitiba, PR",
     daysAgo: 4,
     rating: 5,
-    comment: "Chegou bem rapidão, dentro do prazo. Pedi um numero maior. Calço 40 e pedi 41. Ficou perfeito!! Material de alta qualidade. Podem comprar sem medo!!",
-    helpful: 41,
+    comment: "Chegou bem rapidão, dentro do prazo. Pedi um numero maior. Calço 40 e pedi 41. Ficou perfeito!! Material de alta qualidade.",
+    helpful: 65,
     media: [
       { type: 'image', src: avaliacao04Img1 },
       { type: 'image', src: avaliacao04Img2 },
@@ -96,106 +100,16 @@ const reviewsData: Review[] = [
   {
     id: 5,
     name: "Rafael S.",
+    location: "Porto Alegre, RS",
     daysAgo: 5,
     rating: 5,
-    comment: "Excepcional, muito bom mesmo, melhor do que pagar 1000 reais em um tênis de marca famosa no Brasil, tênis leve, confortável, respirável, com placa, sem palavras pra descrever o quanto esse tênis vale a pena.",
-    helpful: 63,
+    comment: "Excepcional, muito bom mesmo, melhor do que pagar 1000 reais em um tênis de marca famosa.",
+    helpful: 92,
     media: [
       { type: 'video', src: avaliacao05Video, thumbnail: avaliacao05Img },
       { type: 'image', src: avaliacao05Img },
     ],
   },
-  {
-    id: 6,
-    name: "Sabrina Viana",
-    daysAgo: 6,
-    rating: 5,
-    comment: "Tênis incrível! A placa de carbono realmente faz diferença na corrida. Super leve e confortável, uso para treinos e provas. Chegou rápido e bem embalado!",
-    helpful: 34,
-    media: [
-      { type: 'image', src: reviewSabrina1 },
-      { type: 'image', src: reviewSabrina2 },
-    ],
-  },
-  {
-    id: 7,
-    name: "Camila Souza",
-    daysAgo: 8,
-    rating: 5,
-    comment: "Comprei para meu marido e ele amou! O design é lindo e o conforto é impressionante. Ele usa para correr todos os dias e diz que nunca teve um tênis tão bom.",
-    helpful: 28,
-    media: [
-      { type: 'image', src: reviewCamila1 },
-      { type: 'image', src: reviewCamila2 },
-    ],
-  },
-  {
-    id: 8,
-    name: "Fernando Costa",
-    daysAgo: 10,
-    rating: 5,
-    comment: "Excelente custo-benefício! Placa de carbono por esse preço é muito difícil encontrar. O acabamento é de qualidade e o retorno de energia é muito bom.",
-    helpful: 22,
-    media: [
-      { type: 'image', src: review1 },
-      { type: 'image', src: review2 },
-    ],
-  },
-  {
-    id: 9,
-    name: "Ana Paula",
-    daysAgo: 12,
-    rating: 5,
-    comment: "Perfeito para academia! Muito estiloso e super confortável. Todo mundo pergunta onde comprei.",
-    helpful: 19,
-    media: [
-      { type: 'image', src: review4 },
-    ],
-  },
-  {
-    id: 10,
-    name: "Ricardo Almeida",
-    daysAgo: 14,
-    rating: 5,
-    comment: "Melhor tênis de corrida que já tive! A placa de carbono dá uma propulsão incrível. Uso para maratonas e meias maratonas. Superou todas as minhas expectativas!",
-    helpful: 45,
-    media: [],
-  },
-  {
-    id: 11,
-    name: "Juliana Martins",
-    daysAgo: 16,
-    rating: 5,
-    comment: "Tênis muito bonito e confortável. Comprei na cor rosa e ficou lindo! A entrega foi super rápida e veio bem embalado. Recomendo muito!",
-    helpful: 31,
-    media: [],
-  },
-  {
-    id: 12,
-    name: "Marcos Silva",
-    daysAgo: 18,
-    rating: 4,
-    comment: "Ótimo tênis! O único ponto é que poderia ter mais opções de cores. Mas no geral, o conforto e a qualidade são excelentes. Vale muito a pena pelo preço.",
-    helpful: 18,
-    media: [],
-  },
-  {
-    id: 13,
-    name: "Patricia Oliveira",
-    daysAgo: 20,
-    rating: 5,
-    comment: "Comprei para minha filha que é atleta e ela adorou! O tênis é muito leve e o retorno de energia é impressionante. Ela já quer comprar outro de reserva!",
-    helpful: 27,
-    media: [],
-  },
-];
-
-const ratingDistribution = [
-  { stars: 5, count: 520 },
-  { stars: 4, count: 45 },
-  { stars: 3, count: 8 },
-  { stars: 2, count: 3 },
-  { stars: 1, count: 2 },
 ];
 
 interface UserReview {
@@ -207,13 +121,12 @@ interface UserReview {
 }
 
 const Reviews = () => {
-  const averageRating = 4.9;
-  const totalReviews = 578;
+  const averageRating = 4.5;
+  const totalReviews = 127;
   const [showAll, setShowAll] = useState(false);
   const [selectedMedia, setSelectedMedia] = useState<ReviewMedia | null>(null);
   const [userReviews, setUserReviews] = useState<UserReview[]>([]);
   
-  // Fetch approved user reviews
   useEffect(() => {
     const fetchUserReviews = async () => {
       const { data } = await supabase
@@ -231,7 +144,6 @@ const Reviews = () => {
     fetchUserReviews();
   }, []);
   
-  // Generate reviews with dynamic dates
   const reviews = useMemo(() => 
     reviewsData.map(review => ({
       ...review,
@@ -239,81 +151,68 @@ const Reviews = () => {
     })), 
   []);
   
-  const visibleReviews = showAll ? reviews : reviews.slice(0, 4);
-  const totalCount = ratingDistribution.reduce((sum, r) => sum + r.count, 0);
+  const visibleReviews = showAll ? reviews : reviews.slice(0, 3);
 
   return (
-    <section id="avaliacoes" className="space-y-6">
+    <section id="avaliacoes" className="space-y-5">
       {/* Header */}
-      <h2 className="text-lg font-bold text-gray-900">
-        Opiniões do produto
-      </h2>
-
-      {/* Rating Summary */}
-      <div className="text-center pb-4">
-        {/* 5 Stars */}
-        <div className="flex justify-center mb-2">
-          {[1, 2, 3, 4, 5].map((star) => (
-            <Star key={star} className="h-5 w-5 fill-yellow-400 text-yellow-400" />
-          ))}
-        </div>
-        
-        {/* Average Score */}
-        <div className="text-4xl font-bold text-gray-900 mb-1">{averageRating}</div>
-        <div className="text-sm text-gray-500 mb-6">{totalReviews} avaliações</div>
-
-        {/* Rating Distribution Bars */}
-        <div className="space-y-2 max-w-sm mx-auto">
-          {ratingDistribution.map((item) => (
-            <div key={item.stars} className="flex items-center gap-3 text-sm">
-              <span className="w-16 text-left text-gray-600">{item.stars}<br/>estrelas</span>
-              <div className="flex-1 h-3 bg-gray-200 rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-yellow-400 rounded-full"
-                  style={{ width: `${(item.count / totalCount) * 100}%` }}
-                />
-              </div>
-              <span className="w-8 text-right text-gray-500">{item.count}</span>
-            </div>
-          ))}
+      <div className="flex items-center justify-between">
+        <h2 className="text-lg font-bold text-foreground">
+          Avaliações de Clientes
+        </h2>
+        <div className="flex items-center gap-1.5">
+          <Star className="h-5 w-5 fill-amber-400 text-amber-400" />
+          <span className="font-bold text-foreground">{averageRating}</span>
+          <span className="text-sm text-muted-foreground">({totalReviews})</span>
         </div>
       </div>
 
-      {/* Divider */}
-      <div className="border-t border-gray-200" />
-
       {/* Review Cards */}
-      <div className="space-y-6">
+      <div className="space-y-4">
         {visibleReviews.map((review) => (
-          <div key={review.id} className="space-y-3">
-            {/* Rating Stars and Date */}
-            <div className="flex items-center gap-3">
-              <div className="flex">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <Star
-                    key={star}
-                    className={`h-4 w-4 ${
-                      star <= review.rating
-                        ? "fill-yellow-400 text-yellow-400"
-                        : "text-gray-300"
-                    }`}
-                  />
-                ))}
+          <div key={review.id} className="bg-white border border-border rounded-xl p-4 space-y-3">
+            {/* User Info Row */}
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center font-bold text-sm flex-shrink-0">
+                {review.name.charAt(0)}
               </div>
-              <span className="text-sm text-gray-500">{review.date}</span>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-1.5">
+                  <span className="font-semibold text-foreground text-sm">{review.name}</span>
+                  <CheckCircle className="h-4 w-4 text-success" />
+                </div>
+                <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                  <MapPin className="h-3 w-3" />
+                  <span>{review.location}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Stars */}
+            <div className="flex gap-0.5">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <Star
+                  key={star}
+                  className={`h-4 w-4 ${
+                    star <= review.rating
+                      ? "fill-amber-400 text-amber-400"
+                      : "text-gray-300"
+                  }`}
+                />
+              ))}
             </div>
 
             {/* Comment */}
-            <p className="text-sm text-gray-700 leading-relaxed">{review.comment}</p>
+            <p className="text-sm text-muted-foreground leading-relaxed">{review.comment}</p>
 
-            {/* Review Media (Images and Videos) */}
+            {/* Review Media */}
             {review.media && review.media.length > 0 && (
-              <div className="flex gap-2 flex-wrap">
+              <div className="flex gap-2">
                 {review.media.map((media, index) => (
                   <button
                     key={index}
                     onClick={() => setSelectedMedia(media)}
-                    className="relative h-20 w-20 rounded-lg overflow-hidden group cursor-pointer"
+                    className="relative h-20 w-20 rounded-lg overflow-hidden group cursor-pointer border border-border"
                   >
                     <img
                       src={media.type === 'video' ? media.thumbnail : media.src}
@@ -332,35 +231,29 @@ const Reviews = () => {
               </div>
             )}
 
-            {/* Author and Helpful */}
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">{review.name}</span>
-              <button className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 transition-colors">
-                <ThumbsUp className="h-4 w-4" />
-                <span>Útil ({review.helpful})</span>
-              </button>
+            {/* Helpful */}
+            <div className="flex items-center text-xs text-muted-foreground pt-1">
+              <ThumbsUp className="h-3.5 w-3.5 mr-1" />
+              <span>{review.helpful} pessoas acharam isso útil</span>
             </div>
-
-            {/* Separator between reviews */}
-            <div className="border-t border-gray-100 pt-2" />
           </div>
         ))}
       </div>
 
       {/* Ver Mais Button */}
-      {!showAll && reviews.length > 4 && (
+      {!showAll && reviews.length > 3 && (
         <button
           onClick={() => setShowAll(true)}
-          className="w-full py-3 text-center text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+          className="w-full py-3 text-center text-sm font-medium text-primary bg-secondary/50 rounded-xl hover:bg-secondary transition-colors"
         >
-          Ver mais avaliações ({reviews.length - 4} restantes)
+          Ver mais avaliações
         </button>
       )}
 
       {showAll && (
         <button
           onClick={() => setShowAll(false)}
-          className="w-full py-3 text-center text-sm font-medium text-gray-500 hover:text-gray-700 transition-colors"
+          className="w-full py-3 text-center text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
         >
           Ver menos
         </button>
@@ -368,10 +261,10 @@ const Reviews = () => {
 
       {/* User Submitted Reviews */}
       {userReviews.length > 0 && (
-        <div className="space-y-4 pt-4 border-t border-gray-200">
-          <h3 className="text-sm font-semibold text-gray-700">Avaliações de clientes</h3>
+        <div className="space-y-4 pt-4 border-t border-border">
+          <h3 className="text-sm font-semibold text-foreground">Avaliações recentes</h3>
           {userReviews.map((review) => (
-            <div key={review.id} className="bg-gray-50 rounded-lg p-4 space-y-2">
+            <div key={review.id} className="bg-secondary/30 rounded-xl p-4 space-y-2">
               <div className="flex items-center gap-2">
                 <div className="flex">
                   {[1, 2, 3, 4, 5].map((star) => (
@@ -379,27 +272,26 @@ const Reviews = () => {
                       key={star}
                       className={`h-4 w-4 ${
                         star <= review.rating
-                          ? "fill-yellow-400 text-yellow-400"
+                          ? "fill-amber-400 text-amber-400"
                           : "text-gray-300"
                       }`}
                     />
                   ))}
                 </div>
-                <span className="text-xs text-gray-500">
+                <span className="text-xs text-muted-foreground">
                   {new Date(review.created_at).toLocaleDateString('pt-BR')}
                 </span>
               </div>
-              <p className="text-sm text-gray-700">{review.comment}</p>
-              <p className="text-xs text-gray-500">— {review.customer_name}</p>
+              <p className="text-sm text-muted-foreground">{review.comment}</p>
+              <p className="text-xs text-foreground font-medium">— {review.customer_name}</p>
             </div>
           ))}
         </div>
       )}
 
       {/* Review Form */}
-      <div className="pt-6">
+      <div className="pt-6 border-t border-border">
         <ReviewForm onReviewSubmitted={() => {
-          // Refetch reviews after submission
           supabase
             .from("reviews")
             .select("*")
