@@ -42,7 +42,7 @@ const Footer = () => {
             © {new Date().getFullYear()} GIGATEC. Todos os direitos reservados.
           </p>
           <p className="text-xs text-white/40 mt-1">
-            CNPJ: 00.000.000/0001-00
+            CNPJ: 13.865.865/0001-62
           </p>
         </div>
       </div>
