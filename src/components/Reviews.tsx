@@ -7,6 +7,10 @@ import reviewCamera1 from "@/assets/review-camera-1.webp";
 import reviewCamera2 from "@/assets/review-camera-2.webp";
 import reviewCamera3 from "@/assets/review-camera-3.webp";
 import reviewCamera4 from "@/assets/review-camera-4.webp";
+import reviewCamera5 from "@/assets/review-camera-5.webp";
+import reviewCamera6 from "@/assets/review-camera-6.webp";
+import reviewCamera7 from "@/assets/review-camera-7.webp";
+import reviewCamera8 from "@/assets/review-camera-8.webp";
 
 const getDynamicDate = (daysAgo: number): string => {
   const date = new Date();
@@ -70,6 +74,46 @@ const reviewsData: Review[] = [
     comment: "Chegou antes do prazo! Produto bem embalado e de ótima qualidade. As 3 câmeras funcionam perfeitamente.",
     helpful: 64,
     media: [{ type: 'image', src: reviewCamera4 }],
+  },
+  {
+    id: 5,
+    name: "Fernanda L.",
+    location: "Salvador, BA",
+    daysAgo: 5,
+    rating: 5,
+    comment: "Excelente custo-benefício! Câmeras funcionando perfeitamente, homologadas pela Anatel. Compra segura!",
+    helpful: 52,
+    media: [{ type: 'image', src: reviewCamera5 }],
+  },
+  {
+    id: 6,
+    name: "João Pedro",
+    location: "Fortaleza, CE",
+    daysAgo: 6,
+    rating: 5,
+    comment: "Produto original! Veio lacrado e com nota fiscal. Instalação super fácil pelo app iCSee.",
+    helpful: 45,
+    media: [{ type: 'image', src: reviewCamera6 }],
+  },
+  {
+    id: 7,
+    name: "Luciana R.",
+    location: "Porto Alegre, RS",
+    daysAgo: 7,
+    rating: 5,
+    comment: "Embalagem perfeita! Tudo organizado e bem protegido. Câmeras de excelente qualidade!",
+    helpful: 38,
+    media: [{ type: 'image', src: reviewCamera7 }],
+  },
+  {
+    id: 8,
+    name: "Pedro H.",
+    location: "Brasília, DF",
+    daysAgo: 8,
+    rating: 5,
+    comment: "Kit completo! Veio com todas as 3 câmeras conforme anunciado. Qualidade top, recomendo!",
+    helpful: 31,
+    media: [{ type: 'image', src: reviewCamera8 }],
   },
 ];
 
