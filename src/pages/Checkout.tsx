@@ -21,26 +21,29 @@ import {
   ArrowLeft,
   Plus,
   Minus,
-  Gift
+  Gift,
+  Star,
+  ChevronLeft,
+  ChevronRight,
+  Shield
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { useCart } from "@/contexts/CartContext";
 import { supabase } from "@/integrations/supabase/client";
 import { QRCodeSVG } from "qrcode.react";
-import logo from "@/assets/logo-max-runner.png";
-import CheckoutReviews from "@/components/CheckoutReviews";
+import logo from "@/assets/logo.jpg";
+import cameraMain from "@/assets/camera-main.png";
+import reviewCamera1 from "@/assets/review-camera-1.webp";
+import reviewCamera2 from "@/assets/review-camera-2.webp";
+import reviewCamera3 from "@/assets/review-camera-3.webp";
+import reviewCamera4 from "@/assets/review-camera-4.webp";
 import { usePresence } from "@/hooks/usePresence";
 import { trackPixelEvent } from "@/hooks/usePixels";
-import ShippingOptions, { getShippingPrice } from "@/components/ShippingOptions";
-import CartDrawer from "@/components/CartDrawer";
-import CheckoutProgressBar from "@/components/CheckoutProgressBar";
 import PaymentProgressBar from "@/components/PaymentProgressBar";
 
-import ValidatedInput from "@/components/ValidatedInput";
-import FloatingCheckoutSummary from "@/components/FloatingCheckoutSummary";
-import OfferTimer from "@/components/OfferTimer";
 // PIX Icon Component
 const PixIcon = ({ className = "h-5 w-5" }: { className?: string }) => (
   <svg width="16" height="16" viewBox="0 0 512 512" fill="currentColor" className={className}>
@@ -55,9 +58,67 @@ const QRCodeIcon = () => (
   </svg>
 );
 
+// Shipping options data
+const shippingOptions = [
+  {
+    id: "free",
+    name: "Envio Grátis",
+    description: "8 a 12 dias úteis",
+    price: 0,
+    badge: "Grátis",
+  },
+  {
+    id: "sedex",
+    name: "SEDEX",
+    description: "3 a 6 dias úteis",
+    price: 19.00,
+    logo: "SEDEX",
+  },
+  {
+    id: "express",
+    name: "Envio Express",
+    description: "1 a 2 dias úteis",
+    price: 39.90,
+    note: "Somente para capitais",
+  },
+];
+
+const getShippingPrice = (shippingId: string): number => {
+  const option = shippingOptions.find(opt => opt.id === shippingId);
+  return option?.price || 0;
+};
+
+// Customer reviews for carousel
+const customerReviews = [
+  {
+    id: 1,
+    name: "Maria S.",
+    location: "São Paulo, SP",
+    rating: 5,
+    comment: "Entrega rápida, produto excelente! As 3 câmeras chegaram bem embaladas e funcionam perfeitamente.",
+    images: [reviewCamera1, reviewCamera2],
+  },
+  {
+    id: 2,
+    name: "Carlos R.",
+    location: "Rio de Janeiro, RJ",
+    rating: 5,
+    comment: "Muito satisfeito com a qualidade. Instalação super fácil pelo app.",
+    images: [reviewCamera3],
+  },
+  {
+    id: 3,
+    name: "Ana L.",
+    location: "Belo Horizonte, MG",
+    rating: 5,
+    comment: "Excelente custo-benefício! Câmeras funcionando perfeitamente, visão noturna muito boa.",
+    images: [reviewCamera4],
+  },
+];
+
 const Checkout = () => {
   const navigate = useNavigate();
-  const { items, totalPrice, originalPrice, discount, clearCart, updateQuantity } = useCart();
+  const { items, totalPrice, originalPrice, discount, clearCart, updateQuantity, unitPrice, displayOriginalPrice } = useCart();
   
   const [customerData, setCustomerData] = useState({
     name: "",
@@ -85,14 +146,21 @@ const Checkout = () => {
     transactionId: string;
   } | null>(null);
   const [copied, setCopied] = useState(false);
-  const [expirationTime, setExpirationTime] = useState(7 * 60); // 7 minutes in seconds
-  const [isCartOpen, setIsCartOpen] = useState(false);
+  const [expirationTime, setExpirationTime] = useState(7 * 60);
   const [paymentStatus, setPaymentStatus] = useState<'pending' | 'paid' | 'checking'>('pending');
   const [isCheckingPayment, setIsCheckingPayment] = useState(false);
+  
+  // Offer timer state
+  const [timeLeft, setTimeLeft] = useState({ hours: 0, minutes: 0, seconds: 0 });
 
   // Calculate total with shipping
   const shippingPrice = getShippingPrice(selectedShipping);
   const finalTotal = totalPrice + shippingPrice;
+  
+  // Calculate PIX discount (64% off from original price)
+  const pixDiscount = displayOriginalPrice - unitPrice;
+  const totalQuantity = items.reduce((sum, item) => sum + item.quantity, 0);
+  const totalPixDiscount = pixDiscount * totalQuantity;
 
   // Track presence on checkout
   usePresence("/checkout");
@@ -101,14 +169,36 @@ const Checkout = () => {
     window.scrollTo(0, 0);
   }, []);
 
-  // Track InitiateCheckout event for all pixels
+  // Offer timer countdown
+  useEffect(() => {
+    const calculateTimeLeft = () => {
+      const now = new Date();
+      const midnight = new Date();
+      midnight.setHours(24, 0, 0, 0);
+      
+      const diff = midnight.getTime() - now.getTime();
+      
+      if (diff > 0) {
+        const hours = Math.floor(diff / (1000 * 60 * 60));
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+        setTimeLeft({ hours, minutes, seconds });
+      }
+    };
+
+    calculateTimeLeft();
+    const interval = setInterval(calculateTimeLeft, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Track InitiateCheckout event
   useEffect(() => {
     if (items.length > 0) {
       trackPixelEvent('InitiateCheckout', {
         content_type: 'product',
-        content_id: 'carbon-3-0',
-        content_name: 'Tênis de Corrida Chunta Carbon 3.0',
-        quantity: items.reduce((sum, item) => sum + item.quantity, 0),
+        content_id: 'camera-kit',
+        content_name: 'Kit 3 Câmeras Wi-Fi GIGATEC',
+        quantity: totalQuantity,
         value: totalPrice,
         currency: 'BRL',
       });
@@ -125,7 +215,7 @@ const Checkout = () => {
     }
   }, [pixData, expirationTime]);
 
-  // Auto-check payment status every 5 seconds
+  // Auto-check payment status
   useEffect(() => {
     if (!pixData || paymentStatus === 'paid') return;
 
@@ -138,8 +228,6 @@ const Checkout = () => {
           body: { transactionId: pixData.transactionId }
         });
 
-        console.log("Payment status check:", data);
-
         if (error) {
           console.error("Error checking payment status:", error);
           return;
@@ -149,7 +237,6 @@ const Checkout = () => {
           setPaymentStatus('paid');
           toast.success("Pagamento confirmado!");
           
-          // Fetch upsell config to determine redirect
           const { data: settingsData } = await supabase
             .from('app_settings')
             .select('setting_value')
@@ -160,7 +247,6 @@ const Checkout = () => {
           
           setTimeout(() => {
             if (upsellConfig?.enabled && upsellConfig?.redirect_url) {
-              // Check if it's an external URL or internal route
               if (upsellConfig.redirect_url.startsWith('http')) {
                 window.location.href = upsellConfig.redirect_url;
               } else {
@@ -173,20 +259,11 @@ const Checkout = () => {
                       phone: customerData.phone,
                       document: customerData.document,
                     },
-                    address: {
-                      street: addressData.street,
-                      number: addressData.number,
-                      complement: addressData.complement,
-                      neighborhood: addressData.neighborhood,
-                      city: addressData.city,
-                      state: addressData.state,
-                      zipCode: addressData.zipCode,
-                    },
+                    address: addressData,
                   },
                 });
               }
             } else {
-              // Upsell disabled - go to thank you page
               navigate("/obrigado");
             }
             clearCart();
@@ -199,14 +276,10 @@ const Checkout = () => {
       }
     };
 
-    // Initial check
     checkPaymentStatus();
-
-    // Check every 5 seconds
     const interval = setInterval(checkPaymentStatus, 5000);
-
     return () => clearInterval(interval);
-  }, [pixData, paymentStatus, isCheckingPayment, navigate, items, customerData, addressData, finalTotal, shippingPrice, clearCart]);
+  }, [pixData, paymentStatus, isCheckingPayment, navigate, customerData, addressData, clearCart]);
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -214,16 +287,14 @@ const Checkout = () => {
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
-  // Validate CPF using the algorithm
+  const formatTimerNumber = (num: number) => num.toString().padStart(2, '0');
+
+  // Validate CPF
   const validateCPF = (cpf: string): boolean => {
     const numbers = cpf.replace(/\D/g, "");
-    
     if (numbers.length !== 11) return false;
-    
-    // Check for known invalid CPFs (all same digits)
     if (/^(\d)\1{10}$/.test(numbers)) return false;
     
-    // Validate first digit
     let sum = 0;
     for (let i = 0; i < 9; i++) {
       sum += parseInt(numbers[i]) * (10 - i);
@@ -232,7 +303,6 @@ const Checkout = () => {
     if (remainder === 10 || remainder === 11) remainder = 0;
     if (remainder !== parseInt(numbers[9])) return false;
     
-    // Validate second digit
     sum = 0;
     for (let i = 0; i < 10; i++) {
       sum += parseInt(numbers[i]) * (11 - i);
@@ -244,7 +314,7 @@ const Checkout = () => {
     return true;
   };
 
-  // Format CPF
+  // Format functions
   const formatCPF = (value: string) => {
     const numbers = value.replace(/\D/g, "");
     if (numbers.length <= 11) {
@@ -253,14 +323,9 @@ const Checkout = () => {
         .replace(/(\d{3})(\d)/, "$1.$2")
         .replace(/(\d{3})(\d{1,2})$/, "$1-$2");
     }
-    return numbers
-      .replace(/(\d{2})(\d)/, "$1.$2")
-      .replace(/(\d{3})(\d)/, "$1.$2")
-      .replace(/(\d{3})(\d)/, "$1/$2")
-      .replace(/(\d{4})(\d{1,2})$/, "$1-$2");
+    return value;
   };
 
-  // Format Phone
   const formatPhone = (value: string) => {
     const numbers = value.replace(/\D/g, "");
     if (numbers.length <= 10) {
@@ -273,7 +338,6 @@ const Checkout = () => {
       .replace(/(\d{5})(\d)/, "$1-$2");
   };
 
-  // Format CEP
   const formatCEP = (value: string) => {
     const numbers = value.replace(/\D/g, "");
     return numbers.replace(/(\d{5})(\d)/, "$1-$2");
@@ -376,14 +440,8 @@ const Checkout = () => {
   };
 
   const handleCreatePixPayment = async () => {
-    // Prevent duplicate PIX generation
-    if (isLoading || pixData) {
-      console.log("PIX generation blocked - already loading or PIX exists");
-      return;
-    }
-
+    if (isLoading || pixData) return;
     if (!validateForm()) return;
-
     if (items.length === 0) {
       toast.error("Seu carrinho está vazio");
       return;
@@ -426,12 +484,9 @@ const Checkout = () => {
         return;
       }
 
-      console.log("PIX Response:", data);
-
       if (data?.success) {
-        // Save order to database
         const orderItems = items.map(item => ({
-          name: `Tênis Carbon 3.0 - ${item.colorName}`,
+          name: `Kit 3 Câmeras Wi-Fi`,
           color: item.colorName,
           size: item.size,
           quantity: item.quantity,
@@ -467,14 +522,13 @@ const Checkout = () => {
           transactionId: data.transactionId,
         });
         
-        // Track Purchase event when PIX is generated
         trackPixelEvent('Purchase', {
           content_type: 'product',
-          content_id: 'carbon-3-0',
-          content_name: 'Tênis Max Runner Carbon 3.0',
+          content_id: 'camera-kit',
+          content_name: 'Kit 3 Câmeras Wi-Fi GIGATEC',
           currency: 'BRL',
           value: finalTotal,
-          num_items: items.reduce((acc, item) => acc + item.quantity, 0),
+          num_items: totalQuantity,
         });
         
         toast.success("PIX gerado com sucesso!");
@@ -510,21 +564,9 @@ const Checkout = () => {
   const isCityValid = addressData.city.trim().length >= 2;
   const isStateValid = addressData.state.length === 2;
 
-  // Check which step is complete
   const isCustomerDataComplete = isNameValid && isCpfValid && isPhoneValid && isEmailValid;
   const isAddressComplete = isCepValid && isStreetValid && isNumberValid && isNeighborhoodValid && isCityValid && isStateValid;
-
-  // Current step calculation
-  const currentStep: 1 | 2 | 3 = useMemo(() => {
-    if (!isCustomerDataComplete) return 1;
-    if (!isAddressComplete) return 2;
-    return 3;
-  }, [isCustomerDataComplete, isAddressComplete]);
-
   const isFormComplete = isCustomerDataComplete && isAddressComplete;
-
-  // Get first item for display
-  const firstItem = items[0];
 
   if (items.length === 0 && !pixData) {
     return (
@@ -532,7 +574,7 @@ const Checkout = () => {
         <div className="text-center">
           <h1 className="text-xl font-bold text-gray-900 mb-2">Carrinho vazio</h1>
           <p className="text-gray-500 mb-6">Adicione produtos antes de continuar</p>
-          <Button onClick={() => navigate("/")} className="bg-[#28af60] hover:bg-[#23994f]">
+          <Button onClick={() => navigate("/")} className="bg-accent hover:bg-accent/90">
             Voltar às compras
           </Button>
         </div>
@@ -540,16 +582,23 @@ const Checkout = () => {
     );
   }
 
-  // PIX Payment Screen - Redesigned
+  // PIX Payment Screen
   if (pixData) {
     return (
       <div className="min-h-screen bg-white">
         {/* Header */}
-        <header className="bg-white border-b border-gray-100 py-3 px-4">
-          <div className="max-w-lg mx-auto flex items-center justify-center">
+        <header className="bg-primary py-3 px-4">
+          <div className="max-w-lg mx-auto flex items-center justify-between">
+            <button onClick={() => navigate("/")} className="text-white">
+              <ArrowLeft className="h-5 w-5" />
+            </button>
             <Link to="/">
-              <img src={logo} alt="Max Runner" className="h-8 w-auto" loading="eager" decoding="async" />
+              <span className="text-white font-bold text-xl">CASA<span className="text-accent">FORT</span></span>
             </Link>
+            <div className="flex items-center gap-1 text-white text-sm">
+              <Lock className="h-4 w-4" />
+              <span>Seguro</span>
+            </div>
           </div>
         </header>
 
@@ -605,8 +654,6 @@ const Checkout = () => {
                   src={pixData.qrCode.startsWith("data:") ? pixData.qrCode : `data:image/png;base64,${pixData.qrCode}`}
                   alt="QR Code PIX"
                   className="w-64 h-64 rounded-lg"
-                  loading="eager"
-                  decoding="async"
                 />
               ) : (
                 <div className="w-64 h-64 bg-gray-100 flex flex-col items-center justify-center rounded-lg">
@@ -683,84 +730,9 @@ const Checkout = () => {
             </div>
           )}
 
-          {/* Transaction ID */}
           <p className="text-center text-xs text-gray-400">
             ID: {pixData.transactionId}
           </p>
-
-          <Button
-            onClick={async () => {
-              // Check payment status before redirecting
-              setPaymentStatus('checking');
-              try {
-                const { data, error } = await supabase.functions.invoke("check-payment-status", {
-                  body: { transactionId: pixData.transactionId }
-                });
-
-                if (error) {
-                  toast.error("Erro ao verificar pagamento. Tente novamente.");
-                  setPaymentStatus('pending');
-                  return;
-                }
-
-                if (data?.isPaid) {
-                  setPaymentStatus('paid');
-                  toast.success("Pagamento confirmado!");
-                  
-                  setTimeout(() => {
-                    navigate("/obrigado", {
-                      state: {
-                        items: items.map(item => ({
-                          colorName: item.colorName,
-                          size: item.size,
-                          quantity: item.quantity,
-                          price: item.price,
-                        })),
-                        customer: {
-                          name: customerData.name,
-                          email: customerData.email,
-                        },
-                        address: {
-                          street: addressData.street,
-                          number: addressData.number,
-                          complement: addressData.complement,
-                          neighborhood: addressData.neighborhood,
-                          city: addressData.city,
-                          state: addressData.state,
-                          zipCode: addressData.zipCode,
-                        },
-                        totalAmount: finalTotal,
-                        shippingPrice: shippingPrice,
-                        transactionId: pixData.transactionId,
-                      },
-                    });
-                    clearCart();
-                  }, 1000);
-                } else {
-                  toast.error("Pagamento ainda não confirmado. Aguarde ou escaneie o QR Code novamente.");
-                  setPaymentStatus('pending');
-                }
-              } catch (err) {
-                console.error("Error checking payment:", err);
-                toast.error("Erro ao verificar pagamento. Tente novamente.");
-                setPaymentStatus('pending');
-              }
-            }}
-            disabled={paymentStatus === 'checking' || paymentStatus === 'paid'}
-            className="w-full h-14 bg-[#28af60] hover:bg-[#23994f] text-white rounded-xl gap-2 disabled:opacity-50"
-          >
-            {paymentStatus === 'checking' ? (
-              <>
-                <Loader2 className="h-5 w-5 animate-spin" />
-                Verificando pagamento...
-              </>
-            ) : (
-              <>
-                <CheckCircle className="h-5 w-5" />
-                Já fiz o pagamento
-              </>
-            )}
-          </Button>
 
           <Button
             onClick={() => {
@@ -778,392 +750,450 @@ const Checkout = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-24">
-      {/* Floating Summary for Mobile */}
-      <FloatingCheckoutSummary 
-        totalPrice={totalPrice} 
-        shippingPrice={shippingPrice}
-        itemCount={items.reduce((sum, i) => sum + i.quantity, 0)}
-      />
-
-      {/* Header */}
-      <header className="bg-white border-b border-gray-100 py-3 px-4">
+    <div className="min-h-screen bg-gray-50 pb-32">
+      {/* Header - CASAFORT Style */}
+      <header className="bg-primary py-3 px-4">
         <div className="max-w-lg mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <button 
-              onClick={() => navigate("/")}
-              className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors"
-              aria-label="Voltar"
-            >
-              <ArrowLeft className="h-5 w-5 text-gray-600" />
-            </button>
-            <Link to="/">
-              <img src={logo} alt="Max Runner" className="h-8 w-auto" loading="eager" decoding="async" />
-            </Link>
+          <button onClick={() => navigate("/")} className="text-white">
+            <ArrowLeft className="h-5 w-5" />
+          </button>
+          <Link to="/">
+            <span className="text-white font-bold text-xl">CASA<span className="text-accent">FORT</span></span>
+          </Link>
+          <div className="flex items-center gap-1 text-white text-sm">
+            <Lock className="h-4 w-4" />
+            <span>Seguro</span>
           </div>
-          <div className="flex items-center gap-1.5 text-xs text-gray-500 bg-gray-50 px-3 py-1.5 rounded-full">
-            <Lock className="h-3 w-3 text-[#28af60]" />
-            <span>Ambiente seguro</span>
+        </div>
+        {/* SSL Badge */}
+        <div className="max-w-lg mx-auto flex items-center justify-center gap-4 mt-2 text-xs text-white/80">
+          <div className="flex items-center gap-1">
+            <Lock className="h-3 w-3" />
+            <span>SSL 256-bit</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <Shield className="h-3 w-3" />
+            <span>Compra Protegida</span>
           </div>
         </div>
       </header>
 
-      {/* Progress Bar */}
-      <CheckoutProgressBar currentStep={currentStep} />
+      {/* Offer Timer Bar */}
+      <div className="bg-accent py-3 px-4">
+        <div className="max-w-lg mx-auto flex items-center justify-center gap-3">
+          <Clock className="h-4 w-4 text-white" />
+          <span className="text-white text-sm font-medium">Últimas horas de oferta:</span>
+          <div className="bg-white/20 rounded-lg px-3 py-1">
+            <span className="text-white font-bold font-mono">
+              {formatTimerNumber(timeLeft.hours)}:{formatTimerNumber(timeLeft.minutes)}:{formatTimerNumber(timeLeft.seconds)}
+            </span>
+          </div>
+        </div>
+      </div>
 
       <main className="max-w-lg mx-auto px-4 py-4 space-y-4">
-
-        {/* Offer Timer */}
-        <OfferTimer />
-
         {/* Product Card */}
         {items.length > 0 && (
-          <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 space-y-3">
-            {items.map((item, index) => (
-              <div key={item.id} className={index > 0 ? "pt-3 border-t border-gray-100" : ""}>
-                <div className="flex gap-3">
-                  <img
-                    src={item.colorImage}
-                    alt={item.colorName}
-                    className="w-16 h-16 object-cover rounded-xl"
-                    loading="lazy"
-                    decoding="async"
-                  />
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-gray-900 text-sm">Tênis Carbon 3.0</h3>
-                    <p className="text-xs text-gray-500">{item.colorName} • Tam. {item.size}</p>
-                    <p className="text-sm font-bold text-[#28af60] mt-1">
-                      R$ {(item.price * item.quantity).toFixed(2).replace(".", ",")}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                      className="w-7 h-7 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600 transition-colors"
-                    >
-                      <Minus className="h-3.5 w-3.5" strokeWidth={2.5} />
-                    </button>
-                    <span className="text-sm font-medium w-5 text-center">{item.quantity}</span>
-                    <button
-                      onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                      className="w-7 h-7 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600 transition-colors"
-                    >
-                      <Plus className="h-3.5 w-3.5" strokeWidth={2.5} />
-                    </button>
-                  </div>
+          <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+            <div className="flex gap-3">
+              {/* Product Image with PROMOÇÃO badge */}
+              <div className="relative flex-shrink-0">
+                <div className="absolute -top-2 -left-2 z-10">
+                  <span className="bg-accent text-white text-[10px] font-bold px-2 py-1 rounded">
+                    PROMOÇÃO
+                  </span>
                 </div>
+                <img
+                  src={cameraMain}
+                  alt="Kit 3 Câmeras Wi-Fi"
+                  className="w-20 h-20 object-cover rounded-xl border border-gray-200"
+                />
               </div>
-            ))}
-
-            {/* Total and Discount Summary */}
-            <div className="pt-3 border-t border-gray-100">
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-500">Subtotal ({items.reduce((sum, i) => sum + i.quantity, 0)} {items.reduce((sum, i) => sum + i.quantity, 0) === 1 ? 'item' : 'itens'})</span>
-                <div className="flex items-center gap-2">
-                  {discount > 0 && (
-                    <span className="text-sm text-gray-400 line-through">
-                      R$ {originalPrice.toFixed(2).replace(".", ",")}
-                    </span>
-                  )}
-                  <span className="font-bold text-[#28af60]">
-                    R$ {totalPrice.toFixed(2).replace(".", ",")}
+              
+              {/* Product Info */}
+              <div className="flex-1 min-w-0">
+                <h3 className="font-semibold text-gray-900 text-sm leading-tight">
+                  Kit 3 Câmeras Wi-Fi com Sensor de Movimento, Alarme...
+                </h3>
+                <div className="flex items-center gap-1 mt-1">
+                  <div className="flex">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <Star key={star} className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                    ))}
+                  </div>
+                  <span className="text-xs text-gray-500">(127 avaliações)</span>
+                </div>
+                <div className="flex items-center gap-2 mt-2">
+                  <span className="text-xl font-bold text-primary">
+                    R$ {unitPrice.toFixed(2).replace(".", ",")}
+                  </span>
+                  <span className="text-sm text-gray-400 line-through">
+                    R$ {displayOriginalPrice.toFixed(2).replace(".", ",")}
                   </span>
                 </div>
               </div>
-              {discount > 0 && (
-                <div className="flex justify-end mt-1">
-                  <span className="text-xs font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
-                    Economizando R$ {discount.toFixed(2).replace(".", ",")}
-                  </span>
-                </div>
-              )}
+            </div>
+            
+            {/* Trust Badges Row */}
+            <div className="flex items-center justify-between mt-4 pt-3 border-t border-gray-100">
+              <div className="flex flex-col items-center">
+                <ShieldCheck className="h-5 w-5 text-[#28af60]" />
+                <span className="text-[9px] text-gray-500 mt-1">Compra Segura</span>
+              </div>
+              <div className="flex flex-col items-center">
+                <Truck className="h-5 w-5 text-[#28af60]" />
+                <span className="text-[9px] text-gray-500 mt-1">Frete Grátis</span>
+              </div>
+              <div className="flex flex-col items-center">
+                <Award className="h-5 w-5 text-[#28af60]" />
+                <span className="text-[9px] text-gray-500 mt-1">Garantia 12m</span>
+              </div>
+              <div className="flex flex-col items-center">
+                <PixIcon className="h-5 w-5 text-[#28af60]" />
+                <span className="text-[9px] text-gray-500 mt-1">PIX Seguro</span>
+              </div>
             </div>
           </div>
         )}
 
         {/* Customer Data Section */}
         <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-              <div className={`w-6 h-6 rounded-full flex items-center justify-center ${isCustomerDataComplete ? 'bg-[#28af60]' : 'bg-green-50'}`}>
-                {isCustomerDataComplete ? (
-                  <CheckCircle className="h-4 w-4 text-white" />
-                ) : (
-                  <User className="h-3.5 w-3.5 text-[#28af60]" />
-                )}
-              </div>
-              <h2 className="font-semibold text-gray-900">Seus dados</h2>
-            </div>
-            {isCustomerDataComplete && (
-              <span className="text-xs text-[#28af60] font-medium">Completo ✓</span>
-            )}
+          <div className="flex items-center gap-2 mb-4">
+            <User className="h-5 w-5 text-primary" />
+            <h2 className="font-semibold text-gray-900">Dados Pessoais</h2>
           </div>
           
-          <div className="space-y-3">
-            <ValidatedInput
-              placeholder="Nome completo"
-              value={customerData.name}
-              onChange={(e) => handleCustomerChange("name", e.target.value)}
-              icon={<User className="h-4 w-4" />}
-              isValid={isNameValid}
-            />
+          <div className="space-y-4">
+            <div>
+              <Label className="text-sm text-gray-700">Nome completo *</Label>
+              <Input
+                placeholder="Seu nome completo"
+                value={customerData.name}
+                onChange={(e) => handleCustomerChange("name", e.target.value)}
+                className="mt-1 h-12 rounded-xl border-gray-200 bg-gray-50 focus:bg-white"
+              />
+            </div>
             
-            <ValidatedInput
-              placeholder="CPF"
-              value={customerData.document}
-              onChange={(e) => handleCustomerChange("document", e.target.value)}
-              icon={<Hash className="h-4 w-4" />}
-              isValid={isCpfValid}
-              maxLength={14}
-              inputMode="numeric"
-            />
+            <div>
+              <Label className="text-sm text-gray-700">E-mail *</Label>
+              <Input
+                type="email"
+                placeholder="seu@email.com"
+                value={customerData.email}
+                onChange={(e) => handleCustomerChange("email", e.target.value)}
+                className="mt-1 h-12 rounded-xl border-gray-200 bg-gray-50 focus:bg-white"
+              />
+            </div>
             
-            <ValidatedInput
-              placeholder="Telefone"
-              value={customerData.phone}
-              onChange={(e) => handleCustomerChange("phone", e.target.value)}
-              icon={<Phone className="h-4 w-4" />}
-              isValid={isPhoneValid}
-              maxLength={15}
-              inputMode="tel"
-            />
+            <div>
+              <Label className="text-sm text-gray-700">Telefone/WhatsApp *</Label>
+              <Input
+                placeholder="(00) 00000-0000"
+                value={customerData.phone}
+                onChange={(e) => handleCustomerChange("phone", e.target.value)}
+                maxLength={15}
+                inputMode="tel"
+                className="mt-1 h-12 rounded-xl border-gray-200 bg-gray-50 focus:bg-white"
+              />
+            </div>
             
-            <ValidatedInput
-              type="email"
-              placeholder="E-mail"
-              value={customerData.email}
-              onChange={(e) => handleCustomerChange("email", e.target.value)}
-              icon={<Mail className="h-4 w-4" />}
-              isValid={isEmailValid}
-              inputMode="email"
-            />
+            <div>
+              <Label className="text-sm text-gray-700">CPF *</Label>
+              <Input
+                placeholder="000.000.000-00"
+                value={customerData.document}
+                onChange={(e) => handleCustomerChange("document", e.target.value)}
+                maxLength={14}
+                inputMode="numeric"
+                className="mt-1 h-12 rounded-xl border-gray-200 bg-gray-50 focus:bg-white"
+              />
+            </div>
           </div>
         </div>
 
         {/* Address Section */}
         <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-              <div className={`w-6 h-6 rounded-full flex items-center justify-center ${isAddressComplete ? 'bg-[#28af60]' : 'bg-green-50'}`}>
-                {isAddressComplete ? (
-                  <CheckCircle className="h-4 w-4 text-white" />
-                ) : (
-                  <MapPin className="h-3.5 w-3.5 text-[#28af60]" />
-                )}
-              </div>
-              <h2 className="font-semibold text-gray-900">Endereço de entrega</h2>
-            </div>
-            {isAddressComplete && (
-              <span className="text-xs text-[#28af60] font-medium">Completo ✓</span>
-            )}
+          <div className="flex items-center gap-2 mb-4">
+            <MapPin className="h-5 w-5 text-primary" />
+            <h2 className="font-semibold text-gray-900">Endereço de Entrega</h2>
           </div>
           
-          <div className="space-y-3">
+          <div className="space-y-4">
             <div className="relative">
-              <ValidatedInput
-                placeholder="CEP"
+              <Label className="text-sm text-gray-700">CEP *</Label>
+              <Input
+                placeholder="00000-000"
                 value={addressData.zipCode}
                 onChange={(e) => handleAddressChange("zipCode", e.target.value)}
-                icon={<MapPin className="h-4 w-4" />}
-                isValid={isCepValid && !isLoadingCep}
                 maxLength={9}
                 inputMode="numeric"
+                className="mt-1 h-12 rounded-xl border-gray-200 bg-gray-50 focus:bg-white"
               />
               {isLoadingCep && (
-                <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin text-gray-400" />
+                <Loader2 className="absolute right-3 top-9 h-4 w-4 animate-spin text-gray-400" />
               )}
             </div>
             
-            <ValidatedInput
-              placeholder="Rua / Avenida"
-              value={addressData.street}
-              onChange={(e) => handleAddressChange("street", e.target.value)}
-              icon={<Home className="h-4 w-4" />}
-              isValid={isStreetValid}
-            />
-            
-            <div className="grid grid-cols-2 gap-3">
-              <ValidatedInput
-                placeholder="Número"
-                value={addressData.number}
-                onChange={(e) => handleAddressChange("number", e.target.value)}
-                isValid={isNumberValid}
-                inputMode="numeric"
-              />
+            <div>
+              <Label className="text-sm text-gray-700">Endereço *</Label>
               <Input
-                placeholder="Complemento (opcional)"
-                value={addressData.complement}
-                onChange={(e) => handleAddressChange("complement", e.target.value)}
-                className="h-12 rounded-xl border-gray-200 bg-gray-50 focus:bg-white"
+                placeholder="Rua, avenida..."
+                value={addressData.street}
+                onChange={(e) => handleAddressChange("street", e.target.value)}
+                className="mt-1 h-12 rounded-xl border-gray-200 bg-gray-50 focus:bg-white"
               />
             </div>
             
-            <ValidatedInput
-              placeholder="Bairro"
-              value={addressData.neighborhood}
-              onChange={(e) => handleAddressChange("neighborhood", e.target.value)}
-              icon={<Building className="h-4 w-4" />}
-              isValid={isNeighborhoodValid}
-            />
-            
-            <div className="grid grid-cols-3 gap-3">
-              <div className="col-span-2">
-                <ValidatedInput
-                  placeholder="Cidade"
-                  value={addressData.city}
-                  onChange={(e) => handleAddressChange("city", e.target.value)}
-                  isValid={isCityValid}
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label className="text-sm text-gray-700">Nº *</Label>
+                <Input
+                  placeholder="123"
+                  value={addressData.number}
+                  onChange={(e) => handleAddressChange("number", e.target.value)}
+                  inputMode="numeric"
+                  className="mt-1 h-12 rounded-xl border-gray-200 bg-gray-50 focus:bg-white"
                 />
               </div>
-              <ValidatedInput
-                placeholder="UF"
-                value={addressData.state}
-                onChange={(e) => handleAddressChange("state", e.target.value)}
-                isValid={isStateValid}
-                maxLength={2}
-                className="text-center"
+              <div>
+                <Label className="text-sm text-gray-700">Complemento</Label>
+                <Input
+                  placeholder="Apto, bloco..."
+                  value={addressData.complement}
+                  onChange={(e) => handleAddressChange("complement", e.target.value)}
+                  className="mt-1 h-12 rounded-xl border-gray-200 bg-gray-50 focus:bg-white"
+                />
+              </div>
+            </div>
+            
+            <div>
+              <Label className="text-sm text-gray-700">Bairro *</Label>
+              <Input
+                placeholder="Seu bairro"
+                value={addressData.neighborhood}
+                onChange={(e) => handleAddressChange("neighborhood", e.target.value)}
+                className="mt-1 h-12 rounded-xl border-gray-200 bg-gray-50 focus:bg-white"
               />
+            </div>
+            
+            <div className="grid grid-cols-4 gap-3">
+              <div className="col-span-3">
+                <Label className="text-sm text-gray-700">Cidade *</Label>
+                <Input
+                  placeholder="Sua cidade"
+                  value={addressData.city}
+                  onChange={(e) => handleAddressChange("city", e.target.value)}
+                  className="mt-1 h-12 rounded-xl border-gray-200 bg-gray-50 focus:bg-white"
+                />
+              </div>
+              <div>
+                <Label className="text-sm text-gray-700">UF *</Label>
+                <Input
+                  placeholder="UF"
+                  value={addressData.state}
+                  onChange={(e) => handleAddressChange("state", e.target.value)}
+                  maxLength={2}
+                  className="mt-1 h-12 rounded-xl border-gray-200 bg-gray-50 focus:bg-white text-center"
+                />
+              </div>
             </div>
           </div>
         </div>
 
         {/* Shipping Options */}
-        <ShippingOptions 
-          selectedShipping={selectedShipping} 
-          onSelect={setSelectedShipping} 
-        />
+        <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+          <div className="flex items-center gap-2 mb-4">
+            <Truck className="h-5 w-5 text-primary" />
+            <h2 className="font-semibold text-gray-900">Opções de Envio</h2>
+          </div>
+          
+          <div className="space-y-3">
+            {shippingOptions.map((option) => {
+              const isSelected = selectedShipping === option.id;
+              
+              return (
+                <button
+                  key={option.id}
+                  onClick={() => setSelectedShipping(option.id)}
+                  className={`w-full flex items-center justify-between p-4 rounded-xl border-2 transition-all text-left ${
+                    isSelected 
+                      ? "border-primary bg-primary/5" 
+                      : "border-gray-200 hover:border-gray-300"
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                      isSelected ? "border-primary" : "border-gray-300"
+                    }`}>
+                      {isSelected && <div className="w-2.5 h-2.5 rounded-full bg-primary" />}
+                    </div>
+                    <div>
+                      {option.id === "sedex" ? (
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-bold text-yellow-600 bg-yellow-100 px-2 py-0.5 rounded">SEDEX</span>
+                        </div>
+                      ) : (
+                        <span className="font-medium text-gray-900">{option.name}</span>
+                      )}
+                      <p className="text-xs text-gray-500">{option.description}</p>
+                      {option.note && (
+                        <p className="text-[10px] text-accent">{option.note}</p>
+                      )}
+                    </div>
+                  </div>
+                  <span className={`font-bold ${option.price === 0 ? "text-[#28af60]" : "text-gray-900"}`}>
+                    {option.badge || `R$ ${option.price.toFixed(2).replace(".", ",")}`}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
 
         {/* Order Summary */}
         <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
-          <div className="flex items-center gap-2 mb-4">
-            <div className="w-6 h-6 rounded-full bg-green-50 flex items-center justify-center">
-              <CreditCard className="h-3.5 w-3.5 text-[#28af60]" />
-            </div>
-            <h2 className="font-semibold text-gray-900">Resumo do pedido</h2>
-          </div>
+          <h2 className="font-semibold text-gray-900 mb-4">Resumo do Pedido</h2>
           
-          {/* Price breakdown */}
-          <div className="space-y-2 mb-4">
+          <div className="space-y-2">
             <div className="flex justify-between text-sm">
               <span className="text-gray-600">Subtotal</span>
-              <span className="text-gray-900">R$ {totalPrice.toFixed(2).replace(".", ",")}</span>
+              <span className="text-gray-900">R$ {displayOriginalPrice.toFixed(2).replace(".", ",")}</span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-gray-600">Frete</span>
+              <span className="text-gray-600">Desconto PIX (64%)</span>
+              <span className="text-[#28af60] font-medium">- R$ {totalPixDiscount.toFixed(2).replace(".", ",")}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-600">Frete ({shippingOptions.find(s => s.id === selectedShipping)?.name})</span>
               <span className={shippingPrice === 0 ? "text-[#28af60] font-medium" : "text-gray-900"}>
                 {shippingPrice === 0 ? "Grátis" : `R$ ${shippingPrice.toFixed(2).replace(".", ",")}`}
               </span>
             </div>
-            <div className="border-t border-gray-100 pt-2 flex justify-between">
-              <span className="font-semibold text-gray-900">Total</span>
-              <span className="font-bold text-lg text-[#28af60]">R$ {finalTotal.toFixed(2).replace(".", ",")}</span>
-            </div>
-          </div>
-
-          {/* PIX Payment Option */}
-          <div className="border-2 border-[#28af60] rounded-xl p-4 bg-green-50/50">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <QRCodeIcon />
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="font-semibold text-gray-900">PIX</span>
-                    <span className="text-[10px] font-bold text-[#28af60] bg-green-100 px-1.5 py-0.5 rounded">RECOMENDADO</span>
-                  </div>
-                  <p className="text-xs text-gray-500">Aprovação instantânea</p>
-                  <p className="text-[10px] text-gray-400">Sem taxas adicionais</p>
+            <div className="border-t border-gray-100 pt-3 mt-3">
+              <div className="flex justify-between items-center">
+                <span className="font-semibold text-gray-900">Total</span>
+                <div className="text-right">
+                  <span className="font-bold text-2xl text-accent">
+                    R$ {finalTotal.toFixed(2).replace(".", ",")}
+                  </span>
+                  <p className="text-xs text-gray-500">à vista no PIX</p>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Trust Badges */}
-        <div className="flex justify-center gap-6 py-4">
-          <div className="flex flex-col items-center gap-1">
-            <div className="w-12 h-12 rounded-full bg-green-50 flex items-center justify-center">
-              <ShieldCheck className="h-5 w-5 text-[#28af60]" />
+        {/* Customers Reviews Carousel */}
+        <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+          <h2 className="font-semibold text-gray-900 mb-4">Clientes satisfeitos</h2>
+          
+          <div className="overflow-x-auto scrollbar-hide -mx-2 px-2">
+            <div className="flex gap-3" style={{ width: 'max-content' }}>
+              {customerReviews.map((review) => (
+                <div key={review.id} className="w-64 flex-shrink-0 bg-gray-50 rounded-xl p-3">
+                  {/* Review Images */}
+                  {review.images.length > 0 && (
+                    <div className="relative mb-3">
+                      <img 
+                        src={review.images[0]} 
+                        alt={`Avaliação de ${review.name}`}
+                        className="w-full h-40 object-cover rounded-lg"
+                      />
+                      {review.images.length > 1 && (
+                        <div className="absolute bottom-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded">
+                          +{review.images.length - 1}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                  
+                  {/* Reviewer Info */}
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white font-bold text-sm">
+                      {review.name.charAt(0)}
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-1">
+                        <span className="font-medium text-sm text-gray-900">{review.name}</span>
+                        <CheckCircle className="h-3.5 w-3.5 text-[#28af60]" />
+                      </div>
+                      <span className="text-[10px] text-gray-500">{review.location}</span>
+                    </div>
+                  </div>
+                  
+                  {/* Stars */}
+                  <div className="flex mb-2">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <Star
+                        key={star}
+                        className={`h-3.5 w-3.5 ${
+                          star <= review.rating
+                            ? "fill-yellow-400 text-yellow-400"
+                            : "text-gray-300"
+                        }`}
+                      />
+                    ))}
+                  </div>
+                  
+                  {/* Comment */}
+                  <p className="text-xs text-gray-600 line-clamp-3">{review.comment}</p>
+                </div>
+              ))}
             </div>
-            <span className="text-[10px] text-gray-500 text-center">Pagamento<br/>seguro</span>
-          </div>
-          <div className="flex flex-col items-center gap-1">
-            <div className="w-12 h-12 rounded-full bg-green-50 flex items-center justify-center">
-              <Truck className="h-5 w-5 text-[#28af60]" />
-            </div>
-            <span className="text-[10px] text-gray-500 text-center">Frete<br/>garantido</span>
-          </div>
-          <div className="flex flex-col items-center gap-1">
-            <div className="w-12 h-12 rounded-full bg-green-50 flex items-center justify-center">
-              <Award className="h-5 w-5 text-[#28af60]" />
-            </div>
-            <span className="text-[10px] text-gray-500 text-center">Garantia<br/>90 dias</span>
           </div>
         </div>
 
-        {/* Reviews Section */}
-        <CheckoutReviews />
-
-        {/* Footer Links */}
-        <div className="space-y-6 pt-4">
-          <div>
-            <h3 className="font-semibold text-gray-900 mb-3">Institucional</h3>
-            <div className="space-y-2 text-sm text-gray-500">
-              <Link to="/politica-de-privacidade" className="block hover:text-gray-700">Política de Privacidade</Link>
-              <Link to="/termos-de-uso" className="block hover:text-gray-700">Termos de Uso</Link>
-              <Link to="/politica-de-envio" className="block hover:text-gray-700">Política de Envio</Link>
-              <Link to="/politica-de-reembolso" className="block hover:text-gray-700">Política de Reembolso</Link>
-              <Link to="/trocas-e-devolucoes" className="block hover:text-gray-700">Trocas e Devoluções</Link>
-            </div>
+        {/* Security Section */}
+        <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+          <div className="flex items-center gap-2 mb-3">
+            <ShieldCheck className="h-5 w-5 text-[#28af60]" />
+            <h2 className="font-semibold text-gray-900">Compra 100% Segura</h2>
           </div>
-
-          <div>
-            <h3 className="font-semibold text-gray-900 mb-3">Atendimento</h3>
-            <div className="space-y-2 text-sm text-gray-500">
-              <p>Fale Conosco</p>
-              <p>E-mail:<br/>contato@maxrunner.com.br</p>
-              <p>Horário:<br/>Seg a Sex: 8h às 18h</p>
-            </div>
-          </div>
-
-          <div>
-            <h3 className="font-semibold text-gray-900 mb-3">Segurança</h3>
-            <div className="space-y-2 text-sm text-gray-500">
-              <div className="flex items-center gap-2">
-                <ShieldCheck className="h-4 w-4" />
-                <span>Site 100% Seguro</span>
+          <p className="text-sm text-gray-500 mb-4">
+            Site protegido com certificado SSL. Seus dados estão criptografados e seguros.
+          </p>
+          
+          <div className="flex justify-center gap-8">
+            <div className="flex flex-col items-center gap-1">
+              <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center">
+                <Lock className="h-5 w-5 text-gray-600" />
               </div>
-              <div className="flex items-center gap-2">
-                <Lock className="h-4 w-4" />
-                <span>Conexão Criptografada (SSL)</span>
+              <span className="text-xs text-gray-500">SSL</span>
+            </div>
+            <div className="flex flex-col items-center gap-1">
+              <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center">
+                <Shield className="h-5 w-5 text-gray-600" />
               </div>
+              <span className="text-xs text-gray-500">PCI-DSS</span>
             </div>
-            <div className="mt-3 bg-green-50 border border-[#28af60] rounded-lg p-3">
-              <p className="text-xs font-semibold text-[#28af60]">Ambiente Protegido</p>
-              <p className="text-[10px] text-gray-500">Seus dados são protegidos com criptografia de ponta a ponta.</p>
+            <div className="flex flex-col items-center gap-1">
+              <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center">
+                <CheckCircle className="h-5 w-5 text-gray-600" />
+              </div>
+              <span className="text-xs text-gray-500">Antifraude</span>
             </div>
           </div>
+        </div>
 
-          {/* Company Info */}
-          <div className="border-t border-gray-200 pt-4 mt-4">
-            <div className="text-center text-xs text-gray-400 space-y-1">
-              <p className="font-medium text-gray-500">Max Runner Comércio de Calçados LTDA</p>
-              <p>CNPJ: 02.160.402/0001-89</p>
-              <p>Rua Brigadeiro Machado, 175, Brás - São Paulo/SP - CEP 03050-050</p>
-            </div>
-          </div>
+        {/* Footer */}
+        <div className="text-center pt-4 border-t border-gray-200">
+          <p className="text-sm font-medium text-gray-900">
+            CASA <span className="text-accent">FORT</span> - CNPJ: 13.865.865/0001-62
+          </p>
+          <p className="text-xs text-gray-500 mt-1">Todos os direitos reservados © 2025</p>
         </div>
       </main>
 
       {/* Fixed Bottom CTA */}
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 safe-area-inset-bottom">
-        <div className="max-w-lg mx-auto">
+        <div className="max-w-lg mx-auto space-y-2">
           <Button
             onClick={handleCreatePixPayment}
             disabled={isLoading || !isFormComplete}
-            className={`w-full h-14 font-medium text-base rounded-full transition-colors gap-2 ${
+            className={`w-full h-14 font-bold text-base rounded-xl transition-colors gap-2 ${
               isFormComplete && !isLoading
-                ? 'bg-[#28af60] hover:bg-[#23994f] text-white'
-                : 'bg-gray-200 text-gray-500'
+                ? 'bg-accent hover:bg-accent/90 text-white'
+                : 'bg-gray-300 text-gray-500'
             }`}
           >
             {isLoading ? (
@@ -1172,22 +1202,15 @@ const Checkout = () => {
                 Processando...
               </>
             ) : (
-              <>
-                <Lock className="h-4 w-4" />
-                Pagar com segurança
-              </>
+              "Finalizar Compra"
             )}
           </Button>
-          {!isFormComplete && (
-            <p className="text-center text-xs text-gray-500 mt-2">
-              Preencha todos os campos para continuar
-            </p>
-          )}
+          <div className="flex items-center justify-center gap-2 text-xs text-gray-500">
+            <Lock className="h-3 w-3" />
+            <span>Pagamento 100% seguro e criptografado</span>
+          </div>
         </div>
       </div>
-
-      {/* Cart Drawer */}
-      <CartDrawer open={isCartOpen} onOpenChange={setIsCartOpen} />
     </div>
   );
 };
