@@ -4,50 +4,52 @@ const benefits = [
   {
     icon: Zap,
     title: "Placa de Carbono",
-    description: "Retorno de energia excepcional e propulsão otimizada",
+    description: "Retorno de energia excepcional",
   },
   {
     icon: Wind,
     title: "Malha Respirável",
-    description: "Mantém seus pés frescos e secos durante toda a corrida",
+    description: "Pés frescos durante a corrida",
   },
   {
     icon: Footprints,
     title: "Amortecimento Premium",
-    description: "Espuma de alta densidade que absorve impactos",
+    description: "Absorção de impactos",
   },
   {
     icon: Scale,
     title: "Ultra Leve",
-    description: "Apenas 220g para máximo conforto e agilidade",
+    description: "Apenas 220g",
   },
   {
     icon: Activity,
     title: "Antiderrapante",
-    description: "Solado de borracha para maior aderência",
+    description: "Maior aderência",
   },
   {
     icon: Trophy,
     title: "Design Ergonômico",
-    description: "Ideal para corridas longas e treinos intensos",
+    description: "Corridas longas",
   },
 ];
 
 const Benefits = () => {
   return (
-    <section className="space-y-6">
-      <h2 className="text-xl font-bold text-foreground">
+    <section className="space-y-5">
+      <h2 className="text-lg font-bold text-foreground">
         Características do Produto
       </h2>
       
-      <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 gap-3">
         {benefits.map((benefit, index) => (
           <div
             key={index}
-            className="bg-white rounded-lg border border-border p-4"
+            className="bg-secondary/50 rounded-xl p-4 text-center"
           >
-            <benefit.icon className="h-6 w-6 text-primary mb-2" />
-            <h3 className="font-semibold text-foreground text-sm">{benefit.title}</h3>
+            <div className="w-12 h-12 rounded-full bg-secondary flex items-center justify-center mx-auto mb-3">
+              <benefit.icon className="h-6 w-6 text-primary" />
+            </div>
+            <h3 className="font-bold text-foreground text-sm">{benefit.title}</h3>
             <p className="text-xs text-muted-foreground mt-1">{benefit.description}</p>
           </div>
         ))}

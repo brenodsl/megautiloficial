@@ -1,15 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { Truck, Zap, Shield, CircleCheckBig, Award, ShieldCheck, BadgeCheck, MapPin } from "lucide-react";
+import { Truck, ShieldCheck, ShoppingCart, Star, Check } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import Header from "@/components/Header";
 import ProductGallery from "@/components/ProductGallery";
 import ColorSelector, { colors } from "@/components/ColorSelector";
@@ -40,16 +33,13 @@ const Index = () => {
   const [selectedSize, setSelectedSize] = useState<number | null>(null);
   const userLocation = useUserLocation();
 
-  // Track presence on this page
   usePresence("/");
   const [selectedColor, setSelectedColor] = useState<string>("gradient");
 
-  // Calculate discount percentage
   const discountPercent = displayOriginalPrice > 0 
     ? Math.round(((displayOriginalPrice - unitPrice) / displayOriginalPrice) * 100) 
     : 0;
 
-  // Track ViewContent event for all pixels
   useEffect(() => {
     trackPixelEvent('ViewContent', {
       content_type: 'product',
@@ -61,19 +51,16 @@ const Index = () => {
   }, [unitPrice]);
 
   const handleBuyClick = () => {
-    // If cart has items, go directly to checkout (user is finishing their purchase)
     if (totalItems > 0) {
       navigate("/checkout");
       return;
     }
     
-    // If cart is empty, user needs to select a size first
     if (!selectedSize) {
       sizeSelectorRef.current?.showError();
       return;
     }
     
-    // Track AddToCart event for all pixels
     trackPixelEvent('AddToCart', {
       content_type: 'product',
       content_id: 'carbon-3-0',
@@ -83,217 +70,197 @@ const Index = () => {
       currency: 'BRL',
     });
     
-    // Add item to cart and navigate to checkout
     addItem(selectedColor, selectedSize, 1);
     navigate("/checkout");
   };
 
-  const selectedColorData = colors.find(c => c.id === selectedColor);
-
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <Header />
       
       {/* Breadcrumb */}
-      <div className="bg-white border-b border-gray-100">
+      <div className="bg-white border-b border-border">
         <div className="max-w-lg mx-auto px-4 py-2.5">
-          <nav className="flex items-center gap-1.5 text-xs text-gray-400">
+          <nav className="flex items-center gap-1.5 text-xs text-muted-foreground">
             <span>Calçados</span>
-            <span className="text-gray-300">›</span>
+            <span className="text-border">›</span>
             <span>Tênis de Corrida</span>
-            <span className="text-gray-300">›</span>
-            <span className="text-gray-700 font-medium">Carbon 3.0</span>
+            <span className="text-border">›</span>
+            <span className="text-foreground font-medium">Carbon 3.0</span>
           </nav>
         </div>
       </div>
 
       <main className="max-w-lg mx-auto">
-        {/* Product Card */}
+        {/* Product Gallery Card */}
         <div className="bg-white">
-          <div className="px-4 py-5">
-            {/* Trust Badges */}
-            <div className="flex items-center gap-3 mb-4">
-              <div className="flex items-center gap-1.5 text-xs text-gray-600 bg-gray-100 px-2.5 py-1.5 rounded-full">
-                <BadgeCheck className="h-3.5 w-3.5 text-emerald-600" />
-                <span>Loja Verificada</span>
-              </div>
-              <div className="flex items-center gap-1.5 text-xs text-gray-600 bg-gray-100 px-2.5 py-1.5 rounded-full">
-                <Award className="h-3.5 w-3.5 text-amber-500" />
-                <span>Top 1 em Corrida</span>
-              </div>
-            </div>
-
-            {/* Product Title */}
-            <h1 className="text-xl font-bold text-gray-900 leading-tight mb-1">
-              Tênis de Corrida Chunta Carbon 3.0
-            </h1>
-            <p className="text-sm text-gray-500 mb-4">Placa de Carbono • Ultra Leve • Profissional</p>
-
-            {/* Product Gallery */}
+          <div className="px-4 py-4">
             <ProductGallery selectedColor={selectedColor} />
-
-            {/* Scarcity Banner */}
-            <div className="mt-4">
-              <ScarcityBanner />
-            </div>
-
-            {/* Color Selector with Stock */}
-            <div className="mt-5">
-              <ColorSelector 
-                selectedColor={selectedColor} 
-                onColorSelect={setSelectedColor} 
-              />
-            </div>
-
-            {/* Size Selector */}
-            <div className="mt-5">
-              <SizeSelector 
-                ref={sizeSelectorRef} 
-                selectedSize={selectedSize} 
-                onSizeSelect={setSelectedSize} 
-              />
-            </div>
-
           </div>
         </div>
 
-        {/* Price Card */}
+        {/* Product Info Card */}
         <div className="bg-white mt-2 px-4 py-5">
-          <div className="flex items-baseline gap-3 mb-1">
-            <span className="text-sm text-gray-400 line-through">R$ {displayOriginalPrice.toFixed(2).replace(".", ",")}</span>
-            <span className="text-xs font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">-{discountPercent}%</span>
-          </div>
-          <div className="text-3xl font-bold text-gray-900">R$ {unitPrice.toFixed(2).replace(".", ",")}</div>
-          <div className="flex items-center gap-1.5 text-sm text-emerald-600 mt-1">
-            <PixIcon />
-            <span className="font-medium">À vista no PIX</span>
+          {/* Product Title */}
+          <h1 className="text-xl font-bold text-foreground leading-tight">
+            Tênis de Corrida Chunta Carbon 3.0
+          </h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            Placa de Carbono • Ultra Leve • Profissional • Amortecimento Premium
+          </p>
+
+          {/* Rating */}
+          <a 
+            href="#avaliacoes"
+            className="inline-flex items-center gap-2 mt-3 hover:opacity-80 transition-opacity"
+          >
+            <div className="flex items-center gap-0.5">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <Star key={star} className="h-4 w-4 fill-amber-400 text-amber-400" />
+              ))}
+            </div>
+            <span className="text-sm font-medium text-foreground">4.5</span>
+            <span className="text-sm text-primary underline">(127 avaliações)</span>
+          </a>
+
+          {/* Seller */}
+          <p className="text-xs text-muted-foreground mt-2">
+            Vendido e entregue por <span className="text-primary font-semibold">MAX RUNNER</span>
+          </p>
+
+          {/* Price Section */}
+          <div className="mt-5 bg-secondary/30 rounded-xl p-4">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-sm text-muted-foreground line-through">
+                De R$ {displayOriginalPrice.toFixed(2).replace(".", ",")}
+              </span>
+              <span className="bg-accent text-white text-xs font-bold px-2 py-0.5 rounded">
+                {discountPercent}% OFF
+              </span>
+            </div>
+            <div className="text-3xl font-black text-primary">
+              R$ {unitPrice.toFixed(2).replace(".", ",")}
+            </div>
+            <div className="flex items-center gap-1.5 text-sm text-success mt-1">
+              <PixIcon />
+              <span className="font-medium">à vista no PIX</span>
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">
+              ou 12x de R$ {(unitPrice / 12).toFixed(2).replace(".", ",")} sem juros
+            </p>
           </div>
 
-          {/* Benefits */}
-          <div className="mt-5 space-y-2.5">
-            <div className="flex items-center gap-2.5 text-sm text-gray-600">
-              <div className="w-8 h-8 rounded-full bg-emerald-50 flex items-center justify-center flex-shrink-0">
-                <Truck className="h-4 w-4 text-emerald-600" />
+          {/* Guarantees Row */}
+          <div className="mt-5 grid grid-cols-4 gap-2">
+            <div className="flex flex-col items-center text-center">
+              <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center mb-1">
+                <ShieldCheck className="h-4 w-4 text-primary" />
               </div>
-              <div>
-                <span className="font-medium text-emerald-600">Frete grátis</span>
-                {!userLocation.loading && userLocation.city && (
-                  <span className="text-gray-500"> para <span className="font-medium text-emerald-600">{userLocation.city}, {userLocation.state}</span></span>
-                )}
-                {!userLocation.loading && !userLocation.city && (
-                  <span className="text-gray-500"> para todo o Brasil</span>
-                )}
-              </div>
+              <span className="text-[10px] text-muted-foreground leading-tight">Compra<br/>Segura</span>
             </div>
-            <div className="flex items-center gap-2.5 text-sm text-gray-600">
-              <div className="w-8 h-8 rounded-full bg-emerald-50 flex items-center justify-center flex-shrink-0">
-                <Zap className="h-4 w-4 text-emerald-600" />
+            <div className="flex flex-col items-center text-center">
+              <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center mb-1">
+                <PixIcon />
               </div>
-              <span>Entrega expressa em até 2 dias</span>
+              <span className="text-[10px] text-muted-foreground leading-tight">Pagamento<br/>PIX</span>
             </div>
-            <div className="flex items-center gap-2.5 text-sm text-gray-600">
-              <div className="w-8 h-8 rounded-full bg-emerald-50 flex items-center justify-center flex-shrink-0">
-                <ShieldCheck className="h-4 w-4 text-emerald-600" />
+            <div className="flex flex-col items-center text-center">
+              <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center mb-1">
+                <Truck className="h-4 w-4 text-primary" />
               </div>
-              <span>Garantia de 90 dias</span>
+              <span className="text-[10px] text-muted-foreground leading-tight">Entrega<br/>Garantida</span>
+            </div>
+            <div className="flex flex-col items-center text-center">
+              <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center mb-1">
+                <Check className="h-4 w-4 text-primary" />
+              </div>
+              <span className="text-[10px] text-muted-foreground leading-tight">Garantia<br/>12 meses</span>
             </div>
           </div>
 
-          {/* Promotion Banner - Shows when size is selected OR cart has items */}
-          {(selectedSize || totalItems > 0) && (
-            <div className="mt-5 relative overflow-hidden bg-gradient-to-r from-emerald-600 to-emerald-500 rounded-xl p-4 shadow-lg animate-fade-in">
-              <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2" />
-              <div className="absolute bottom-0 left-0 w-16 h-16 bg-white/10 rounded-full translate-y-1/2 -translate-x-1/2" />
-              <div className="relative flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0 backdrop-blur-sm">
-                    <span className="text-2xl">👟</span>
-                  </div>
-                  <div>
-                    <p className="font-bold text-white text-sm">Leve 2, pague menos!</p>
-                    <p className="text-emerald-100 text-xs">Adicione outro par ao carrinho</p>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <p className="text-xs text-emerald-100">2º par com</p>
-                  <p className="text-xl font-black text-white">20% OFF</p>
-                </div>
-              </div>
-            </div>
-          )}
+          {/* Color Selector */}
+          <div className="mt-6">
+            <ColorSelector 
+              selectedColor={selectedColor} 
+              onColorSelect={setSelectedColor} 
+            />
+          </div>
 
-          {/* CTA Buttons */}
-          <div className="mt-6 space-y-3">
+          {/* Size Selector */}
+          <div className="mt-5">
+            <SizeSelector 
+              ref={sizeSelectorRef} 
+              selectedSize={selectedSize} 
+              onSizeSelect={setSelectedSize} 
+            />
+          </div>
+
+          {/* Scarcity Banner */}
+          <div className="mt-5">
+            <ScarcityBanner />
+          </div>
+
+          {/* CTA Button */}
+          <div className="mt-5">
             <Button
               onClick={handleBuyClick}
               size="lg"
-              className={`w-full h-14 font-semibold text-base rounded-xl transition-all shadow-lg ${
+              className={`w-full h-14 font-bold text-base rounded-xl transition-all ${
                 (selectedSize || totalItems > 0)
-                  ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-200' 
-                  : 'bg-gray-200 text-gray-400 cursor-default hover:bg-gray-200 shadow-none'
+                  ? 'gradient-cta text-white glow-cta hover:opacity-90' 
+                  : 'bg-muted text-muted-foreground cursor-default hover:bg-muted'
               }`}
             >
+              <ShoppingCart className="h-5 w-5 mr-2" />
               {totalItems > 0 ? 'Finalizar compra' : 'Comprar agora'}
             </Button>
 
-            <Button
-              onClick={() => {
-                if (!selectedSize) {
-                  sizeSelectorRef.current?.showError();
-                  return;
-                }
-                addItem(selectedColor, selectedSize, 1);
-                toast.success("Produto adicionado ao carrinho!");
-              }}
-              variant="outline"
-              size="lg"
-              className={`w-full h-12 font-medium text-sm rounded-xl border-2 transition-all ${
-                selectedSize 
-                  ? 'border-emerald-500 text-emerald-700 hover:bg-emerald-50 hover:border-emerald-600' 
-                  : 'border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300'
-              }`}
-            >
-              Adicionar ao carrinho
-            </Button>
-
-            {!selectedSize && (
-              <p className="text-center text-xs text-gray-400">
+            {!selectedSize && totalItems === 0 && (
+              <p className="text-center text-xs text-muted-foreground mt-2">
                 Selecione cor e tamanho para continuar
               </p>
             )}
           </div>
+
+          {/* Quick Benefits */}
+          <div className="mt-5 flex items-center justify-center gap-6 text-xs text-muted-foreground">
+            <span className="flex items-center gap-1">
+              <Check className="h-3.5 w-3.5 text-success" />
+              Compra Segura
+            </span>
+            <span className="flex items-center gap-1">
+              <Check className="h-3.5 w-3.5 text-success" />
+              Pagamento PIX
+            </span>
+            <span className="flex items-center gap-1">
+              <Check className="h-3.5 w-3.5 text-success" />
+              Entrega Garantida
+            </span>
+          </div>
         </div>
 
-        {/* Content Sections */}
+        {/* Product Description */}
         <div className="bg-white mt-2 px-4 py-6">
-
-          {/* Product Description */}
           <ProductDescription />
+        </div>
 
-          {/* Divider */}
-          <div className="border-t border-gray-100 my-8" />
-
-          {/* Guarantees */}
-          <Guarantees />
-
-          {/* Divider */}
-          <div className="border-t border-gray-100 my-8" />
-
-          {/* Benefits */}
+        {/* Features/Benefits */}
+        <div className="bg-white mt-2 px-4 py-6">
           <Benefits />
+        </div>
 
-          {/* Divider */}
-          <div className="border-t border-gray-100 my-8" />
+        {/* Guarantees */}
+        <div className="bg-white mt-2 px-4 py-6">
+          <Guarantees />
+        </div>
 
-          {/* Reviews */}
+        {/* Reviews */}
+        <div className="bg-white mt-2 px-4 py-6">
           <Reviews />
         </div>
       </main>
 
-      {/* Footer */}
       <Footer />
-
-      {/* AI ChatBot */}
       <AIChatBot />
     </div>
   );

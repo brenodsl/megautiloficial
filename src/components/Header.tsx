@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Menu, ShoppingCart, Star, Search, X, Home, Package, MessageSquare, Shield, FileText, Truck, RefreshCw, ArrowLeftRight } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Menu, ShoppingCart, Search, X, Home, Package, MessageSquare, Shield, FileText, Truck, RefreshCw, ArrowLeftRight, Zap } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import logo from "@/assets/logo-max-runner.png";
 import { Button } from "@/components/ui/button";
@@ -30,40 +30,87 @@ const Header = () => {
   const [showSearch, setShowSearch] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [cartOpen, setCartOpen] = useState(false);
+  
+  // Timer state
+  const [timeLeft, setTimeLeft] = useState({ hours: 23, minutes: 46, seconds: 89 });
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTimeLeft(prev => {
+        let { hours, minutes, seconds } = prev;
+        seconds--;
+        if (seconds < 0) {
+          seconds = 59;
+          minutes--;
+        }
+        if (minutes < 0) {
+          minutes = 59;
+          hours--;
+        }
+        if (hours < 0) {
+          hours = 23;
+          minutes = 59;
+          seconds = 59;
+        }
+        return { hours, minutes, seconds };
+      });
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const formatTime = (num: number) => String(num).padStart(2, '0');
 
   return (
     <>
       <header className="sticky top-0 z-40">
-        {/* Top Promo Bar - Black Premium */}
-        <div className="bg-black py-2">
-          <div className="container mx-auto px-4">
-            <p className="text-center text-xs font-medium text-white tracking-wider uppercase">
-              Oferta Exclusiva • 67% OFF + Frete Grátis
-            </p>
+        {/* Top Promo Bar - Orange with Timer */}
+        <div className="bg-accent py-2 px-4">
+          <div className="container mx-auto flex items-center justify-center gap-3">
+            <div className="flex items-center gap-1.5 text-white">
+              <Zap className="h-4 w-4 fill-current" />
+              <span className="text-xs sm:text-sm font-bold">Oferta Relâmpago</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <span className="bg-white/20 text-white font-bold text-xs sm:text-sm px-2 py-0.5 rounded">
+                {formatTime(timeLeft.hours)}
+              </span>
+              <span className="text-white font-bold">:</span>
+              <span className="bg-white/20 text-white font-bold text-xs sm:text-sm px-2 py-0.5 rounded">
+                {formatTime(timeLeft.minutes)}
+              </span>
+              <span className="text-white font-bold">:</span>
+              <span className="bg-white/20 text-white font-bold text-xs sm:text-sm px-2 py-0.5 rounded">
+                {formatTime(timeLeft.seconds)}
+              </span>
+            </div>
           </div>
         </div>
 
-        {/* Main Header - Light/Premium */}
-        <div className="bg-white border-b border-gray-100 shadow-sm">
+        {/* Main Header - Dark Blue */}
+        <div className="bg-primary">
           <div className="container mx-auto px-4 py-3">
             {/* Search Bar - Expanded */}
             {showSearch ? (
               <div className="flex items-center gap-2">
                 <div className="flex-1 relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                   <Input
                     type="text"
                     placeholder="Buscar produtos..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-10 bg-gray-50 border-gray-200 h-10 focus:ring-emerald-500 focus:border-emerald-500"
+                    className="bg-white border-0 h-10 rounded-l-lg rounded-r-none pr-10"
                     autoFocus
                   />
                 </div>
                 <Button
+                  className="bg-accent hover:bg-accent/90 h-10 rounded-l-none rounded-r-lg px-4"
+                >
+                  <Search className="h-5 w-5 text-white" />
+                </Button>
+                <Button
                   variant="ghost"
                   size="icon"
-                  className="text-gray-600 hover:bg-gray-100"
+                  className="text-white hover:bg-white/10"
                   onClick={() => {
                     setShowSearch(false);
                     setSearchQuery("");
@@ -73,31 +120,26 @@ const Header = () => {
                 </Button>
               </div>
             ) : (
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between gap-3">
                 {/* Menu Button */}
                 <Sheet open={isOpen} onOpenChange={setIsOpen}>
                   <SheetTrigger asChild>
-                    <Button variant="ghost" size="icon" className="text-gray-700 hover:bg-gray-100">
+                    <Button variant="ghost" size="icon" className="text-white hover:bg-white/10">
                       <Menu className="h-6 w-6" />
                     </Button>
                   </SheetTrigger>
                   <SheetContent side="left" className="w-72 bg-white p-0 border-0">
                     <div className="flex flex-col h-full">
                       {/* Menu Header */}
-                      <div className="p-4 border-b border-gray-100 bg-gray-50">
-                        <span className="text-lg font-semibold text-gray-900">
+                      <div className="p-4 border-b border-border bg-primary">
+                        <span className="text-lg font-bold text-white">
                           Max Runner
                         </span>
-                        <div className="flex items-center gap-1 text-xs text-gray-500 mt-0.5">
-                          <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
-                          <span>4.9 (578 avaliações)</span>
-                        </div>
                       </div>
                       
                       {/* Menu Items */}
                       <nav className="flex-1 p-2 overflow-y-auto">
-                        {/* Main Navigation */}
-                        <p className="px-4 py-2 text-xs font-medium text-gray-400 uppercase tracking-wider">
+                        <p className="px-4 py-2 text-xs font-medium text-muted-foreground uppercase tracking-wider">
                           Navegação
                         </p>
                         <ul className="space-y-1 mb-4">
@@ -107,18 +149,18 @@ const Header = () => {
                                 <Link
                                   to={item.href}
                                   onClick={() => setIsOpen(false)}
-                                  className="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors font-medium"
+                                  className="flex items-center gap-3 px-4 py-3 rounded-lg text-foreground hover:bg-secondary transition-colors font-medium"
                                 >
-                                  <item.icon className="h-4 w-4 text-gray-400" />
+                                  <item.icon className="h-4 w-4 text-primary" />
                                   {item.label}
                                 </Link>
                               ) : (
                                 <a
                                   href={item.href}
                                   onClick={() => setIsOpen(false)}
-                                  className="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors font-medium"
+                                  className="flex items-center gap-3 px-4 py-3 rounded-lg text-foreground hover:bg-secondary transition-colors font-medium"
                                 >
-                                  <item.icon className="h-4 w-4 text-gray-400" />
+                                  <item.icon className="h-4 w-4 text-primary" />
                                   {item.label}
                                 </a>
                               )}
@@ -126,8 +168,7 @@ const Header = () => {
                           ))}
                         </ul>
 
-                        {/* Policy Links */}
-                        <p className="px-4 py-2 text-xs font-medium text-gray-400 uppercase tracking-wider">
+                        <p className="px-4 py-2 text-xs font-medium text-muted-foreground uppercase tracking-wider">
                           Institucional
                         </p>
                         <ul className="space-y-1">
@@ -136,9 +177,9 @@ const Header = () => {
                               <Link
                                 to={item.href}
                                 onClick={() => setIsOpen(false)}
-                                className="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-50 transition-colors font-medium text-sm"
+                                className="flex items-center gap-3 px-4 py-3 rounded-lg text-muted-foreground hover:bg-secondary transition-colors font-medium text-sm"
                               >
-                                <item.icon className="h-4 w-4 text-gray-400" />
+                                <item.icon className="h-4 w-4" />
                                 {item.label}
                               </Link>
                             </li>
@@ -146,14 +187,13 @@ const Header = () => {
                         </ul>
                       </nav>
 
-                      {/* Menu Footer */}
-                      <div className="p-4 border-t border-gray-100">
+                      <div className="p-4 border-t border-border">
                         <Button
                           onClick={() => {
                             setIsOpen(false);
                             navigate("/");
                           }}
-                          className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium h-12 rounded-xl"
+                          className="w-full bg-accent hover:bg-accent/90 text-white font-bold h-12 rounded-xl"
                         >
                           Ver Produto
                         </Button>
@@ -162,39 +202,49 @@ const Header = () => {
                   </SheetContent>
                 </Sheet>
 
-                {/* Logo - Centered */}
-                <div className="absolute left-1/2 -translate-x-1/2">
-                  <Link to="/">
-                    <img
-                      src={logo}
-                      alt="Max Runner"
-                      className="h-9 w-auto object-contain"
+                {/* Logo */}
+                <Link to="/" className="flex-shrink-0">
+                  <span className="text-white font-black text-xl tracking-tight">
+                    MAX<span className="text-accent">RUNNER</span>
+                  </span>
+                </Link>
+
+                {/* Search Bar - Desktop */}
+                <div className="hidden sm:flex flex-1 max-w-md mx-4">
+                  <div className="flex w-full">
+                    <Input
+                      type="text"
+                      placeholder="Busque aqui..."
+                      className="bg-white border-0 h-10 rounded-l-lg rounded-r-none"
                     />
-                  </Link>
+                    <Button className="bg-accent hover:bg-accent/90 h-10 rounded-l-none rounded-r-lg px-4">
+                      <Search className="h-5 w-5 text-white" />
+                    </Button>
+                  </div>
                 </div>
 
                 {/* Right Actions */}
                 <div className="flex items-center gap-1">
-                  {/* Search Button */}
+                  {/* Search Button - Mobile */}
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="text-gray-600 hover:bg-gray-100"
+                    className="sm:hidden text-white hover:bg-white/10"
                     onClick={() => setShowSearch(true)}
                   >
                     <Search className="h-5 w-5" />
                   </Button>
 
-                  {/* Cart Button - Opens drawer */}
+                  {/* Cart Button */}
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="text-gray-600 hover:bg-gray-100 relative"
+                    className="text-white hover:bg-white/10 relative"
                     onClick={() => setCartOpen(true)}
                   >
                     <ShoppingCart className="h-5 w-5" />
                     {totalItems > 0 && (
-                      <span className="absolute -top-0.5 -right-0.5 h-4 w-4 rounded-full bg-emerald-600 text-white text-[10px] flex items-center justify-center font-bold">
+                      <span className="absolute -top-0.5 -right-0.5 h-5 w-5 rounded-full bg-accent text-white text-[10px] flex items-center justify-center font-bold">
                         {totalItems}
                       </span>
                     )}
@@ -206,7 +256,6 @@ const Header = () => {
         </div>
       </header>
 
-      {/* Cart Drawer */}
       <CartDrawer open={cartOpen} onOpenChange={setCartOpen} />
     </>
   );
