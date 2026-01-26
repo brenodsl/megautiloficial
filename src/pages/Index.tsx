@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { Truck, ShieldCheck, ShoppingCart, Star, Check } from "lucide-react";
+import { Truck, ShieldCheck, ShoppingCart, Star, Check, MapPin } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import Header from "@/components/Header";
@@ -20,8 +20,8 @@ import { useUserLocation } from "@/hooks/useUserLocation";
 import AIChatBot from "@/components/AIChatBot";
 
 // PIX Icon Component
-const PixIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 512 512" fill="currentColor" className="h-4 w-4 flex-shrink-0">
+const PixIcon = ({ className = "h-4 w-4" }: { className?: string }) => (
+  <svg viewBox="0 0 512 512" fill="currentColor" className={className}>
     <path d="M242.4 292.5C247.8 287.1 257.1 287.1 262.5 292.5L339.5 369.5C353.7 383.7 372.5 391.5 392.5 391.5H407.7L310.6 488.6C280.3 518.9 231.7 518.9 201.4 488.6L103.3 390.5H112.5C132.5 390.5 151.3 382.7 165.5 368.5L242.4 291.6V292.5zM262.5 218.5C257.1 223.9 247.8 223.9 242.4 218.5L165.5 141.6C151.3 127.4 132.5 119.6 112.5 119.6H103.3L201.4 21.49C231.7-8.83 280.3-8.83 310.6 21.49L407.7 118.6H392.5C372.5 118.6 353.7 126.4 339.5 140.6L262.5 217.6V218.5zM112.5 142.1C126.7 142.1 140.3 147.6 150.5 157.9L227.4 234.8C234.3 241.7 243.1 245.9 252.5 247.1V264C243.1 265.2 234.3 269.4 227.4 276.3L150.5 353.2C140.3 363.5 126.7 369 112.5 369H80.19L21.49 310.3C-8.832 280-8.832 231.4 21.49 201.1L80.19 142.4H112.5V142.1zM431.8 369H399.5C385.3 369 371.7 363.5 361.5 353.2L284.6 276.3C277.7 269.4 268.9 265.2 259.5 264V247.1C268.9 245.9 277.7 241.7 284.6 234.8L361.5 157.9C371.7 147.6 385.3 142.1 399.5 142.1H431.8L490.5 200.8C520.8 231.1 520.8 279.7 490.5 310L431.8 368.7V369z"/>
   </svg>
 );
@@ -86,7 +86,7 @@ const Index = () => {
             <span className="text-border">›</span>
             <span>Tênis de Corrida</span>
             <span className="text-border">›</span>
-            <span className="text-foreground font-medium">Carbon 3.0</span>
+            <span className="text-primary font-medium">Carbon 3.0</span>
           </nav>
         </div>
       </div>
@@ -129,52 +129,65 @@ const Index = () => {
           </p>
 
           {/* Price Section */}
-          <div className="mt-5 bg-secondary/30 rounded-xl p-4">
+          <div className="mt-5 bg-secondary/40 rounded-2xl p-5 border border-primary/10">
             <div className="flex items-center gap-2 mb-1">
               <span className="text-sm text-muted-foreground line-through">
-                De R$ {displayOriginalPrice.toFixed(2).replace(".", ",")}
+                De: R$ {displayOriginalPrice.toFixed(2).replace(".", ",")}
               </span>
-              <span className="bg-accent text-white text-xs font-bold px-2 py-0.5 rounded">
+              <span className="bg-accent text-white text-xs font-bold px-2.5 py-1 rounded-lg">
                 {discountPercent}% OFF
               </span>
             </div>
-            <div className="text-3xl font-black text-primary">
+            <div className="text-4xl font-black text-primary">
               R$ {unitPrice.toFixed(2).replace(".", ",")}
             </div>
-            <div className="flex items-center gap-1.5 text-sm text-success mt-1">
-              <PixIcon />
-              <span className="font-medium">à vista no PIX</span>
+            <div className="flex items-center gap-1.5 text-sm text-success mt-1.5">
+              <PixIcon className="h-4 w-4" />
+              <span className="font-semibold">à vista no PIX</span>
             </div>
-            <p className="text-xs text-muted-foreground mt-1">
+            <p className="text-xs text-muted-foreground mt-1.5 flex items-center gap-1">
+              <span className="inline-block w-4 h-4 bg-muted rounded flex items-center justify-center text-[10px]">💳</span>
               ou 12x de R$ {(unitPrice / 12).toFixed(2).replace(".", ",")} sem juros
             </p>
           </div>
 
-          {/* Guarantees Row */}
-          <div className="mt-5 grid grid-cols-4 gap-2">
-            <div className="flex flex-col items-center text-center">
-              <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center mb-1">
-                <ShieldCheck className="h-4 w-4 text-primary" />
+          {/* Guarantees Grid */}
+          <div className="mt-5 grid grid-cols-2 gap-3">
+            <div className="flex items-center gap-3 bg-secondary/40 rounded-xl p-3">
+              <div className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center flex-shrink-0">
+                <ShieldCheck className="h-5 w-5 text-primary" />
               </div>
-              <span className="text-[10px] text-muted-foreground leading-tight">Compra<br/>Segura</span>
+              <div>
+                <p className="text-xs font-bold text-foreground">Compra Segura</p>
+                <p className="text-[10px] text-muted-foreground">Site 100% protegido</p>
+              </div>
             </div>
-            <div className="flex flex-col items-center text-center">
-              <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center mb-1">
-                <PixIcon />
+            <div className="flex items-center gap-3 bg-secondary/40 rounded-xl p-3">
+              <div className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center flex-shrink-0">
+                <PixIcon className="h-5 w-5 text-primary" />
               </div>
-              <span className="text-[10px] text-muted-foreground leading-tight">Pagamento<br/>PIX</span>
+              <div>
+                <p className="text-xs font-bold text-foreground">Pagamento PIX</p>
+                <p className="text-[10px] text-muted-foreground">Desconto especial à vista</p>
+              </div>
             </div>
-            <div className="flex flex-col items-center text-center">
-              <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center mb-1">
-                <Truck className="h-4 w-4 text-primary" />
+            <div className="flex items-center gap-3 bg-secondary/40 rounded-xl p-3">
+              <div className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center flex-shrink-0">
+                <Truck className="h-5 w-5 text-primary" />
               </div>
-              <span className="text-[10px] text-muted-foreground leading-tight">Entrega<br/>Garantida</span>
+              <div>
+                <p className="text-xs font-bold text-foreground">Entrega Garantida</p>
+                <p className="text-[10px] text-muted-foreground">Frete grátis todo Brasil</p>
+              </div>
             </div>
-            <div className="flex flex-col items-center text-center">
-              <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center mb-1">
-                <Check className="h-4 w-4 text-primary" />
+            <div className="flex items-center gap-3 bg-secondary/40 rounded-xl p-3">
+              <div className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center flex-shrink-0">
+                <Check className="h-5 w-5 text-primary" />
               </div>
-              <span className="text-[10px] text-muted-foreground leading-tight">Garantia<br/>12 meses</span>
+              <div>
+                <p className="text-xs font-bold text-foreground">Garantia 12 meses</p>
+                <p className="text-[10px] text-muted-foreground">Cobertura total</p>
+              </div>
             </div>
           </div>
 
@@ -222,8 +235,8 @@ const Index = () => {
             )}
           </div>
 
-          {/* Quick Benefits */}
-          <div className="mt-5 flex items-center justify-center gap-6 text-xs text-muted-foreground">
+          {/* Quick Benefits Row */}
+          <div className="mt-5 flex items-center justify-center gap-4 text-xs text-muted-foreground border-t border-border pt-4">
             <span className="flex items-center gap-1">
               <Check className="h-3.5 w-3.5 text-success" />
               Compra Segura
