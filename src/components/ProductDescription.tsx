@@ -21,15 +21,19 @@ const ProductDescription = () => {
           <AccordionContent className="pb-4">
             <div className="space-y-4 text-sm text-muted-foreground leading-relaxed">
               <p>
-                O <strong className="text-foreground">Tênis de Corrida Carbon 3.0</strong> é a escolha perfeita para corredores que buscam performance máxima. Com tecnologia avançada de <strong className="text-foreground">placa de carbono</strong>, oferece retorno de energia excepcional e propulsão otimizada.
+                O <strong className="text-foreground">Kit 3 Câmeras Wi-Fi Full HD com Lente Dupla</strong> é a solução completa para a segurança da sua casa ou empresa. Com tecnologia avançada de <strong className="text-foreground">lente dupla (3,6mm + 6mm)</strong>, oferece imagens de alta qualidade tanto de perto quanto de longe.
               </p>
               
               <p>
-                O <strong className="text-foreground">amortecimento premium</strong> garante absorção de impactos com clareza excepcional, ideal para treinos intensos. O sistema de <strong className="text-foreground">malha respirável</strong> mantém seus pés frescos durante toda a corrida.
+                A <strong className="text-foreground">visão noturna colorida</strong> garante monitoramento 24 horas com clareza excepcional, mesmo em ambientes com pouca luz. O sistema de <strong className="text-foreground">rastreamento humano inteligente</strong> detecta e segue automaticamente pessoas em movimento, enviando alertas em tempo real para seu celular.
               </p>
               
               <p>
-                Com <strong className="text-foreground">design ergonômico</strong> e material antiderrapante, o tênis é resistente e perfeito para uso interno e externo. A <strong className="text-foreground">tecnologia ultra leve</strong> permite maior agilidade e conforto.
+                Com <strong className="text-foreground">proteção IP66</strong>, as câmeras são resistentes à água e poeira, perfeitas para uso interno e externo. O <strong className="text-foreground">áudio bidirecional</strong> permite que você ouça e fale através do app, ideal para comunicação com familiares ou para alertar intrusos.
+              </p>
+
+              <p>
+                Configure facilmente através do app <strong className="text-foreground">iCSee</strong>, disponível para iOS e Android. Armazene suas gravações em cartão SD (até 128GB) ou utilize o armazenamento em nuvem.
               </p>
             </div>
           </AccordionContent>
@@ -48,11 +52,12 @@ const ProductDescription = () => {
           <AccordionContent className="pb-4">
             <ul className="space-y-2.5">
               {[
-                "1x Tênis Carbon 3.0 (par)",
-                "1x Palmilha extra de conforto",
-                "1x Saco organizador",
-                "1x Cadarço reserva",
-                "1x Manual de cuidados",
+                "3x Câmeras Wi-Fi Full HD 1080P",
+                "3x Suportes de parede com parafusos",
+                "3x Cabos USB de alimentação (2m)",
+                "3x Fontes de energia 5V/2A",
+                "1x Manual de instalação em português",
+                "1x Adesivo de aviso de vigilância",
                 "Garantia de 12 meses",
               ].map((item, index) => (
                 <li key={index} className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -77,11 +82,15 @@ const ProductDescription = () => {
           <AccordionContent className="pb-4">
             <div className="grid grid-cols-2 gap-3">
               {[
-                { label: "Material", value: "Malha respirável + Carbono" },
-                { label: "Peso", value: "220g (por pé)" },
-                { label: "Solado", value: "Borracha antiderrapante" },
-                { label: "Amortecimento", value: "Espuma de alta densidade" },
-                { label: "Tamanhos", value: "33 ao 45" },
+                { label: "Resolução", value: "Full HD 1080P" },
+                { label: "Lentes", value: "Dupla 3,6mm + 6mm" },
+                { label: "Visão Noturna", value: "Colorida até 15m" },
+                { label: "Proteção", value: "IP66 (água/poeira)" },
+                { label: "Áudio", value: "Bidirecional" },
+                { label: "Armazenamento", value: "SD até 128GB / Nuvem" },
+                { label: "Conectividade", value: "Wi-Fi 2.4GHz" },
+                { label: "App", value: "iCSee (iOS/Android)" },
+                { label: "Alimentação", value: "5V/2A DC" },
                 { label: "Garantia", value: "12 meses" },
               ].map((spec, index) => (
                 <div key={index} className="bg-secondary/30 rounded-lg p-3">

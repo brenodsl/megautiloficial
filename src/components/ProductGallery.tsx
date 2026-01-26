@@ -1,52 +1,38 @@
-import { useState, useEffect, useCallback, useRef } from "react";
-import { Play } from "lucide-react";
+import { useState, useEffect, useCallback } from "react";
 import useEmblaCarousel from "embla-carousel-react";
-import tenisMain from "@/assets/tenis-main.webp";
-import tenis2 from "@/assets/tenis-2.webp";
-import tenis3 from "@/assets/tenis-3.webp";
-import tenis4 from "@/assets/tenis-4.webp";
-import tenis5 from "@/assets/tenis-5.webp";
-import tenis6 from "@/assets/tenis-6.webp";
-import tenis7 from "@/assets/tenis-7.webp";
-import tenisVideo from "@/assets/tenis-video.mp4";
-import { colors } from "@/components/ColorSelector";
-
-interface ProductGalleryProps {
-  selectedColor: string;
-}
+import cameraMain from "@/assets/camera-main.png";
+import camera2 from "@/assets/camera-2.jpg";
+import camera3 from "@/assets/camera-3.jpg";
+import camera4 from "@/assets/camera-4.jpg";
+import camera5 from "@/assets/camera-5.jpg";
+import camera6 from "@/assets/camera-6.jpg";
+import camera7 from "@/assets/camera-7.jpg";
+import camera8 from "@/assets/camera-8.jpg";
+import camera9 from "@/assets/camera-9.jpg";
 
 interface MediaItem {
   id: number;
-  type: "video" | "image";
+  type: "image";
   src: string;
   alt: string;
-  thumbnail?: string;
 }
 
-const baseImages: MediaItem[] = [
-  { id: 0, type: "video", src: tenisVideo, alt: "Max Runner - Vídeo", thumbnail: tenisMain },
-  { id: 2, type: "image", src: tenis2, alt: "Max Runner - Vista Lateral" },
-  { id: 3, type: "image", src: tenis3, alt: "Max Runner - Vista Traseira" },
-  { id: 4, type: "image", src: tenis4, alt: "Max Runner - Detalhe" },
-  { id: 5, type: "image", src: tenis5, alt: "Max Runner - Sola" },
-  { id: 6, type: "image", src: tenis6, alt: "Max Runner - Vista Angular" },
-  { id: 7, type: "image", src: tenis7, alt: "Max Runner - Vista Traseira" },
+const mediaItems: MediaItem[] = [
+  { id: 1, type: "image", src: cameraMain, alt: "Kit 3 Câmeras Wi-Fi - Vista Principal" },
+  { id: 2, type: "image", src: camera2, alt: "Kit 3 Câmeras Wi-Fi - Detalhe" },
+  { id: 3, type: "image", src: camera3, alt: "Kit 3 Câmeras Wi-Fi - Instalação" },
+  { id: 4, type: "image", src: camera4, alt: "Kit 3 Câmeras Wi-Fi - App" },
+  { id: 5, type: "image", src: camera5, alt: "Kit 3 Câmeras Wi-Fi - Visão Noturna" },
+  { id: 6, type: "image", src: camera6, alt: "Kit 3 Câmeras Wi-Fi - Especificações" },
+  { id: 7, type: "image", src: camera7, alt: "Kit 3 Câmeras Wi-Fi - Recursos" },
+  { id: 8, type: "image", src: camera8, alt: "Kit 3 Câmeras Wi-Fi - Conexão" },
+  { id: 9, type: "image", src: camera9, alt: "Kit 3 Câmeras Wi-Fi - Vista Completa" },
 ];
 
-const ProductGallery = ({ selectedColor }: ProductGalleryProps) => {
+const ProductGallery = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const prevColorRef = useRef(selectedColor);
   
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, dragFree: false });
-
-  const selectedColorData = colors.find(c => c.id === selectedColor);
-  const mediaItems: MediaItem[] = selectedColorData 
-    ? [
-        baseImages[0],
-        { id: -1, type: "image", src: selectedColorData.image, alt: `Max Runner - ${selectedColorData.name}` },
-        ...baseImages.slice(1)
-      ]
-    : baseImages;
 
   const onSelect = useCallback(() => {
     if (!emblaApi) return;
@@ -61,20 +47,13 @@ const ProductGallery = ({ selectedColor }: ProductGalleryProps) => {
     };
   }, [emblaApi, onSelect]);
 
-  useEffect(() => {
-    if (emblaApi && selectedColor !== prevColorRef.current) {
-      prevColorRef.current = selectedColor;
-      emblaApi.scrollTo(1);
-    }
-  }, [selectedColor, emblaApi]);
-
   const scrollTo = (index: number) => {
     emblaApi?.scrollTo(index);
   };
 
   return (
     <div id="produto" className="space-y-3">
-      {/* Main Image/Video Display with Discount Badge */}
+      {/* Main Image Display with Discount Badge */}
       <div className="relative aspect-square overflow-hidden rounded-2xl bg-white">
         {/* Discount Badge */}
         <div className="absolute top-4 left-4 z-10 bg-accent text-white text-sm font-bold px-3 py-1.5 rounded-lg shadow-lg">
@@ -85,26 +64,14 @@ const ProductGallery = ({ selectedColor }: ProductGalleryProps) => {
           <div className="flex h-full">
             {mediaItems.map((item) => (
               <div key={item.id} className="flex-[0_0_100%] min-w-0 h-full">
-                {item.type === "video" ? (
-                  <video
-                    src={item.src}
-                    autoPlay
-                    loop
-                    muted
-                    playsInline
-                    preload="metadata"
-                    className="h-full w-full object-contain bg-gradient-to-b from-gray-50 to-white"
-                  />
-                ) : (
-                  <img
-                    src={item.src}
-                    alt={item.alt}
-                    className="h-full w-full object-contain bg-gradient-to-b from-gray-50 to-white"
-                    loading={item.id === -1 ? "eager" : "lazy"}
-                    decoding="async"
-                    fetchPriority={item.id === -1 ? "high" : "auto"}
-                  />
-                )}
+                <img
+                  src={item.src}
+                  alt={item.alt}
+                  className="h-full w-full object-contain bg-gradient-to-b from-gray-50 to-white"
+                  loading={item.id === 1 ? "eager" : "lazy"}
+                  decoding="async"
+                  fetchPriority={item.id === 1 ? "high" : "auto"}
+                />
               </div>
             ))}
           </div>
@@ -125,28 +92,13 @@ const ProductGallery = ({ selectedColor }: ProductGalleryProps) => {
               }
             `}
           >
-            {item.type === "video" ? (
-              <>
-                <img
-                  src={item.thumbnail || tenisMain}
-                  alt={item.alt}
-                  className="h-full w-full object-cover"
-                  loading="lazy"
-                  decoding="async"
-                />
-                <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                  <Play className="h-4 w-4 text-white fill-white" />
-                </div>
-              </>
-            ) : (
-              <img
-                src={item.src}
-                alt={item.alt}
-                className="h-full w-full object-cover"
-                loading="lazy"
-                decoding="async"
-              />
-            )}
+            <img
+              src={item.src}
+              alt={item.alt}
+              className="h-full w-full object-cover"
+              loading="lazy"
+              decoding="async"
+            />
           </button>
         ))}
       </div>

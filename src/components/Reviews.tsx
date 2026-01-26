@@ -1,25 +1,12 @@
 import { useState, useMemo, useEffect } from "react";
-import { Star, ThumbsUp, X, Play, MapPin, CheckCircle } from "lucide-react";
+import { Star, ThumbsUp, X, MapPin, CheckCircle } from "lucide-react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import ReviewForm from "@/components/ReviewForm";
 import { supabase } from "@/integrations/supabase/client";
-import review1 from "@/assets/review-1.webp";
-import review2 from "@/assets/review-2.webp";
-import review4 from "@/assets/review-4.webp";
-import reviewCamila1 from "@/assets/review-camila-1.webp";
-import reviewCamila2 from "@/assets/review-camila-2.webp";
-import reviewSabrina1 from "@/assets/review-sabrina-1.webp";
-import reviewSabrina2 from "@/assets/review-sabrina-2.webp";
-import avaliacao01Video from "@/assets/avaliacao01-video.mp4";
-import avaliacao01Img from "@/assets/avaliacao01-img.png";
-import avaliacao02Img1 from "@/assets/avaliacao02-img1.webp";
-import avaliacao02Img2 from "@/assets/avaliacao02-img2.webp";
-import avaliacao03Video from "@/assets/avaliacao03-video.mp4";
-import avaliacao03Img from "@/assets/avaliacao03-img.webp";
-import avaliacao04Img1 from "@/assets/avaliacao04-img1.webp";
-import avaliacao04Img2 from "@/assets/avaliacao04-img2.webp";
-import avaliacao05Video from "@/assets/avaliacao05-video.mp4";
-import avaliacao05Img from "@/assets/avaliacao05-img.webp";
+import reviewCamera1 from "@/assets/review-camera-1.webp";
+import reviewCamera2 from "@/assets/review-camera-2.webp";
+import reviewCamera3 from "@/assets/review-camera-3.webp";
+import reviewCamera4 from "@/assets/review-camera-4.webp";
 
 const getDynamicDate = (daysAgo: number): string => {
   const date = new Date();
@@ -28,9 +15,8 @@ const getDynamicDate = (daysAgo: number): string => {
 };
 
 interface ReviewMedia {
-  type: 'image' | 'video';
+  type: 'image';
   src: string;
-  thumbnail?: string;
 }
 
 interface Review {
@@ -51,64 +37,39 @@ const reviewsData: Review[] = [
     location: "São Paulo, SP",
     daysAgo: 1,
     rating: 5,
-    comment: "Entrega rápida, produto excelente! Os tênis chegaram bem embalados e funcionam perfeitamente. A qualidade da...",
+    comment: "Entrega rápida, produto excelente! As 3 câmeras chegaram bem embaladas e funcionam perfeitamente. A qualidade da imagem é incrível!",
     helpful: 127,
-    media: [
-      { type: 'video', src: avaliacao01Video, thumbnail: avaliacao01Img },
-      { type: 'image', src: avaliacao01Img },
-    ],
+    media: [{ type: 'image', src: reviewCamera1 }],
   },
   {
     id: 2,
-    name: "Bruno R.",
+    name: "Carlos M.",
     location: "Rio de Janeiro, RJ",
     daysAgo: 2,
     rating: 5,
-    comment: "Tênis leve, material resistente, respirável, bom acabamento, macio, te impulsiona pra frente, excelente tênis! Recomendo.",
-    helpful: 89,
-    media: [
-      { type: 'image', src: avaliacao02Img1 },
-      { type: 'image', src: avaliacao02Img2 },
-    ],
+    comment: "Qualidade impressionante! Instalei em casa e a imagem é muito nítida, mesmo à noite. Super recomendo!",
+    helpful: 98,
+    media: [{ type: 'image', src: reviewCamera2 }],
   },
   {
     id: 3,
-    name: "Juliana M.",
+    name: "Ana Paula S.",
     location: "Belo Horizonte, MG",
     daysAgo: 3,
     rating: 5,
-    comment: "Surpreendeu as minhas expectativas, chegou rápido a numeração bate, é leve, confortável, adorei.",
+    comment: "Super recomendo! O app funciona muito bem e consigo ver tudo pelo celular de qualquer lugar.",
     helpful: 76,
-    media: [
-      { type: 'video', src: avaliacao03Video, thumbnail: avaliacao03Img },
-      { type: 'image', src: avaliacao03Img },
-    ],
+    media: [{ type: 'image', src: reviewCamera3 }],
   },
   {
     id: 4,
-    name: "Carlos E.",
+    name: "Roberto F.",
     location: "Curitiba, PR",
     daysAgo: 4,
     rating: 5,
-    comment: "Chegou bem rapidão, dentro do prazo. Pedi um numero maior. Calço 40 e pedi 41. Ficou perfeito!! Material de alta qualidade.",
-    helpful: 65,
-    media: [
-      { type: 'image', src: avaliacao04Img1 },
-      { type: 'image', src: avaliacao04Img2 },
-    ],
-  },
-  {
-    id: 5,
-    name: "Rafael S.",
-    location: "Porto Alegre, RS",
-    daysAgo: 5,
-    rating: 5,
-    comment: "Excepcional, muito bom mesmo, melhor do que pagar 1000 reais em um tênis de marca famosa.",
-    helpful: 92,
-    media: [
-      { type: 'video', src: avaliacao05Video, thumbnail: avaliacao05Img },
-      { type: 'image', src: avaliacao05Img },
-    ],
+    comment: "Chegou antes do prazo! Produto bem embalado e de ótima qualidade. As 3 câmeras funcionam perfeitamente.",
+    helpful: 64,
+    media: [{ type: 'image', src: reviewCamera4 }],
   },
 ];
 
@@ -215,17 +176,12 @@ const Reviews = () => {
                     className="relative h-20 w-20 rounded-lg overflow-hidden group cursor-pointer border border-border"
                   >
                     <img
-                      src={media.type === 'video' ? media.thumbnail : media.src}
+                      src={media.src}
                       alt={`Mídia do cliente ${review.name}`}
                       className="h-full w-full object-cover group-hover:scale-105 transition-transform"
                       loading="lazy"
                       decoding="async"
                     />
-                    {media.type === 'video' && (
-                      <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
-                        <Play className="h-6 w-6 text-white fill-white" />
-                      </div>
-                    )}
                   </button>
                 ))}
               </div>
@@ -313,20 +269,11 @@ const Reviews = () => {
           >
             <X className="h-5 w-5" />
           </button>
-          {selectedMedia?.type === 'video' ? (
-            <video
-              src={selectedMedia.src}
-              controls
-              autoPlay
-              className="w-full max-h-[80vh] object-contain"
-            />
-          ) : (
-            <img
-              src={selectedMedia?.src}
-              alt="Avaliação do cliente"
-              className="w-full max-h-[80vh] object-contain"
-            />
-          )}
+          <img
+            src={selectedMedia?.src}
+            alt="Avaliação do cliente"
+            className="w-full max-h-[80vh] object-contain"
+          />
         </DialogContent>
       </Dialog>
     </section>

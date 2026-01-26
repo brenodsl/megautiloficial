@@ -130,7 +130,7 @@ const Header = () => {
                       {/* Menu Header */}
                       <div className="p-4 border-b border-border bg-primary">
                         <span className="text-lg font-black text-white">
-                          MAX<span className="text-accent">RUNNER</span>
+                          GIGA<span className="text-accent">TEC</span>
                         </span>
                       </div>
                       
@@ -202,7 +202,7 @@ const Header = () => {
                 {/* Logo */}
                 <Link to="/" className="flex-shrink-0">
                   <span className="text-white font-black text-xl tracking-tight">
-                    MAX<span className="text-accent">RUNNER</span>
+                    GIGA<span className="text-accent">TEC</span>
                   </span>
                 </Link>
 

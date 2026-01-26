@@ -3,44 +3,7 @@ import { ShoppingCart, Plus, Minus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { useCart } from "@/contexts/CartContext";
-
-// Import color images
-import colorGradient from "@/assets/color-gradient.webp";
-import colorOrange from "@/assets/color-orange.webp";
-import colorMint from "@/assets/color-mint.webp";
-import colorPink from "@/assets/color-pink.webp";
-import colorPurple from "@/assets/color-purple.webp";
-import colorGreen from "@/assets/color-green.webp";
-import colorLime from "@/assets/color-lime.webp";
-import colorSunset from "@/assets/color-sunset.webp";
-import colorCreamOrange from "@/assets/color-cream-orange.webp";
-import colorOrangeHd from "@/assets/color-orange-hd.webp";
-
-const colorImages: Record<string, string> = {
-  gradient: colorGradient,
-  orange: colorOrange,
-  mint: colorMint,
-  pink: colorPink,
-  purple: colorPurple,
-  green: colorGreen,
-  lime: colorLime,
-  sunset: colorSunset,
-  "cream-orange": colorCreamOrange,
-  "orange-hd": colorOrangeHd,
-};
-
-const colorNames: Record<string, string> = {
-  gradient: "Gradient",
-  orange: "Orange",
-  mint: "Mint",
-  pink: "Pink",
-  purple: "Purple",
-  green: "Green",
-  lime: "Lime",
-  sunset: "Sunset",
-  "cream-orange": "Cream Orange",
-  "orange-hd": "Orange HD",
-};
+import cameraMain from "@/assets/camera-main.png";
 
 interface CartDrawerProps {
   open: boolean;
@@ -85,9 +48,9 @@ const CartDrawer = ({ open, onOpenChange }: CartDrawerProps) => {
                   {/* Product Image */}
                   <div className="w-20 h-20 rounded-lg overflow-hidden bg-white flex-shrink-0">
                     <img
-                      src={colorImages[item.colorId] || colorGradient}
-                      alt={item.colorName}
-                      className="w-full h-full object-cover"
+                      src={cameraMain}
+                      alt="Kit 3 Câmeras Wi-Fi"
+                      className="w-full h-full object-contain"
                       loading="lazy"
                       decoding="async"
                     />
@@ -96,10 +59,10 @@ const CartDrawer = ({ open, onOpenChange }: CartDrawerProps) => {
                   {/* Product Info */}
                   <div className="flex-1 min-w-0">
                     <h3 className="font-medium text-sm text-foreground truncate">
-                      Tênis Carbon 3.0
+                      Kit 3 Câmeras Wi-Fi
                     </h3>
                     <p className="text-xs text-muted-foreground">
-                      {colorNames[item.colorId] || item.colorName} • Tam. {item.size}
+                      Full HD 1080P • Visão Noturna
                     </p>
                     <p className="text-sm font-bold text-success mt-1">
                       R$ {item.price.toFixed(2).replace(".", ",")}
@@ -143,16 +106,16 @@ const CartDrawer = ({ open, onOpenChange }: CartDrawerProps) => {
 
             {/* Footer */}
             <div className="border-t border-border p-4 space-y-4">
-              {/* Promotion Banner - Encourage 2nd pair */}
+              {/* Promotion Banner - Encourage 2nd kit */}
               {totalItems === 1 && (
                 <div className="relative overflow-hidden bg-gradient-to-r from-emerald-600 to-emerald-500 rounded-xl p-3 shadow-md">
                   <div className="absolute top-0 right-0 w-16 h-16 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2" />
                   <div className="relative flex items-center gap-3">
                     <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
-                      <span className="text-lg">👟</span>
+                      <span className="text-lg">📦</span>
                     </div>
                     <div className="flex-1">
-                      <p className="font-semibold text-white text-sm">Adicione +1 par</p>
+                      <p className="font-semibold text-white text-sm">Adicione +1 kit</p>
                       <p className="text-emerald-100 text-xs">e ganhe <span className="font-bold text-white">20% OFF</span> no segundo!</p>
                     </div>
                   </div>
