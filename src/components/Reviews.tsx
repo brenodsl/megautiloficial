@@ -8,9 +8,6 @@ import reviewCamera2 from "@/assets/review-camera-2.webp";
 import reviewCamera3 from "@/assets/review-camera-3.webp";
 import reviewCamera4 from "@/assets/review-camera-4.webp";
 import reviewCamera5 from "@/assets/review-camera-5.webp";
-import reviewCamera6 from "@/assets/review-camera-6.webp";
-import reviewCamera7 from "@/assets/review-camera-7.webp";
-import reviewCamera8 from "@/assets/review-camera-8.webp";
 
 const getDynamicDate = (daysAgo: number): string => {
   const date = new Date();
@@ -41,7 +38,7 @@ const reviewsData: Review[] = [
     location: "São Paulo, SP",
     daysAgo: 1,
     rating: 5,
-    comment: "Entrega rápida, produto excelente! As 3 câmeras chegaram bem embaladas e funcionam perfeitamente. A qualidade da imagem é incrível!",
+    comment: "Câmera instalada no poste, imagem perfeita! A qualidade mesmo à distância é incrível, recomendo demais!",
     helpful: 127,
     media: [{ type: 'image', src: reviewCamera1 }],
   },
@@ -51,7 +48,7 @@ const reviewsData: Review[] = [
     location: "Rio de Janeiro, RJ",
     daysAgo: 2,
     rating: 5,
-    comment: "Qualidade impressionante! Instalei em casa e a imagem é muito nítida, mesmo à noite. Super recomendo!",
+    comment: "Produto de excelente qualidade! Acabamento premium e funcionamento perfeito. Super satisfeito!",
     helpful: 98,
     media: [{ type: 'image', src: reviewCamera2 }],
   },
@@ -61,7 +58,7 @@ const reviewsData: Review[] = [
     location: "Belo Horizonte, MG",
     daysAgo: 3,
     rating: 5,
-    comment: "Super recomendo! O app funciona muito bem e consigo ver tudo pelo celular de qualquer lugar.",
+    comment: "Chegou super bem embalado! Produto original com todos os acessórios. Instalação super fácil!",
     helpful: 76,
     media: [{ type: 'image', src: reviewCamera3 }],
   },
@@ -71,7 +68,7 @@ const reviewsData: Review[] = [
     location: "Curitiba, PR",
     daysAgo: 4,
     rating: 5,
-    comment: "Chegou antes do prazo! Produto bem embalado e de ótima qualidade. As 3 câmeras funcionam perfeitamente.",
+    comment: "Embalagem original WiFi Smart Camera! Produto idêntico ao anunciado, qualidade top!",
     helpful: 64,
     media: [{ type: 'image', src: reviewCamera4 }],
   },
@@ -81,39 +78,9 @@ const reviewsData: Review[] = [
     location: "Salvador, BA",
     daysAgo: 5,
     rating: 5,
-    comment: "Excelente custo-benefício! Câmeras funcionando perfeitamente, homologadas pela Anatel. Compra segura!",
+    comment: "Kit completo com câmera e todos os acessórios! Visão noturna incrível, recomendo!",
     helpful: 52,
     media: [{ type: 'image', src: reviewCamera5 }],
-  },
-  {
-    id: 6,
-    name: "João Pedro",
-    location: "Fortaleza, CE",
-    daysAgo: 6,
-    rating: 5,
-    comment: "Produto original! Veio lacrado e com nota fiscal. Instalação super fácil pelo app iCSee.",
-    helpful: 45,
-    media: [{ type: 'image', src: reviewCamera6 }],
-  },
-  {
-    id: 7,
-    name: "Luciana R.",
-    location: "Porto Alegre, RS",
-    daysAgo: 7,
-    rating: 5,
-    comment: "Embalagem perfeita! Tudo organizado e bem protegido. Câmeras de excelente qualidade!",
-    helpful: 38,
-    media: [{ type: 'image', src: reviewCamera7 }],
-  },
-  {
-    id: 8,
-    name: "Pedro H.",
-    location: "Brasília, DF",
-    daysAgo: 8,
-    rating: 5,
-    comment: "Kit completo! Veio com todas as 3 câmeras conforme anunciado. Qualidade top, recomendo!",
-    helpful: 31,
-    media: [{ type: 'image', src: reviewCamera8 }],
   },
 ];
 
