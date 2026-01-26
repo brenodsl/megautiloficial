@@ -1,35 +1,45 @@
-import { Zap, Wind, Footprints, Scale, Activity, Trophy } from "lucide-react";
+import { Camera, Moon, Wifi, MonitorPlay, Mic2, Droplets, Smartphone, UserCheck } from "lucide-react";
 
 const benefits = [
   {
-    icon: Zap,
-    title: "Placa de Carbono",
-    description: "Retorno de energia excepcional",
+    icon: Camera,
+    title: "Lente Dupla",
+    description: "3,6mm + 6mm para imagem superior",
   },
   {
-    icon: Wind,
-    title: "Malha Respirável",
-    description: "Pés frescos durante a corrida",
+    icon: Moon,
+    title: "Visão Noturna Colorida",
+    description: "Imagens nítidas até 15m no escuro",
   },
   {
-    icon: Footprints,
-    title: "Amortecimento Premium",
-    description: "Absorção de impactos",
+    icon: Wifi,
+    title: "WiFi Integrado",
+    description: "Conecte ao app e monitore de qualquer lugar",
   },
   {
-    icon: Scale,
-    title: "Ultra Leve",
-    description: "Apenas 220g",
+    icon: MonitorPlay,
+    title: "Full HD 1080P",
+    description: "Gravação em alta definição",
   },
   {
-    icon: Activity,
-    title: "Antiderrapante",
-    description: "Maior aderência",
+    icon: Mic2,
+    title: "Áudio Bidirecional",
+    description: "Fale e ouça pelo app",
   },
   {
-    icon: Trophy,
-    title: "Design Ergonômico",
-    description: "Corridas longas",
+    icon: Droplets,
+    title: "IP66 à Prova D'água",
+    description: "Uso interno e externo",
+  },
+  {
+    icon: Smartphone,
+    title: "App iCSee",
+    description: "Controle total pelo celular",
+  },
+  {
+    icon: UserCheck,
+    title: "Rastreamento Humano",
+    description: "Alertas inteligentes de movimento",
   },
 ];
 

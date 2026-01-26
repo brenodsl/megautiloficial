@@ -13,7 +13,7 @@ interface Message {
 const AIChatBot = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'assistant', content: 'Olá! 👋 Sou o João Lucas, atendente da Max Runner. Como posso ajudar você hoje?' }
+    { role: 'assistant', content: 'Olá! 👋 Sou a Ana, especialista em câmeras de segurança da GIGATEC. Como posso ajudar você hoje?' }
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -51,7 +51,7 @@ const AIChatBot = () => {
       console.error('Error sending message:', error);
       setMessages(prev => [...prev, { 
         role: 'assistant', 
-        content: 'Desculpe, tive um problema. Tente novamente ou envie um e-mail para contato@maxrunner.com.br - respondemos em menos de 10 min! 📧' 
+        content: 'Desculpe, tive um problema. Tente novamente ou envie um e-mail para contato@gigatec.com.br - respondemos em menos de 10 min! 📧' 
       }]);
     } finally {
       setIsLoading(false);
@@ -70,35 +70,36 @@ const AIChatBot = () => {
       {/* Floating Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-4 right-4 z-50 w-16 h-16 rounded-full bg-gray-900 hover:bg-gray-800 flex items-center justify-center text-white shadow-lg hover:scale-110 transition-all duration-200 overflow-hidden border-2 border-white"
+        className="fixed bottom-4 right-4 z-50 w-16 h-16 rounded-full bg-primary hover:bg-primary/90 flex items-center justify-center text-white shadow-lg hover:scale-110 transition-all duration-200 overflow-hidden border-2 border-white"
         aria-label="Abrir chat de suporte"
       >
         {isOpen ? (
           <X className="w-6 h-6" />
         ) : (
-          <img 
-            src={perfilAtendente} 
-            alt="João Lucas" 
-            className="w-full h-full object-cover"
-            loading="lazy"
-            decoding="async"
-          />
+          <MessageCircle className="w-7 h-7" />
         )}
       </button>
+
+      {/* Floating Label */}
+      {!isOpen && (
+        <div className="fixed bottom-[88px] right-4 z-40 bg-white rounded-lg shadow-lg px-3 py-2 text-sm font-medium text-foreground animate-bounce">
+          👋 Dúvidas sobre as câmeras?
+          <br />
+          <span className="text-muted-foreground text-xs">Fale com nossa especialista!</span>
+        </div>
+      )}
 
       {/* Chat Window */}
       {isOpen && (
         <div className="fixed bottom-[88px] right-4 z-50 w-[350px] max-w-[calc(100vw-32px)] h-[480px] max-h-[calc(100vh-120px)] bg-white border border-gray-200 rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-bottom-5 duration-300">
-          {/* Header with Attendant */}
-          <div className="bg-gray-900 p-4 text-white flex items-center gap-3">
-            <img 
-              src={perfilAtendente} 
-              alt="João Lucas - Atendente" 
-              className="w-12 h-12 rounded-full object-cover border-2 border-white/20"
-            />
+          {/* Header */}
+          <div className="bg-primary p-4 text-white flex items-center gap-3">
+            <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-2xl">
+              📹
+            </div>
             <div>
-              <h3 className="font-bold text-lg">João Lucas</h3>
-              <p className="text-sm text-gray-300">Atendente Max Runner</p>
+              <h3 className="font-bold text-lg">Suporte GIGATEC</h3>
+              <p className="text-sm text-white/80">Especialista em segurança</p>
             </div>
           </div>
 
@@ -112,7 +113,7 @@ const AIChatBot = () => {
                 <div
                   className={`max-w-[80%] p-3 rounded-2xl text-sm ${
                     message.role === 'user'
-                      ? 'bg-gray-900 text-white rounded-br-md'
+                      ? 'bg-primary text-white rounded-br-md'
                       : 'bg-white text-gray-800 border border-gray-200 rounded-bl-md shadow-sm'
                   }`}
                 >
@@ -138,14 +139,14 @@ const AIChatBot = () => {
                 onChange={(e) => setInput(e.target.value)}
                 onKeyPress={handleKeyPress}
                 placeholder="Digite sua mensagem..."
-                className="flex-1 bg-gray-100 border-0 focus-visible:ring-gray-400"
+                className="flex-1 bg-gray-100 border-0 focus-visible:ring-primary/40"
                 disabled={isLoading}
               />
               <Button
                 onClick={sendMessage}
                 disabled={!input.trim() || isLoading}
                 size="icon"
-                className="bg-gray-900 hover:bg-gray-800 shrink-0"
+                className="bg-primary hover:bg-primary/90 shrink-0"
               >
                 <Send className="w-4 h-4" />
               </Button>

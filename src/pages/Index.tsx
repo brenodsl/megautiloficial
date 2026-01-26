@@ -1,12 +1,9 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Truck, ShieldCheck, ShoppingCart, Star, Check, MapPin } from "lucide-react";
-import { toast } from "sonner";
+import { Truck, ShieldCheck, ShoppingCart, Star, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Header from "@/components/Header";
 import ProductGallery from "@/components/ProductGallery";
-import ColorSelector, { colors } from "@/components/ColorSelector";
-import SizeSelector, { SizeSelectorRef } from "@/components/SizeSelector";
 import ScarcityBanner from "@/components/ScarcityBanner";
 import Reviews from "@/components/Reviews";
 import Benefits from "@/components/Benefits";
@@ -16,7 +13,6 @@ import Footer from "@/components/Footer";
 import { useCart } from "@/contexts/CartContext";
 import { usePresence } from "@/hooks/usePresence";
 import { trackPixelEvent } from "@/hooks/usePixels";
-import { useUserLocation } from "@/hooks/useUserLocation";
 import AIChatBot from "@/components/AIChatBot";
 
 // PIX Icon Component
@@ -29,12 +25,8 @@ const PixIcon = ({ className = "h-4 w-4" }: { className?: string }) => (
 const Index = () => {
   const navigate = useNavigate();
   const { addItem, totalItems, unitPrice, displayOriginalPrice } = useCart();
-  const sizeSelectorRef = useRef<SizeSelectorRef>(null);
-  const [selectedSize, setSelectedSize] = useState<number | null>(null);
-  const userLocation = useUserLocation();
 
   usePresence("/");
-  const [selectedColor, setSelectedColor] = useState<string>("gradient");
 
   const discountPercent = displayOriginalPrice > 0 
     ? Math.round(((displayOriginalPrice - unitPrice) / displayOriginalPrice) * 100) 
@@ -43,8 +35,8 @@ const Index = () => {
   useEffect(() => {
     trackPixelEvent('ViewContent', {
       content_type: 'product',
-      content_id: 'carbon-3-0',
-      content_name: 'Tênis de Corrida Chunta Carbon 3.0',
+      content_id: 'camera-kit-3',
+      content_name: 'Kit 3 Câmeras Wi-Fi com Sensor de Movimento',
       value: unitPrice,
       currency: 'BRL',
     });
@@ -56,21 +48,17 @@ const Index = () => {
       return;
     }
     
-    if (!selectedSize) {
-      sizeSelectorRef.current?.showError();
-      return;
-    }
-    
     trackPixelEvent('AddToCart', {
       content_type: 'product',
-      content_id: 'carbon-3-0',
-      content_name: 'Tênis de Corrida Chunta Carbon 3.0',
+      content_id: 'camera-kit-3',
+      content_name: 'Kit 3 Câmeras Wi-Fi com Sensor de Movimento',
       quantity: 1,
       value: unitPrice,
       currency: 'BRL',
     });
     
-    addItem(selectedColor, selectedSize, 1);
+    // Add camera kit to cart (no color/size selection needed)
+    addItem("default", 0, 1);
     navigate("/checkout");
   };
 
@@ -82,11 +70,11 @@ const Index = () => {
       <div className="bg-white border-b border-border">
         <div className="max-w-lg mx-auto px-4 py-2.5">
           <nav className="flex items-center gap-1.5 text-xs text-muted-foreground">
-            <span>Calçados</span>
+            <span>Eletrônicos</span>
             <span className="text-border">›</span>
-            <span>Tênis de Corrida</span>
+            <span>Segurança</span>
             <span className="text-border">›</span>
-            <span className="text-primary font-medium">Carbon 3.0</span>
+            <span className="text-primary font-medium">Kit Câmeras WiFi</span>
           </nav>
         </div>
       </div>
@@ -95,7 +83,7 @@ const Index = () => {
         {/* Product Gallery Card */}
         <div className="bg-white">
           <div className="px-4 py-4">
-            <ProductGallery selectedColor={selectedColor} />
+            <ProductGallery />
           </div>
         </div>
 
@@ -103,10 +91,10 @@ const Index = () => {
         <div className="bg-white mt-2 px-4 py-5">
           {/* Product Title */}
           <h1 className="text-xl font-bold text-foreground leading-tight">
-            Tênis de Corrida Chunta Carbon 3.0
+            Kit 3 Câmeras Wi-Fi com Sensor de Movimento, Alarme Automático e à Prova d'Água
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Placa de Carbono • Ultra Leve • Profissional • Amortecimento Premium
+            Visão Noturna Colorida • IP66 • Áudio Bidirecional • Rastreamento Humano • App iCSee
           </p>
 
           {/* Rating */}
@@ -125,7 +113,7 @@ const Index = () => {
 
           {/* Seller */}
           <p className="text-xs text-muted-foreground mt-2">
-            Vendido e entregue por <span className="text-primary font-semibold">MAX RUNNER</span>
+            Vendido e entregue por <span className="text-primary font-semibold">GIGATEC</span>
           </p>
 
           {/* Price Section */}
@@ -191,23 +179,6 @@ const Index = () => {
             </div>
           </div>
 
-          {/* Color Selector */}
-          <div className="mt-6">
-            <ColorSelector 
-              selectedColor={selectedColor} 
-              onColorSelect={setSelectedColor} 
-            />
-          </div>
-
-          {/* Size Selector */}
-          <div className="mt-5">
-            <SizeSelector 
-              ref={sizeSelectorRef} 
-              selectedSize={selectedSize} 
-              onSizeSelect={setSelectedSize} 
-            />
-          </div>
-
           {/* Scarcity Banner */}
           <div className="mt-5">
             <ScarcityBanner />
@@ -218,21 +189,11 @@ const Index = () => {
             <Button
               onClick={handleBuyClick}
               size="lg"
-              className={`w-full h-14 font-bold text-base rounded-xl transition-all ${
-                (selectedSize || totalItems > 0)
-                  ? 'gradient-cta text-white glow-cta hover:opacity-90' 
-                  : 'bg-muted text-muted-foreground cursor-default hover:bg-muted'
-              }`}
+              className="w-full h-14 font-bold text-base rounded-xl gradient-cta text-white glow-cta hover:opacity-90 transition-all"
             >
               <ShoppingCart className="h-5 w-5 mr-2" />
               {totalItems > 0 ? 'Finalizar compra' : 'Comprar agora'}
             </Button>
-
-            {!selectedSize && totalItems === 0 && (
-              <p className="text-center text-xs text-muted-foreground mt-2">
-                Selecione cor e tamanho para continuar
-              </p>
-            )}
           </div>
 
           {/* Quick Benefits Row */}

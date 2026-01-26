@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
-import { colors, ColorOption } from "@/components/ColorSelector";
 import { fetchProductPrice } from "@/hooks/useProductPrice";
+import cameraMain from "@/assets/camera-main.png";
 
 export interface CartItem {
   id: string;
@@ -29,8 +29,8 @@ interface CartContextType {
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
-const DEFAULT_UNIT_PRICE = 77.98;
-const DEFAULT_ORIGINAL_PRICE = 239.80;
+const DEFAULT_UNIT_PRICE = 99.00;
+const DEFAULT_ORIGINAL_PRICE = 279.80;
 
 export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [items, setItems] = useState<CartItem[]>([]);
@@ -48,11 +48,8 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const addItem = (colorId: string, size: number, quantity: number = 1) => {
-    const color = colors.find(c => c.id === colorId);
-    if (!color) return;
-
     const existingItem = items.find(
-      item => item.colorId === colorId && item.size === size
+      item => item.colorId === colorId
     );
 
     if (existingItem) {
@@ -63,10 +60,10 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       ));
     } else {
       const newItem: CartItem = {
-        id: `${colorId}-${size}-${Date.now()}`,
+        id: `camera-kit-${Date.now()}`,
         colorId,
-        colorName: color.name,
-        colorImage: color.image,
+        colorName: "Kit 3 Câmeras",
+        colorImage: cameraMain,
         size,
         quantity,
         price: unitPrice,
@@ -96,7 +93,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
   const originalPrice = items.reduce((sum, item) => sum + (unitPrice * item.quantity), 0);
   
-  // Calculate progressive discount: 2nd pair onwards gets 20% off
+  // Calculate progressive discount: 2nd kit onwards gets 20% off
   const calculateDiscount = () => {
     if (totalItems < 2) return 0;
     // First item is full price, remaining items get 20% off
