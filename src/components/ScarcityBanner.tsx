@@ -1,10 +1,10 @@
-import { Zap } from "lucide-react";
+import { AlertTriangle } from "lucide-react";
 
 const ScarcityBanner = () => {
   return (
-    <div className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-xs font-semibold px-3 py-1.5 rounded-md shadow-md">
-      <Zap className="w-3.5 h-3.5 fill-current" />
-      <span>Últimas unidades</span>
+    <div className="flex items-center gap-2 bg-accent/10 border border-accent/30 text-accent px-4 py-2.5 rounded-lg">
+      <AlertTriangle className="w-4 h-4 flex-shrink-0" />
+      <span className="text-sm font-semibold">Últimas unidades com 64% OFF!</span>
     </div>
   );
 };

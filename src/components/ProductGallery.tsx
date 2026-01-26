@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { Star, Play, Image as ImageIcon } from "lucide-react";
+import { Star, Play } from "lucide-react";
 import useEmblaCarousel from "embla-carousel-react";
 import tenisMain from "@/assets/tenis-main.webp";
 import tenis2 from "@/assets/tenis-2.webp";
@@ -39,11 +39,10 @@ const ProductGallery = ({ selectedColor }: ProductGalleryProps) => {
   
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, dragFree: false });
 
-  // Get selected color image and add to media array
   const selectedColorData = colors.find(c => c.id === selectedColor);
   const mediaItems: MediaItem[] = selectedColorData 
     ? [
-        baseImages[0], // Video first
+        baseImages[0],
         { id: -1, type: "image", src: selectedColorData.image, alt: `Max Runner - ${selectedColorData.name}` },
         ...baseImages.slice(1)
       ]
@@ -62,11 +61,9 @@ const ProductGallery = ({ selectedColor }: ProductGalleryProps) => {
     };
   }, [emblaApi, onSelect]);
 
-  // Navigate to color image when color changes (index 1 is the color image)
   useEffect(() => {
     if (emblaApi && selectedColor !== prevColorRef.current) {
       prevColorRef.current = selectedColor;
-      // Scroll to index 1 which is the color image
       emblaApi.scrollTo(1);
     }
   }, [selectedColor, emblaApi]);
@@ -77,91 +74,81 @@ const ProductGallery = ({ selectedColor }: ProductGalleryProps) => {
 
   return (
     <div id="produto" className="space-y-3">
-      {/* Rating Link */}
-      <a
-        href="#avaliacoes"
-        className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
-      >
-        <div className="flex items-center gap-1 bg-foreground text-white px-2 py-1 rounded font-bold text-xs">
-          <span>4.9</span>
-          <Star className="h-3 w-3 fill-white" />
+      {/* Main Image/Video Display with Discount Badge */}
+      <div className="relative aspect-square overflow-hidden rounded-xl bg-white border border-border">
+        {/* Discount Badge */}
+        <div className="absolute top-3 left-3 z-10 bg-accent text-white text-sm font-bold px-3 py-1 rounded-lg shadow-lg">
+          -64%
         </div>
-        <span className="underline">(578 avaliações)</span>
-      </a>
 
-      {/* Gallery with Thumbnails on Left (All Devices) */}
-      <div className="flex flex-row gap-2 sm:gap-3">
-        {/* Thumbnails Column - Left Side (All Devices) */}
-        <div className="flex flex-col gap-1.5 sm:gap-2 w-14 sm:w-20 flex-shrink-0 max-h-[300px] sm:max-h-[500px] overflow-y-auto scrollbar-hide">
-          {mediaItems.map((item, index) => (
-            <button
-              key={item.id}
-              onClick={() => scrollTo(index)}
-              className={`
-                relative aspect-square rounded-md sm:rounded-lg overflow-hidden border-2 transition-all duration-200 flex-shrink-0
-                ${currentIndex === index 
-                  ? "border-gray-900 shadow-md" 
-                  : "border-gray-200 hover:border-gray-400"
-                }
-              `}
-            >
-              {item.type === "video" ? (
-                <>
+        <div ref={emblaRef} className="overflow-hidden h-full">
+          <div className="flex h-full">
+            {mediaItems.map((item) => (
+              <div key={item.id} className="flex-[0_0_100%] min-w-0 h-full">
+                {item.type === "video" ? (
+                  <video
+                    src={item.src}
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    preload="metadata"
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
                   <img
-                    src={item.thumbnail || tenisMain}
+                    src={item.src}
                     alt={item.alt}
                     className="h-full w-full object-cover"
-                    loading="lazy"
+                    loading={item.id === -1 ? "eager" : "lazy"}
                     decoding="async"
+                    fetchPriority={item.id === -1 ? "high" : "auto"}
                   />
-                  <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
-                    <Play className="h-3 w-3 sm:h-4 sm:w-4 text-white fill-white" />
-                  </div>
-                </>
-              ) : (
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Thumbnails Row - Bottom */}
+      <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
+        {mediaItems.map((item, index) => (
+          <button
+            key={item.id}
+            onClick={() => scrollTo(index)}
+            className={`
+              relative flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all duration-200
+              ${currentIndex === index 
+                ? "border-primary shadow-md" 
+                : "border-border hover:border-primary/50"
+              }
+            `}
+          >
+            {item.type === "video" ? (
+              <>
                 <img
-                  src={item.src}
+                  src={item.thumbnail || tenisMain}
                   alt={item.alt}
                   className="h-full w-full object-cover"
                   loading="lazy"
                   decoding="async"
                 />
-              )}
-            </button>
-          ))}
-        </div>
-
-        {/* Main Image/Video Display */}
-        <div className="relative flex-1 aspect-square overflow-hidden rounded-xl bg-white border border-gray-100">
-          <div ref={emblaRef} className="overflow-hidden h-full">
-            <div className="flex h-full">
-              {mediaItems.map((item) => (
-                <div key={item.id} className="flex-[0_0_100%] min-w-0 h-full">
-                  {item.type === "video" ? (
-                    <video
-                      src={item.src}
-                      autoPlay
-                      loop
-                      muted
-                      playsInline
-                      preload="metadata"
-                      className="h-full w-full object-cover"
-                    />
-                  ) : (
-                    <img
-                      src={item.src}
-                      alt={item.alt}
-                      className="h-full w-full object-cover"
-                      loading={item.id === -1 ? "eager" : "lazy"}
-                      decoding="async"
-                      fetchPriority={item.id === -1 ? "high" : "auto"}
-                    />
-                  )}
+                <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+                  <Play className="h-4 w-4 text-white fill-white" />
                 </div>
-              ))}
-            </div>
-          </div>
-        </div>
+              </>
+            ) : (
+              <img
+                src={item.src}
+                alt={item.alt}
+                className="h-full w-full object-cover"
+                loading="lazy"
+                decoding="async"
+              />
+            )}
+          </button>
+        ))}
       </div>
     </div>
   );
