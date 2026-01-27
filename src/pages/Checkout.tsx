@@ -571,17 +571,109 @@ const Checkout = () => {
     }
   };
 
+  // Track touched fields for validation display
+  const [touchedFields, setTouchedFields] = useState<Record<string, boolean>>({});
+  
+  const handleFieldBlur = (fieldName: string) => {
+    setTouchedFields(prev => ({ ...prev, [fieldName]: true }));
+  };
+
+  // Email validation with regex
+  const validateEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
   // Validation helpers
   const isNameValid = customerData.name.trim().length >= 3;
+  const isCpfComplete = customerData.document.replace(/\D/g, "").length === 11;
   const isCpfValid = validateCPF(customerData.document);
   const isPhoneValid = customerData.phone.replace(/\D/g, "").length >= 10;
-  const isEmailValid = customerData.email.includes("@") && customerData.email.includes(".");
+  const isEmailValid = validateEmail(customerData.email);
   const isCepValid = addressData.zipCode.replace(/\D/g, "").length === 8;
   const isStreetValid = addressData.street.trim().length >= 3;
   const isNumberValid = addressData.number.trim().length >= 1;
   const isNeighborhoodValid = addressData.neighborhood.trim().length >= 2;
   const isCityValid = addressData.city.trim().length >= 2;
   const isStateValid = addressData.state.length === 2;
+
+  // Error messages
+  const getNameError = () => {
+    if (!touchedFields.name) return null;
+    if (!customerData.name.trim()) return "Nome é obrigatório";
+    if (customerData.name.trim().length < 3) return "Nome deve ter pelo menos 3 caracteres";
+    return null;
+  };
+  
+  const getCpfError = () => {
+    if (!touchedFields.document) return null;
+    if (!customerData.document) return "CPF é obrigatório";
+    if (!isCpfComplete) return "CPF deve ter 11 dígitos";
+    if (!isCpfValid) return "CPF inválido";
+    return null;
+  };
+  
+  const getPhoneError = () => {
+    if (!touchedFields.phone) return null;
+    if (!customerData.phone) return "Telefone é obrigatório";
+    if (!isPhoneValid) return "Telefone deve ter pelo menos 10 dígitos";
+    return null;
+  };
+  
+  const getEmailError = () => {
+    if (!touchedFields.email) return null;
+    if (!customerData.email) return "E-mail é obrigatório";
+    if (!isEmailValid) return "E-mail inválido";
+    return null;
+  };
+  
+  const getCepError = () => {
+    if (!touchedFields.zipCode) return null;
+    if (!addressData.zipCode) return "CEP é obrigatório";
+    if (!isCepValid) return "CEP deve ter 8 dígitos";
+    return null;
+  };
+  
+  const getStreetError = () => {
+    if (!touchedFields.street) return null;
+    if (!addressData.street.trim()) return "Endereço é obrigatório";
+    if (!isStreetValid) return "Endereço muito curto";
+    return null;
+  };
+  
+  const getNumberError = () => {
+    if (!touchedFields.number) return null;
+    if (!addressData.number.trim()) return "Número é obrigatório";
+    return null;
+  };
+  
+  const getNeighborhoodError = () => {
+    if (!touchedFields.neighborhood) return null;
+    if (!addressData.neighborhood.trim()) return "Bairro é obrigatório";
+    return null;
+  };
+  
+  const getCityError = () => {
+    if (!touchedFields.city) return null;
+    if (!addressData.city.trim()) return "Cidade é obrigatória";
+    return null;
+  };
+  
+  const getStateError = () => {
+    if (!touchedFields.state) return null;
+    if (!addressData.state) return "UF obrigatório";
+    if (!isStateValid) return "UF inválido";
+    return null;
+  };
+
+  // Input class helper
+  const getInputClass = (isValid: boolean, isTouched: boolean, hasValue: boolean) => {
+    const baseClass = "mt-1 h-12 rounded-xl focus:bg-white transition-colors";
+    if (!isTouched) return `${baseClass} border-gray-200 bg-gray-50`;
+    if (hasValue && isValid) return `${baseClass} border-green-500 bg-green-50/30`;
+    if (hasValue && !isValid) return `${baseClass} border-red-500 bg-red-50/30`;
+    return `${baseClass} border-red-500 bg-red-50/30`;
+  };
 
   const isCustomerDataComplete = isNameValid && isCpfValid && isPhoneValid && isEmailValid;
   const isAddressComplete = isCepValid && isStreetValid && isNumberValid && isNeighborhoodValid && isCityValid && isStateValid;
@@ -880,52 +972,97 @@ const Checkout = () => {
           <div className="flex items-center gap-2 mb-4">
             <User className="h-5 w-5 text-primary" />
             <h2 className="font-semibold text-gray-900">Dados Pessoais</h2>
+            {isCustomerDataComplete && (
+              <span className="ml-auto text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full flex items-center gap-1">
+                <CheckCircle className="h-3 w-3" /> Completo
+              </span>
+            )}
           </div>
           
           <div className="space-y-4">
             <div>
-              <Label className="text-sm text-gray-700">Nome completo *</Label>
+              <Label className="text-sm text-gray-700 flex items-center gap-1">
+                Nome completo <span className="text-red-500">*</span>
+                {touchedFields.name && isNameValid && <CheckCircle className="h-3.5 w-3.5 text-green-500" />}
+              </Label>
               <Input
                 placeholder="Seu nome completo"
                 value={customerData.name}
                 onChange={(e) => handleCustomerChange("name", e.target.value)}
-                className="mt-1 h-12 rounded-xl border-gray-200 bg-gray-50 focus:bg-white"
+                onBlur={() => handleFieldBlur("name")}
+                className={getInputClass(isNameValid, touchedFields.name || false, !!customerData.name)}
               />
+              {getNameError() && (
+                <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
+                  <AlertCircle className="h-3 w-3" />
+                  {getNameError()}
+                </p>
+              )}
             </div>
             
             <div>
-              <Label className="text-sm text-gray-700">E-mail *</Label>
+              <Label className="text-sm text-gray-700 flex items-center gap-1">
+                E-mail <span className="text-red-500">*</span>
+                {touchedFields.email && isEmailValid && <CheckCircle className="h-3.5 w-3.5 text-green-500" />}
+              </Label>
               <Input
                 type="email"
                 placeholder="seu@email.com"
                 value={customerData.email}
                 onChange={(e) => handleCustomerChange("email", e.target.value)}
-                className="mt-1 h-12 rounded-xl border-gray-200 bg-gray-50 focus:bg-white"
+                onBlur={() => handleFieldBlur("email")}
+                className={getInputClass(isEmailValid, touchedFields.email || false, !!customerData.email)}
               />
+              {getEmailError() && (
+                <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
+                  <AlertCircle className="h-3 w-3" />
+                  {getEmailError()}
+                </p>
+              )}
             </div>
             
             <div>
-              <Label className="text-sm text-gray-700">Telefone/WhatsApp *</Label>
+              <Label className="text-sm text-gray-700 flex items-center gap-1">
+                Telefone/WhatsApp <span className="text-red-500">*</span>
+                {touchedFields.phone && isPhoneValid && <CheckCircle className="h-3.5 w-3.5 text-green-500" />}
+              </Label>
               <Input
                 placeholder="(00) 00000-0000"
                 value={customerData.phone}
                 onChange={(e) => handleCustomerChange("phone", e.target.value)}
+                onBlur={() => handleFieldBlur("phone")}
                 maxLength={15}
                 inputMode="tel"
-                className="mt-1 h-12 rounded-xl border-gray-200 bg-gray-50 focus:bg-white"
+                className={getInputClass(isPhoneValid, touchedFields.phone || false, !!customerData.phone)}
               />
+              {getPhoneError() && (
+                <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
+                  <AlertCircle className="h-3 w-3" />
+                  {getPhoneError()}
+                </p>
+              )}
             </div>
             
             <div>
-              <Label className="text-sm text-gray-700">CPF *</Label>
+              <Label className="text-sm text-gray-700 flex items-center gap-1">
+                CPF <span className="text-red-500">*</span>
+                {touchedFields.document && isCpfValid && <CheckCircle className="h-3.5 w-3.5 text-green-500" />}
+              </Label>
               <Input
                 placeholder="000.000.000-00"
                 value={customerData.document}
                 onChange={(e) => handleCustomerChange("document", e.target.value)}
+                onBlur={() => handleFieldBlur("document")}
                 maxLength={14}
                 inputMode="numeric"
-                className="mt-1 h-12 rounded-xl border-gray-200 bg-gray-50 focus:bg-white"
+                className={getInputClass(isCpfValid, touchedFields.document || false, !!customerData.document)}
               />
+              {getCpfError() && (
+                <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
+                  <AlertCircle className="h-3 w-3" />
+                  {getCpfError()}
+                </p>
+              )}
             </div>
           </div>
         </div>
@@ -935,44 +1072,78 @@ const Checkout = () => {
           <div className="flex items-center gap-2 mb-4">
             <MapPin className="h-5 w-5 text-primary" />
             <h2 className="font-semibold text-gray-900">Endereço de Entrega</h2>
+            {isAddressComplete && (
+              <span className="ml-auto text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full flex items-center gap-1">
+                <CheckCircle className="h-3 w-3" /> Completo
+              </span>
+            )}
           </div>
           
           <div className="space-y-4">
             <div className="relative">
-              <Label className="text-sm text-gray-700">CEP *</Label>
+              <Label className="text-sm text-gray-700 flex items-center gap-1">
+                CEP <span className="text-red-500">*</span>
+                {touchedFields.zipCode && isCepValid && <CheckCircle className="h-3.5 w-3.5 text-green-500" />}
+              </Label>
               <Input
                 placeholder="00000-000"
                 value={addressData.zipCode}
                 onChange={(e) => handleAddressChange("zipCode", e.target.value)}
+                onBlur={() => handleFieldBlur("zipCode")}
                 maxLength={9}
                 inputMode="numeric"
-                className="mt-1 h-12 rounded-xl border-gray-200 bg-gray-50 focus:bg-white"
+                className={getInputClass(isCepValid, touchedFields.zipCode || false, !!addressData.zipCode)}
               />
               {isLoadingCep && (
                 <Loader2 className="absolute right-3 top-9 h-4 w-4 animate-spin text-gray-400" />
               )}
+              {getCepError() && (
+                <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
+                  <AlertCircle className="h-3 w-3" />
+                  {getCepError()}
+                </p>
+              )}
             </div>
             
             <div>
-              <Label className="text-sm text-gray-700">Endereço *</Label>
+              <Label className="text-sm text-gray-700 flex items-center gap-1">
+                Endereço <span className="text-red-500">*</span>
+                {touchedFields.street && isStreetValid && <CheckCircle className="h-3.5 w-3.5 text-green-500" />}
+              </Label>
               <Input
                 placeholder="Rua, avenida..."
                 value={addressData.street}
                 onChange={(e) => handleAddressChange("street", e.target.value)}
-                className="mt-1 h-12 rounded-xl border-gray-200 bg-gray-50 focus:bg-white"
+                onBlur={() => handleFieldBlur("street")}
+                className={getInputClass(isStreetValid, touchedFields.street || false, !!addressData.street)}
               />
+              {getStreetError() && (
+                <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
+                  <AlertCircle className="h-3 w-3" />
+                  {getStreetError()}
+                </p>
+              )}
             </div>
             
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <Label className="text-sm text-gray-700">Nº *</Label>
+                <Label className="text-sm text-gray-700 flex items-center gap-1">
+                  Nº <span className="text-red-500">*</span>
+                </Label>
                 <Input
                   placeholder="123"
                   value={addressData.number}
                   onChange={(e) => handleAddressChange("number", e.target.value)}
+                  onBlur={() => handleFieldBlur("number")}
                   inputMode="numeric"
-                  className="mt-1 h-12 rounded-xl border-gray-200 bg-gray-50 focus:bg-white"
+                  className={getInputClass(isNumberValid, touchedFields.number || false, !!addressData.number)}
                 />
+                {getNumberError() && (
+                  <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
+                    <AlertCircle className="h-3 w-3" />
+                    {getNumberError()}
+                  </p>
+                )}
               </div>
               <div>
                 <Label className="text-sm text-gray-700">Complemento</Label>
@@ -986,34 +1157,63 @@ const Checkout = () => {
             </div>
             
             <div>
-              <Label className="text-sm text-gray-700">Bairro *</Label>
+              <Label className="text-sm text-gray-700 flex items-center gap-1">
+                Bairro <span className="text-red-500">*</span>
+                {touchedFields.neighborhood && isNeighborhoodValid && <CheckCircle className="h-3.5 w-3.5 text-green-500" />}
+              </Label>
               <Input
                 placeholder="Seu bairro"
                 value={addressData.neighborhood}
                 onChange={(e) => handleAddressChange("neighborhood", e.target.value)}
-                className="mt-1 h-12 rounded-xl border-gray-200 bg-gray-50 focus:bg-white"
+                onBlur={() => handleFieldBlur("neighborhood")}
+                className={getInputClass(isNeighborhoodValid, touchedFields.neighborhood || false, !!addressData.neighborhood)}
               />
+              {getNeighborhoodError() && (
+                <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
+                  <AlertCircle className="h-3 w-3" />
+                  {getNeighborhoodError()}
+                </p>
+              )}
             </div>
             
             <div className="grid grid-cols-4 gap-3">
               <div className="col-span-3">
-                <Label className="text-sm text-gray-700">Cidade *</Label>
+                <Label className="text-sm text-gray-700 flex items-center gap-1">
+                  Cidade <span className="text-red-500">*</span>
+                  {touchedFields.city && isCityValid && <CheckCircle className="h-3.5 w-3.5 text-green-500" />}
+                </Label>
                 <Input
                   placeholder="Sua cidade"
                   value={addressData.city}
                   onChange={(e) => handleAddressChange("city", e.target.value)}
-                  className="mt-1 h-12 rounded-xl border-gray-200 bg-gray-50 focus:bg-white"
+                  onBlur={() => handleFieldBlur("city")}
+                  className={getInputClass(isCityValid, touchedFields.city || false, !!addressData.city)}
                 />
+                {getCityError() && (
+                  <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
+                    <AlertCircle className="h-3 w-3" />
+                    {getCityError()}
+                  </p>
+                )}
               </div>
               <div>
-                <Label className="text-sm text-gray-700">UF *</Label>
+                <Label className="text-sm text-gray-700 flex items-center gap-1">
+                  UF <span className="text-red-500">*</span>
+                </Label>
                 <Input
                   placeholder="UF"
                   value={addressData.state}
                   onChange={(e) => handleAddressChange("state", e.target.value)}
+                  onBlur={() => handleFieldBlur("state")}
                   maxLength={2}
-                  className="mt-1 h-12 rounded-xl border-gray-200 bg-gray-50 focus:bg-white text-center"
+                  className={`${getInputClass(isStateValid, touchedFields.state || false, !!addressData.state)} text-center`}
                 />
+                {getStateError() && (
+                  <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
+                    <AlertCircle className="h-3 w-3" />
+                    {getStateError()}
+                  </p>
+                )}
               </div>
             </div>
           </div>
@@ -1102,13 +1302,34 @@ const Checkout = () => {
           </div>
 
           {/* CTA Button */}
+          {/* Missing fields warning */}
+          {!isFormComplete && (
+            <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 mb-4">
+              <p className="text-sm text-amber-800 font-medium mb-2">
+                Preencha os campos obrigatórios:
+              </p>
+              <ul className="text-xs text-amber-700 space-y-1">
+                {!isNameValid && <li>• Nome completo</li>}
+                {!isEmailValid && <li>• E-mail válido</li>}
+                {!isPhoneValid && <li>• Telefone/WhatsApp</li>}
+                {!isCpfValid && <li>• CPF válido</li>}
+                {!isCepValid && <li>• CEP</li>}
+                {!isStreetValid && <li>• Endereço</li>}
+                {!isNumberValid && <li>• Número</li>}
+                {!isNeighborhoodValid && <li>• Bairro</li>}
+                {!isCityValid && <li>• Cidade</li>}
+                {!isStateValid && <li>• UF</li>}
+              </ul>
+            </div>
+          )}
+
           <Button
             onClick={handleCreatePixPayment}
             disabled={isLoading || !isFormComplete}
-            className={`w-full h-14 font-bold text-lg rounded-xl mt-4 transition-colors gap-2 ${
+            className={`w-full h-14 font-bold text-lg rounded-xl transition-colors gap-2 ${
               isFormComplete && !isLoading
                 ? 'bg-accent hover:bg-accent/90 text-white'
-                : 'bg-gray-300 text-gray-500'
+                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
             }`}
           >
             {isLoading ? (
@@ -1116,8 +1337,13 @@ const Checkout = () => {
                 <Loader2 className="h-5 w-5 animate-spin" />
                 Processando...
               </>
+            ) : isFormComplete ? (
+              <>
+                <PixIcon className="h-5 w-5" />
+                Pagar com PIX
+              </>
             ) : (
-              "Finalizar Compra"
+              "Preencha os dados acima"
             )}
           </Button>
           
