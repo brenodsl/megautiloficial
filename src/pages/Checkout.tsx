@@ -612,7 +612,7 @@ const Checkout = () => {
               <ArrowLeft className="h-5 w-5" />
             </button>
             <Link to="/">
-              <span className="text-white font-bold text-xl">CASA<span className="text-accent">FORT</span></span>
+              <img src="/logo-megautil.png" alt="MegaUtil" className="h-8 w-auto" />
             </Link>
             <div className="flex items-center gap-1 text-white text-sm">
               <Lock className="h-4 w-4" />
