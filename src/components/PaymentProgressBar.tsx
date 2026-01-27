@@ -37,7 +37,7 @@ const PaymentProgressBar = ({ currentStep }: PaymentProgressBarProps) => {
                     isCompleted
                       ? "bg-[#28af60] text-white"
                       : isCurrent
-                      ? "bg-[#28af60] text-white ring-4 ring-[#28af60]/20 animate-[pulse_5s_ease-in-out_infinite]"
+                      ? "bg-[#28af60] text-white ring-4 ring-[#28af60]/10 animate-[pulse_8s_ease-in-out_infinite]"
                       : "bg-white text-gray-400 border border-gray-200"
                   }`}
                 >
