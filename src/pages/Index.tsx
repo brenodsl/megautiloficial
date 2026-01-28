@@ -1,13 +1,13 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Truck, ShieldCheck, ShoppingCart, Star, Check } from "lucide-react";
+import { ShoppingCart, Star, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Header from "@/components/Header";
 import ProductGallery from "@/components/ProductGallery";
 import ScarcityBanner from "@/components/ScarcityBanner";
 import Reviews from "@/components/Reviews";
 import Benefits from "@/components/Benefits";
-import Guarantees from "@/components/Guarantees";
+
 import ProductDescription from "@/components/ProductDescription";
 import Footer from "@/components/Footer";
 import { useCart } from "@/contexts/CartContext";
@@ -163,45 +163,6 @@ const Index = () => {
             )}
           </div>
 
-          {/* Guarantees Grid */}
-          <div className="mt-5 grid grid-cols-2 gap-3">
-            <div className="flex items-center gap-3 bg-secondary/40 rounded-xl p-3">
-              <div className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center flex-shrink-0">
-                <ShieldCheck className="h-5 w-5 text-primary" />
-              </div>
-              <div>
-                <p className="text-xs font-bold text-foreground">Compra Segura</p>
-                <p className="text-[10px] text-muted-foreground">Site 100% protegido</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3 bg-secondary/40 rounded-xl p-3">
-              <div className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center flex-shrink-0">
-                <PixIcon className="h-5 w-5 text-primary" />
-              </div>
-              <div>
-                <p className="text-xs font-bold text-foreground">Pagamento PIX</p>
-                <p className="text-[10px] text-muted-foreground">Desconto especial à vista</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3 bg-secondary/40 rounded-xl p-3">
-              <div className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center flex-shrink-0">
-                <Truck className="h-5 w-5 text-primary" />
-              </div>
-              <div>
-                <p className="text-xs font-bold text-foreground">Entrega Garantida</p>
-                <p className="text-[10px] text-muted-foreground">Frete grátis todo Brasil</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3 bg-secondary/40 rounded-xl p-3">
-              <div className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center flex-shrink-0">
-                <Check className="h-5 w-5 text-primary" />
-              </div>
-              <div>
-                <p className="text-xs font-bold text-foreground">Garantia 12 meses</p>
-                <p className="text-[10px] text-muted-foreground">Cobertura total</p>
-              </div>
-            </div>
-          </div>
 
           {/* Scarcity Banner */}
           <div className="mt-5">
@@ -247,10 +208,6 @@ const Index = () => {
           <Benefits />
         </div>
 
-        {/* Guarantees */}
-        <div className="bg-white mt-2 px-4 py-6">
-          <Guarantees />
-        </div>
 
         {/* Reviews */}
         <div className="bg-white mt-2 px-4 py-6">
