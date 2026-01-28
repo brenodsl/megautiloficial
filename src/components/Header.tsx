@@ -60,7 +60,7 @@ const Header = () => {
 
   return (
     <>
-      <header className="sticky top-0 z-40">
+      <header className="fixed top-0 left-0 right-0 z-40">
         {/* Top Promo Bar - Orange with Timer */}
         <div className="bg-accent py-2.5 px-4">
           <div className="container mx-auto flex items-center justify-center gap-3">
@@ -227,19 +227,14 @@ const Header = () => {
                     <Search className="h-5 w-5" />
                   </Button>
 
-                  {/* Cart Button */}
+                  {/* Buy Now Button */}
                   <Button
-                    variant="ghost"
-                    size="icon"
-                    className="text-white hover:bg-white/10 relative"
-                    onClick={() => setCartOpen(true)}
+                    onClick={() => navigate("/checkout")}
+                    className="bg-accent hover:bg-accent/90 text-white font-bold text-xs sm:text-sm px-3 sm:px-4 h-9 rounded-lg"
                   >
-                    <ShoppingCart className="h-5 w-5" />
-                    {totalItems > 0 && (
-                      <span className="absolute -top-0.5 -right-0.5 h-5 w-5 rounded-full bg-accent text-white text-[10px] flex items-center justify-center font-bold border-2 border-primary">
-                        {totalItems}
-                      </span>
-                    )}
+                    <ShoppingCart className="h-4 w-4 mr-1.5" />
+                    <span className="hidden sm:inline">Comprar</span>
+                    <span className="sm:hidden">Comprar</span>
                   </Button>
                 </div>
               </div>
