@@ -16,6 +16,7 @@ import { trackPixelEvent } from "@/hooks/usePixels";
 import AIChatBot from "@/components/AIChatBot";
 import PurchaseNotifications from "@/components/PurchaseNotifications";
 import QuantitySelector, { QUANTITY_OPTIONS } from "@/components/QuantitySelector";
+import FloatingBuyButton from "@/components/FloatingBuyButton";
 
 // PIX Icon Component
 const PixIcon = ({ className = "h-4 w-4" }: { className?: string }) => (
@@ -77,7 +78,7 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background pt-[104px]">
+    <div className="min-h-screen bg-background pb-20">
       <Header />
       
       {/* Breadcrumb */}
@@ -258,6 +259,7 @@ const Index = () => {
       </main>
 
       <Footer />
+      <FloatingBuyButton />
       <AIChatBot />
       <PurchaseNotifications />
     </div>
