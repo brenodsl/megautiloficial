@@ -14,7 +14,7 @@ export interface CartItem {
 
 interface CartContextType {
   items: CartItem[];
-  addItem: (colorId: string, size: number, quantity?: number) => void;
+  addItem: (colorId: string, size: number, quantity?: number, customPrice?: number, customOriginalPrice?: number) => void;
   removeItem: (id: string) => void;
   updateQuantity: (id: string, quantity: number) => void;
   clearCart: () => void;
@@ -47,29 +47,31 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     loadPrice();
   }, []);
 
-  const addItem = (colorId: string, size: number, quantity: number = 1) => {
-    const existingItem = items.find(
-      item => item.colorId === colorId
-    );
+  const addItem = (colorId: string, size: number, quantity: number = 1, customPrice?: number, customOriginalPrice?: number) => {
+    const priceToUse = customPrice ?? unitPrice;
+    const originalPriceToUse = customOriginalPrice ?? displayOriginalPrice;
+    
+    // Get quantity label based on size parameter (which now represents camera count)
+    const getQuantityLabel = (cameraCount: number) => {
+      if (cameraCount === 1) return "1 Câmera";
+      return `Kit ${cameraCount} Câmeras`;
+    };
 
-    if (existingItem) {
-      setItems(items.map(item =>
-        item.id === existingItem.id
-          ? { ...item, quantity: item.quantity + quantity }
-          : item
-      ));
-    } else {
-      const newItem: CartItem = {
-        id: `camera-kit-${Date.now()}`,
-        colorId,
-        colorName: "Kit 3 Câmeras",
-        colorImage: cameraMain,
-        size,
-        quantity,
-        price: unitPrice,
-      };
-      setItems([...items, newItem]);
-    }
+    const newItem: CartItem = {
+      id: `camera-${Date.now()}`,
+      colorId,
+      colorName: getQuantityLabel(size),
+      colorImage: cameraMain,
+      size, // This now represents camera count
+      quantity,
+      price: priceToUse,
+    };
+    
+    // Update prices for display
+    setUnitPrice(priceToUse);
+    setDisplayOriginalPrice(originalPriceToUse);
+    
+    setItems([newItem]); // Replace cart with new selection
   };
 
   const removeItem = (id: string) => {
@@ -91,18 +93,11 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
-  const originalPrice = items.reduce((sum, item) => sum + (unitPrice * item.quantity), 0);
+  const originalPrice = displayOriginalPrice;
   
-  // Calculate progressive discount: 2nd kit onwards gets 20% off
-  const calculateDiscount = () => {
-    if (totalItems < 2) return 0;
-    // First item is full price, remaining items get 20% off
-    const discountedItems = totalItems - 1;
-    return discountedItems * unitPrice * 0.20;
-  };
-  
-  const discount = calculateDiscount();
-  const totalPrice = originalPrice - discount;
+  // Discount is already calculated in the price options
+  const discount = displayOriginalPrice - unitPrice;
+  const totalPrice = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   const discountPercentage = originalPrice > 0 ? (discount / originalPrice) * 100 : 0;
 
   return (
