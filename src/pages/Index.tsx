@@ -13,7 +13,7 @@ import Footer from "@/components/Footer";
 import { useCart } from "@/contexts/CartContext";
 import { usePresence } from "@/hooks/usePresence";
 import { trackPixelEvent } from "@/hooks/usePixels";
-import AIChatBot from "@/components/AIChatBot";
+
 import PurchaseNotifications from "@/components/PurchaseNotifications";
 import QuantitySelector, { QUANTITY_OPTIONS } from "@/components/QuantitySelector";
 import FloatingBuyButton from "@/components/FloatingBuyButton";
@@ -260,7 +260,6 @@ const Index = () => {
 
       <Footer />
       <FloatingBuyButton />
-      <AIChatBot />
       <PurchaseNotifications />
     </div>
   );
