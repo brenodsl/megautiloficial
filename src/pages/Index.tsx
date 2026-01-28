@@ -14,6 +14,7 @@ import { useCart } from "@/contexts/CartContext";
 import { usePresence } from "@/hooks/usePresence";
 import { trackPixelEvent } from "@/hooks/usePixels";
 import AIChatBot from "@/components/AIChatBot";
+import PurchaseNotifications from "@/components/PurchaseNotifications";
 import QuantitySelector, { QUANTITY_OPTIONS } from "@/components/QuantitySelector";
 
 // PIX Icon Component
@@ -159,10 +160,6 @@ const Index = () => {
                 💰 Você economiza R$ {currentSavings.toFixed(2).replace(".", ",")}
               </p>
             )}
-            <p className="text-xs text-muted-foreground mt-1.5 flex items-center gap-1">
-              <span className="inline-block w-4 h-4 bg-muted rounded flex items-center justify-center text-[10px]">💳</span>
-              ou 12x de R$ {(currentPrice / 12).toFixed(2).replace(".", ",")} sem juros
-            </p>
           </div>
 
           {/* Guarantees Grid */}
@@ -262,6 +259,7 @@ const Index = () => {
 
       <Footer />
       <AIChatBot />
+      <PurchaseNotifications />
     </div>
   );
 };
