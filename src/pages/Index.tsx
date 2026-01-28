@@ -14,6 +14,7 @@ import { useCart } from "@/contexts/CartContext";
 import { usePresence } from "@/hooks/usePresence";
 import { trackPixelEvent } from "@/hooks/usePixels";
 import AIChatBot from "@/components/AIChatBot";
+import QuantitySelector, { QUANTITY_OPTIONS } from "@/components/QuantitySelector";
 
 // PIX Icon Component
 const PixIcon = ({ className = "h-4 w-4" }: { className?: string }) => (
@@ -24,23 +25,34 @@ const PixIcon = ({ className = "h-4 w-4" }: { className?: string }) => (
 
 const Index = () => {
   const navigate = useNavigate();
-  const { addItem, totalItems, unitPrice, displayOriginalPrice } = useCart();
+  const { addItem, totalItems, clearCart } = useCart();
+  const [selectedQuantity, setSelectedQuantity] = useState(1);
+  const [currentPrice, setCurrentPrice] = useState(QUANTITY_OPTIONS[0].salePrice);
+  const [currentOriginalPrice, setCurrentOriginalPrice] = useState(QUANTITY_OPTIONS[0].originalPrice);
 
   usePresence("/");
 
-  const discountPercent = displayOriginalPrice > 0 
-    ? Math.round(((displayOriginalPrice - unitPrice) / displayOriginalPrice) * 100) 
+  const discountPercent = currentOriginalPrice > 0 
+    ? Math.round(((currentOriginalPrice - currentPrice) / currentOriginalPrice) * 100) 
     : 0;
+
+  const currentSavings = currentOriginalPrice - currentPrice;
 
   useEffect(() => {
     trackPixelEvent('ViewContent', {
       content_type: 'product',
-      content_id: 'camera-kit-3',
-      content_name: 'Kit 3 Câmeras Wi-Fi com Sensor de Movimento',
-      value: unitPrice,
+      content_id: 'camera-wifi-security',
+      content_name: 'Câmera Wi-Fi com Sensor de Movimento',
+      value: currentPrice,
       currency: 'BRL',
     });
-  }, [unitPrice]);
+  }, [currentPrice]);
+
+  const handleQuantityChange = (quantity: number, price: number, originalPrice: number) => {
+    setSelectedQuantity(quantity);
+    setCurrentPrice(price);
+    setCurrentOriginalPrice(originalPrice);
+  };
 
   const handleBuyClick = () => {
     if (totalItems > 0) {
@@ -50,15 +62,16 @@ const Index = () => {
     
     trackPixelEvent('AddToCart', {
       content_type: 'product',
-      content_id: 'camera-kit-3',
-      content_name: 'Kit 3 Câmeras Wi-Fi com Sensor de Movimento',
-      quantity: 1,
-      value: unitPrice,
+      content_id: 'camera-wifi-security',
+      content_name: 'Câmera Wi-Fi com Sensor de Movimento',
+      quantity: selectedQuantity,
+      value: currentPrice,
       currency: 'BRL',
     });
     
-    // Add camera kit to cart (no color/size selection needed)
-    addItem("default", 0, 1);
+    // Clear cart and add new selection
+    clearCart();
+    addItem("default", selectedQuantity, 1, currentPrice, currentOriginalPrice);
     navigate("/checkout");
   };
 
@@ -91,7 +104,7 @@ const Index = () => {
         <div className="bg-white mt-2 px-4 py-5">
           {/* Product Title */}
           <h1 className="text-xl font-bold text-foreground leading-tight">
-            Kit 3 Câmeras Wi-Fi com Sensor de Movimento, Alarme Automático e à Prova d'Água
+            Câmera Wi-Fi com Sensor de Movimento, Alarme Automático e à Prova d'Água
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
             Visão Noturna Colorida • IP66 • Áudio Bidirecional • Rastreamento Humano • App iCSee
@@ -116,26 +129,39 @@ const Index = () => {
             Vendido e entregue por <span className="text-primary font-semibold">MegaUtil</span>
           </p>
 
+          {/* Quantity Selector */}
+          <div className="mt-5">
+            <QuantitySelector 
+              selectedQuantity={selectedQuantity}
+              onQuantityChange={handleQuantityChange}
+            />
+          </div>
+
           {/* Price Section */}
           <div className="mt-5 bg-secondary/40 rounded-2xl p-5 border border-primary/10">
             <div className="flex items-center gap-2 mb-1">
               <span className="text-sm text-muted-foreground line-through">
-                De: R$ {displayOriginalPrice.toFixed(2).replace(".", ",")}
+                De: R$ {currentOriginalPrice.toFixed(2).replace(".", ",")}
               </span>
               <span className="bg-accent text-white text-xs font-bold px-2.5 py-1 rounded-lg">
                 {discountPercent}% OFF
               </span>
             </div>
             <div className="text-4xl font-black text-primary">
-              R$ {unitPrice.toFixed(2).replace(".", ",")}
+              R$ {currentPrice.toFixed(2).replace(".", ",")}
             </div>
             <div className="flex items-center gap-1.5 text-sm text-success mt-1.5">
               <PixIcon className="h-4 w-4" />
               <span className="font-semibold">à vista no PIX</span>
             </div>
+            {currentSavings > 0 && (
+              <p className="text-sm text-success font-bold mt-2">
+                💰 Você economiza R$ {currentSavings.toFixed(2).replace(".", ",")}
+              </p>
+            )}
             <p className="text-xs text-muted-foreground mt-1.5 flex items-center gap-1">
               <span className="inline-block w-4 h-4 bg-muted rounded flex items-center justify-center text-[10px]">💳</span>
-              ou 12x de R$ {(unitPrice / 12).toFixed(2).replace(".", ",")} sem juros
+              ou 12x de R$ {(currentPrice / 12).toFixed(2).replace(".", ",")} sem juros
             </p>
           </div>
 
