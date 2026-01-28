@@ -213,10 +213,11 @@ const Checkout = () => {
   // Track InitiateCheckout event
   useEffect(() => {
     if (items.length > 0) {
+      const quantityLabel = items[0]?.size === 1 ? "1 Câmera" : `Kit ${items[0]?.size} Câmeras`;
       trackPixelEvent('InitiateCheckout', {
         content_type: 'product',
-        content_id: 'camera-kit',
-        content_name: 'Kit 3 Câmeras Wi-Fi MegaUtil',
+        content_id: 'camera-wifi',
+        content_name: `${quantityLabel} Wi-Fi MegaUtil`,
         quantity: totalQuantity,
         value: totalPrice,
         currency: 'BRL',
@@ -504,8 +505,9 @@ const Checkout = () => {
       }
 
       if (data?.success) {
+        const quantityLabel = items[0]?.size === 1 ? "1 Câmera" : `Kit ${items[0]?.size} Câmeras`;
         const orderItems = items.map(item => ({
-          name: `Kit 3 Câmeras Wi-Fi`,
+          name: quantityLabel,
           color: item.colorName,
           size: item.size,
           quantity: item.quantity,
@@ -543,8 +545,8 @@ const Checkout = () => {
         
         trackPixelEvent('Purchase', {
           content_type: 'product',
-          content_id: 'camera-kit',
-          content_name: 'Kit 3 Câmeras Wi-Fi MegaUtil',
+          content_id: 'camera-wifi',
+          content_name: `${quantityLabel} Wi-Fi MegaUtil`,
           currency: 'BRL',
           value: finalTotal,
           num_items: totalQuantity,
@@ -904,46 +906,49 @@ const Checkout = () => {
 
       <main className="max-w-lg mx-auto px-4 py-4 space-y-4">
         {/* Product Card */}
-        {items.length > 0 && (
-          <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
-            <div className="flex gap-3">
-              {/* Product Image with PROMOÇÃO badge */}
-              <div className="relative flex-shrink-0">
-                <div className="absolute -top-2 -left-2 z-10">
-                  <span className="bg-accent text-white text-[10px] font-bold px-2 py-1 rounded">
-                    PROMOÇÃO
-                  </span>
-                </div>
-                <img
-                  src={cameraMain}
-                  alt="Kit 3 Câmeras Wi-Fi"
-                  className="w-20 h-20 object-cover rounded-xl border border-gray-200"
-                />
-              </div>
-              
-              {/* Product Info */}
-              <div className="flex-1 min-w-0">
-                <h3 className="font-semibold text-gray-900 text-sm leading-tight">
-                  Kit 3 Câmeras Wi-Fi com Sensor de Movimento, Alarme...
-                </h3>
-                <div className="flex items-center gap-1 mt-1">
-                  <div className="flex">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <Star key={star} className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-                    ))}
+        {items.length > 0 && items.map((item) => {
+          const quantityLabel = item.size === 1 ? "1 Câmera" : `Kit ${item.size} Câmeras`;
+          
+          return (
+            <div key={item.id} className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+              <div className="flex gap-3">
+                {/* Product Image with PROMOÇÃO badge */}
+                <div className="relative flex-shrink-0">
+                  <div className="absolute -top-2 -left-2 z-10">
+                    <span className="bg-accent text-white text-[10px] font-bold px-2 py-1 rounded">
+                      PROMOÇÃO
+                    </span>
                   </div>
-                  <span className="text-xs text-gray-500">(127 avaliações)</span>
+                  <img
+                    src={cameraMain}
+                    alt={quantityLabel}
+                    className="w-20 h-20 object-cover rounded-xl border border-gray-200"
+                  />
                 </div>
-                <div className="flex items-center gap-2 mt-2">
-                  <span className="text-xl font-bold text-primary">
-                    R$ {unitPrice.toFixed(2).replace(".", ",")}
-                  </span>
-                  <span className="text-sm text-gray-400 line-through">
-                    R$ {displayOriginalPrice.toFixed(2).replace(".", ",")}
-                  </span>
+                
+                {/* Product Info */}
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-semibold text-gray-900 text-sm leading-tight">
+                    {quantityLabel} - Câmera Wi-Fi com Sensor de Movimento
+                  </h3>
+                  <div className="flex items-center gap-1 mt-1">
+                    <div className="flex">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <Star key={star} className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                      ))}
+                    </div>
+                    <span className="text-xs text-gray-500">(127 avaliações)</span>
+                  </div>
+                  <div className="flex items-center gap-2 mt-2">
+                    <span className="text-xl font-bold text-primary">
+                      R$ {item.price.toFixed(2).replace(".", ",")}
+                    </span>
+                    <span className="text-sm text-gray-400 line-through">
+                      R$ {displayOriginalPrice.toFixed(2).replace(".", ",")}
+                    </span>
+                  </div>
                 </div>
               </div>
-            </div>
             
             {/* Trust Badges Row */}
             <div className="flex items-center justify-between mt-4 pt-3 border-t border-gray-100">
@@ -965,7 +970,9 @@ const Checkout = () => {
               </div>
             </div>
           </div>
-        )}
+        );
+        })}
+
 
         {/* Customer Data Section */}
         <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
@@ -1302,26 +1309,6 @@ const Checkout = () => {
           </div>
 
           {/* CTA Button */}
-          {/* Missing fields warning */}
-          {!isFormComplete && (
-            <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 mb-4">
-              <p className="text-sm text-amber-800 font-medium mb-2">
-                Preencha os campos obrigatórios:
-              </p>
-              <ul className="text-xs text-amber-700 space-y-1">
-                {!isNameValid && <li>• Nome completo</li>}
-                {!isEmailValid && <li>• E-mail válido</li>}
-                {!isPhoneValid && <li>• Telefone/WhatsApp</li>}
-                {!isCpfValid && <li>• CPF válido</li>}
-                {!isCepValid && <li>• CEP</li>}
-                {!isStreetValid && <li>• Endereço</li>}
-                {!isNumberValid && <li>• Número</li>}
-                {!isNeighborhoodValid && <li>• Bairro</li>}
-                {!isCityValid && <li>• Cidade</li>}
-                {!isStateValid && <li>• UF</li>}
-              </ul>
-            </div>
-          )}
 
           <Button
             onClick={handleCreatePixPayment}
