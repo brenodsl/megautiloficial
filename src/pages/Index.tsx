@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { ShoppingCart, Star, Check } from "lucide-react";
+import { ShoppingCart, Star, Check, Truck } from "lucide-react";
+import { useUserLocation } from "@/hooks/useUserLocation";
 import { Button } from "@/components/ui/button";
 import Header from "@/components/Header";
 import ProductGallery from "@/components/ProductGallery";
@@ -28,11 +29,27 @@ const PixIcon = ({ className = "h-4 w-4" }: { className?: string }) => (
 const Index = () => {
   const navigate = useNavigate();
   const { addItem, totalItems, clearCart } = useCart();
+  const { city, state, loading: locationLoading } = useUserLocation();
   const [selectedQuantity, setSelectedQuantity] = useState(1);
   const [currentPrice, setCurrentPrice] = useState(QUANTITY_OPTIONS[0].salePrice);
   const [currentOriginalPrice, setCurrentOriginalPrice] = useState(QUANTITY_OPTIONS[0].originalPrice);
 
   usePresence("/");
+
+  // Calculate delivery date (3-5 days from now)
+  const getDeliveryDateRange = () => {
+    const today = new Date();
+    const minDate = new Date(today);
+    const maxDate = new Date(today);
+    minDate.setDate(today.getDate() + 3);
+    maxDate.setDate(today.getDate() + 5);
+    
+    const formatDate = (date: Date) => {
+      return date.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' }).replace('.', '');
+    };
+    
+    return `${formatDate(minDate)} - ${formatDate(maxDate)}`;
+  };
 
   const discountPercent = currentOriginalPrice > 0 
     ? Math.round(((currentOriginalPrice - currentPrice) / currentOriginalPrice) * 100) 
@@ -185,6 +202,22 @@ const Index = () => {
               <ShoppingCart className="h-5 w-5 mr-2" />
               {totalItems > 0 ? 'Finalizar compra' : 'Comprar agora'}
             </Button>
+            
+            {/* Free Shipping Info */}
+            <div className="mt-3 flex items-center justify-center gap-2 bg-success/10 border border-success/20 rounded-xl p-3">
+              <Truck className="h-5 w-5 text-success flex-shrink-0" />
+              <div className="text-sm">
+                <span className="font-bold text-success">FRETE FULL GRÁTIS</span>
+                {!locationLoading && city ? (
+                  <span className="text-foreground"> para <span className="font-semibold">{city}{state ? `, ${state}` : ''}</span></span>
+                ) : (
+                  <span className="text-foreground"> para todo o Brasil</span>
+                )}
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  Chegará entre <span className="font-medium text-foreground">{getDeliveryDateRange()}</span>
+                </p>
+              </div>
+            </div>
           </div>
 
           {/* Quick Benefits Row */}
