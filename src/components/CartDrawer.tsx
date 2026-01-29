@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { ShoppingCart, Plus, Minus, Trash2 } from "lucide-react";
+import { ShoppingCart, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { useCart } from "@/contexts/CartContext";
@@ -31,7 +31,7 @@ const CartDrawer = ({ open, onOpenChange }: CartDrawerProps) => {
 
         {items.length === 0 ? (
           <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">
-            <ShoppingCart className="h-16 w-16 text-muted-foreground mb-4" />
+            <ShoppingCart className="h-16 w-16 text-primary/50 mb-4" />
             <p className="text-lg font-medium text-foreground mb-2">Carrinho vazio</p>
             <p className="text-sm text-muted-foreground">
               Adicione produtos ao carrinho para continuar
@@ -43,13 +43,13 @@ const CartDrawer = ({ open, onOpenChange }: CartDrawerProps) => {
               {items.map((item) => (
                 <div
                   key={item.id}
-                  className="flex gap-3 p-3 bg-muted/30 rounded-lg"
+                  className="flex gap-3 p-4 bg-primary/5 rounded-xl border border-primary/20"
                 >
                   {/* Product Image */}
-                  <div className="w-20 h-20 rounded-lg overflow-hidden bg-white flex-shrink-0">
+                  <div className="w-20 h-20 rounded-xl overflow-hidden bg-white flex-shrink-0 border border-primary/20">
                     <img
                       src={cameraMain}
-                      alt="Kit 3 Câmeras Wi-Fi"
+                      alt={item.colorName}
                       className="w-full h-full object-contain"
                       loading="lazy"
                       decoding="async"
@@ -58,93 +58,55 @@ const CartDrawer = ({ open, onOpenChange }: CartDrawerProps) => {
 
                   {/* Product Info */}
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-medium text-sm text-foreground truncate">
-                      Kit 3 Câmeras Wi-Fi
+                    <h3 className="font-bold text-sm text-foreground">
+                      {item.colorName}
                     </h3>
                     <p className="text-xs text-muted-foreground">
                       Full HD 1080P • Visão Noturna
                     </p>
-                    <p className="text-sm font-bold text-success mt-1">
+                    <p className="text-lg font-bold text-accent mt-2">
                       R$ {item.price.toFixed(2).replace(".", ",")}
                     </p>
-
-                    {/* Quantity Controls */}
-                    <div className="flex items-center gap-2 mt-2">
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        className="h-7 w-7"
-                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                      >
-                        <Minus className="h-3 w-3" />
-                      </Button>
-                      <span className="text-sm font-medium w-6 text-center">
-                        {item.quantity}
-                      </span>
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        className="h-7 w-7"
-                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                      >
-                        <Plus className="h-3 w-3" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-7 w-7 ml-auto text-destructive hover:text-destructive"
-                        onClick={() => removeItem(item.id)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
+                    
+                    {/* Remove Button */}
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-7 px-2 mt-1 text-destructive hover:text-destructive hover:bg-destructive/10"
+                      onClick={() => removeItem(item.id)}
+                    >
+                      <Trash2 className="h-3.5 w-3.5 mr-1" />
+                      <span className="text-xs">Remover</span>
+                    </Button>
                   </div>
                 </div>
               ))}
-
             </div>
 
             {/* Footer */}
-            <div className="border-t border-border p-4 space-y-4">
-              {/* Promotion Banner - Encourage 2nd kit */}
-              {totalItems === 1 && (
-                <div className="relative overflow-hidden bg-gradient-to-r from-emerald-600 to-emerald-500 rounded-xl p-3 shadow-md">
-                  <div className="absolute top-0 right-0 w-16 h-16 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2" />
-                  <div className="relative flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
-                      <span className="text-lg">📦</span>
-                    </div>
-                    <div className="flex-1">
-                      <p className="font-semibold text-white text-sm">Adicione +1 kit</p>
-                      <p className="text-emerald-100 text-xs">e ganhe <span className="font-bold text-white">20% OFF</span> no segundo!</p>
-                    </div>
-                  </div>
-                </div>
-              )}
-              
+            <div className="border-t border-primary/20 p-4 space-y-4 bg-gradient-to-t from-primary/5 to-transparent">
               {/* Discount Applied Banner */}
               {discount > 0 && (
-                <div className="relative overflow-hidden bg-gradient-to-r from-emerald-500 to-teal-500 rounded-xl p-3 shadow-md">
+                <div className="relative overflow-hidden bg-gradient-to-r from-primary to-primary/80 rounded-xl p-3 shadow-md">
                   <div className="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2" />
                   <div className="relative flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
-                        <span className="text-base">✨</span>
+                        <span className="text-base">💰</span>
                       </div>
                       <div>
-                        <p className="font-semibold text-white text-sm">Desconto aplicado!</p>
-                        <p className="text-emerald-100 text-xs">Você está economizando</p>
+                        <p className="font-semibold text-white text-sm">Você economiza</p>
                       </div>
                     </div>
-                    <div className="bg-white/20 backdrop-blur-sm rounded-lg px-3 py-1.5">
-                      <p className="text-white font-bold text-base">-R$ {discount.toFixed(2).replace(".", ",")}</p>
+                    <div className="bg-accent rounded-lg px-3 py-1.5">
+                      <p className="text-white font-bold text-base">R$ {discount.toFixed(2).replace(".", ",")}</p>
                     </div>
                   </div>
                 </div>
               )}
               
               {/* Price Summary */}
-              <div className="bg-muted/30 rounded-xl p-4 space-y-2">
+              <div className="bg-primary/10 rounded-xl p-4 space-y-2 border border-primary/20">
                 {discount > 0 && (
                   <div className="flex justify-between items-center text-sm">
                     <span className="text-muted-foreground">Subtotal</span>
@@ -155,7 +117,7 @@ const CartDrawer = ({ open, onOpenChange }: CartDrawerProps) => {
                 )}
                 <div className="flex justify-between items-center">
                   <span className="font-medium text-foreground">Total</span>
-                  <span className="font-bold text-xl text-foreground">
+                  <span className="font-bold text-xl text-primary">
                     R$ {totalPrice.toFixed(2).replace(".", ",")}
                   </span>
                 </div>
@@ -163,7 +125,7 @@ const CartDrawer = ({ open, onOpenChange }: CartDrawerProps) => {
               
               <Button
                 onClick={handleCheckout}
-                className="w-full h-12 bg-success hover:bg-success/90 text-white font-bold rounded-xl shadow-lg shadow-success/20"
+                className="w-full h-12 bg-accent hover:bg-accent/90 text-white font-bold rounded-xl shadow-lg shadow-accent/30"
               >
                 Finalizar Compra
               </Button>
