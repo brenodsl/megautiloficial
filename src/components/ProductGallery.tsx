@@ -53,13 +53,8 @@ const ProductGallery = () => {
 
   return (
     <div id="produto" className="space-y-3">
-      {/* Main Image Display with Discount Badge */}
+      {/* Main Image Display */}
       <div className="relative aspect-square overflow-hidden rounded-2xl bg-white">
-        {/* Discount Badge */}
-        <div className="absolute top-4 left-4 z-10 bg-accent text-white text-sm font-bold px-3 py-1.5 rounded-lg shadow-lg">
-          -64%
-        </div>
-
         <div ref={emblaRef} className="overflow-hidden h-full">
           <div className="flex h-full">
             {mediaItems.map((item) => (
