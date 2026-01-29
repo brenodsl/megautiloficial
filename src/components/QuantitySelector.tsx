@@ -1,4 +1,4 @@
-import { Check, Tag } from "lucide-react";
+import { Tag } from "lucide-react";
 import kit1und from "@/assets/kit-1und.jpg";
 import kit2und from "@/assets/kit-2und.jpg";
 import kit3und from "@/assets/kit-3und.jpg";
@@ -51,31 +51,21 @@ const QuantitySelector = ({ selectedQuantity, onQuantityChange }: QuantitySelect
                 </span>
               )}
               
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  {/* Selection indicator */}
-                  <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
-                    isSelected 
-                      ? "border-primary bg-primary" 
-                      : "border-muted-foreground/30"
-                  }`}>
-                    {isSelected && <Check className="h-3 w-3 text-white" />}
-                  </div>
-                  
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2 sm:gap-3 min-w-0">
                   {/* Kit Image */}
                   <img 
                     src={option.image} 
                     alt={option.label}
-                    className="w-14 h-14 object-cover rounded-lg border border-border"
+                    className="w-12 h-12 sm:w-14 sm:h-14 object-cover rounded-lg border border-border flex-shrink-0"
                   />
                   
-                  <div>
-                    <p className="font-bold text-foreground">{option.label}</p>
-                    <div className="flex items-center gap-2 mt-0.5">
+                  <div className="min-w-0">
+                    <p className="font-bold text-foreground text-sm sm:text-base">{option.label}</p>
+                    <div className="flex items-center gap-1 sm:gap-2 mt-0.5 flex-wrap">
                       <span className="text-xs text-muted-foreground line-through">
                         R$ {option.originalPrice.toFixed(2).replace(".", ",")}
                       </span>
-                      <span className="text-xs text-muted-foreground">👉</span>
                       <span className="text-sm font-bold text-primary">
                         R$ {option.salePrice.toFixed(2).replace(".", ",")}
                       </span>
@@ -85,9 +75,9 @@ const QuantitySelector = ({ selectedQuantity, onQuantityChange }: QuantitySelect
                 
                 {/* Savings badge */}
                 {option.savings > 0 && (
-                  <div className="flex items-center gap-1 bg-success/10 text-success px-2 py-1 rounded-lg">
-                    <Tag className="h-3 w-3" />
-                    <span className="text-xs font-bold">
+                  <div className="flex items-center gap-1 bg-success/10 text-success px-1.5 sm:px-2 py-1 rounded-lg flex-shrink-0">
+                    <Tag className="h-3 w-3 hidden sm:block" />
+                    <span className="text-[10px] sm:text-xs font-bold whitespace-nowrap">
                       -R$ {option.savings.toFixed(2).replace(".", ",")}
                     </span>
                   </div>
