@@ -112,6 +112,8 @@ serve(async (req) => {
       API_URL = `https://api.sigmapay.com.br/api/public/v1/transactions?api_token=${gateway.api_token}`;
     } else if (gateway.gateway_name === 'goatpay') {
       API_URL = `https://api.goatpayments.com.br/api/public/v1/transactions?api_token=${gateway.api_token}`;
+    } else if (gateway.gateway_name === 'visionpay') {
+      API_URL = `https://api.visionpayments.com.br/api/public/v1/transactions?api_token=${gateway.api_token}`;
     } else {
       console.error('Unknown gateway:', gateway.gateway_name);
       return new Response(
