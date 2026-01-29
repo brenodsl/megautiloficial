@@ -54,6 +54,12 @@ const Index = () => {
     setSelectedQuantity(quantity);
     setCurrentPrice(price);
     setCurrentOriginalPrice(originalPrice);
+    
+    // Atualiza o carrinho automaticamente quando troca de kit
+    if (totalItems > 0) {
+      clearCart();
+      addItem("default", quantity, 1, price, originalPrice);
+    }
   };
 
   const handleBuyClick = () => {
