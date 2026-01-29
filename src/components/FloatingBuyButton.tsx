@@ -2,12 +2,36 @@ import { useNavigate } from "react-router-dom";
 import { ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/CartContext";
+import { trackPixelEvent } from "@/hooks/usePixels";
 
-const FloatingBuyButton = () => {
+interface FloatingBuyButtonProps {
+  selectedQuantity: number;
+  currentPrice: number;
+  currentOriginalPrice: number;
+}
+
+const FloatingBuyButton = ({ selectedQuantity, currentPrice, currentOriginalPrice }: FloatingBuyButtonProps) => {
   const navigate = useNavigate();
-  const { totalItems } = useCart();
+  const { totalItems, addItem, clearCart } = useCart();
 
   const handleClick = () => {
+    if (totalItems > 0) {
+      navigate("/checkout");
+      return;
+    }
+    
+    trackPixelEvent('AddToCart', {
+      content_type: 'product',
+      content_id: 'camera-wifi-security',
+      content_name: 'Câmera Wi-Fi com Sensor de Movimento',
+      quantity: selectedQuantity,
+      value: currentPrice,
+      currency: 'BRL',
+    });
+    
+    // Clear cart and add new selection
+    clearCart();
+    addItem("default", selectedQuantity, 1, currentPrice, currentOriginalPrice);
     navigate("/checkout");
   };
 

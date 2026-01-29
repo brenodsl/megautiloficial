@@ -216,7 +216,11 @@ const Index = () => {
       </main>
 
       <Footer />
-      <FloatingBuyButton />
+      <FloatingBuyButton 
+        selectedQuantity={selectedQuantity}
+        currentPrice={currentPrice}
+        currentOriginalPrice={currentOriginalPrice}
+      />
       <PurchaseNotifications />
     </div>
   );
