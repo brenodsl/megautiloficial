@@ -19,6 +19,7 @@ import {
   Clock,
   AlertCircle,
   ArrowLeft,
+  ArrowRight,
   Plus,
   Minus,
   Gift,
@@ -41,6 +42,14 @@ import reviewCamera2 from "@/assets/review-camera-2.webp";
 import reviewCamera3 from "@/assets/review-camera-3.webp";
 import reviewCamera4 from "@/assets/review-camera-4.webp";
 import reviewCamera5 from "@/assets/review-camera-5.webp";
+import reviewNew1 from "@/assets/review-new-1.webp";
+import reviewNew2 from "@/assets/review-new-2.webp";
+import reviewNew3 from "@/assets/review-new-3.webp";
+import reviewNew4 from "@/assets/review-new-4.webp";
+import reviewNew5 from "@/assets/review-new-5.webp";
+import reviewNew6 from "@/assets/review-new-6.webp";
+import reviewNew7 from "@/assets/review-new-7.webp";
+import reviewNew8 from "@/assets/review-new-8.webp";
 import seloSiteBlindado from "@/assets/selo-site-blindado.png";
 import seloReclameAqui from "@/assets/selo-reclame-aqui.png";
 import { usePresence } from "@/hooks/usePresence";
@@ -98,7 +107,7 @@ const customerReviews = [
     name: "Maria S.",
     location: "São Paulo, SP",
     rating: 5,
-    comment: "Câmera instalada no poste, imagem perfeita! A qualidade mesmo à distância é incrível, recomendo demais!",
+    comment: "Câmera instalada no poste, imagem perfeita!",
     images: [reviewCamera1],
   },
   {
@@ -106,7 +115,7 @@ const customerReviews = [
     name: "Carlos M.",
     location: "Rio de Janeiro, RJ",
     rating: 5,
-    comment: "Produto de excelente qualidade! Acabamento premium e funcionamento perfeito. Super satisfeito!",
+    comment: "Qualidade incrível, recomendo!",
     images: [reviewCamera2],
   },
   {
@@ -114,7 +123,7 @@ const customerReviews = [
     name: "Ana Paula S.",
     location: "Belo Horizonte, MG",
     rating: 5,
-    comment: "Chegou super bem embalado! Produto original com todos os acessórios. Instalação super fácil!",
+    comment: "Chegou super bem embalado!",
     images: [reviewCamera3],
   },
   {
@@ -122,7 +131,7 @@ const customerReviews = [
     name: "Roberto F.",
     location: "Curitiba, PR",
     rating: 5,
-    comment: "Embalagem original WiFi Smart Camera! Produto idêntico ao anunciado, qualidade top!",
+    comment: "Produto idêntico ao anunciado!",
     images: [reviewCamera4],
   },
   {
@@ -130,14 +139,41 @@ const customerReviews = [
     name: "Fernanda L.",
     location: "Salvador, BA",
     rating: 5,
-    comment: "Kit completo com câmera e todos os acessórios! Visão noturna incrível, recomendo!",
+    comment: "Kit completo, visão noturna incrível!",
     images: [reviewCamera5],
+  },
+  {
+    id: 6,
+    name: "Ricardo A.",
+    location: "Brasília, DF",
+    rating: 5,
+    comment: "Instalação super fácil!",
+    images: [reviewNew1],
+  },
+  {
+    id: 7,
+    name: "Juliana P.",
+    location: "Porto Alegre, RS",
+    rating: 5,
+    comment: "Qualidade excepcional!",
+    images: [reviewNew2],
+  },
+  {
+    id: 8,
+    name: "Marcos V.",
+    location: "Recife, PE",
+    rating: 5,
+    comment: "Monitorando 24h perfeitamente!",
+    images: [reviewNew3],
   },
 ];
 
 const Checkout = () => {
   const navigate = useNavigate();
   const { items, totalPrice, originalPrice, discount, clearCart, updateQuantity, unitPrice, displayOriginalPrice } = useCart();
+  
+  // Step state: 1 = Dados Pessoais, 2 = Endereço, 3 = Resumo/Pagamento
+  const [currentStep, setCurrentStep] = useState(1);
   
   const [customerData, setCustomerData] = useState({
     name: "",
@@ -187,6 +223,11 @@ const Checkout = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  // Scroll to top when step changes
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [currentStep]);
 
   // Offer timer countdown
   useEffect(() => {
@@ -681,6 +722,63 @@ const Checkout = () => {
   const isAddressComplete = isCepValid && isStreetValid && isNumberValid && isNeighborhoodValid && isCityValid && isStateValid;
   const isFormComplete = isCustomerDataComplete && isAddressComplete;
 
+  // Step navigation handlers
+  const handleNextStep = () => {
+    if (currentStep === 1) {
+      // Validate step 1
+      if (!isNameValid) {
+        toast.error("Preencha seu nome completo");
+        return;
+      }
+      if (!isEmailValid) {
+        toast.error("Preencha um e-mail válido");
+        return;
+      }
+      if (!isPhoneValid) {
+        toast.error("Preencha um telefone válido");
+        return;
+      }
+      if (!isCpfValid) {
+        toast.error("Preencha um CPF válido");
+        return;
+      }
+      setCurrentStep(2);
+    } else if (currentStep === 2) {
+      // Validate step 2
+      if (!isCepValid) {
+        toast.error("Preencha um CEP válido");
+        return;
+      }
+      if (!isStreetValid) {
+        toast.error("Preencha o endereço");
+        return;
+      }
+      if (!isNumberValid) {
+        toast.error("Preencha o número");
+        return;
+      }
+      if (!isNeighborhoodValid) {
+        toast.error("Preencha o bairro");
+        return;
+      }
+      if (!isCityValid) {
+        toast.error("Preencha a cidade");
+        return;
+      }
+      if (!isStateValid) {
+        toast.error("Preencha o estado");
+        return;
+      }
+      setCurrentStep(3);
+    }
+  };
+
+  const handlePrevStep = () => {
+    if (currentStep > 1) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
+
   if (items.length === 0 && !pixData) {
     return (
       <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
@@ -862,12 +960,55 @@ const Checkout = () => {
     );
   }
 
+  // Step indicator component
+  const StepIndicator = () => (
+    <div className="bg-white border-b border-gray-100 py-4 px-4">
+      <div className="max-w-lg mx-auto">
+        <div className="flex items-center justify-between">
+          {[
+            { num: 1, label: "Dados", icon: User },
+            { num: 2, label: "Endereço", icon: MapPin },
+            { num: 3, label: "Pagamento", icon: CreditCard },
+          ].map((step, index) => (
+            <div key={step.num} className="flex items-center">
+              <div className="flex flex-col items-center">
+                <div 
+                  className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${
+                    currentStep >= step.num 
+                      ? "bg-primary text-white" 
+                      : "bg-gray-200 text-gray-500"
+                  }`}
+                >
+                  {currentStep > step.num ? (
+                    <CheckCircle className="h-5 w-5" />
+                  ) : (
+                    <step.icon className="h-5 w-5" />
+                  )}
+                </div>
+                <span className={`text-xs mt-1 font-medium ${
+                  currentStep >= step.num ? "text-primary" : "text-gray-400"
+                }`}>
+                  {step.label}
+                </span>
+              </div>
+              {index < 2 && (
+                <div className={`w-16 sm:w-24 h-1 mx-2 rounded ${
+                  currentStep > step.num ? "bg-primary" : "bg-gray-200"
+                }`} />
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <div className="min-h-screen bg-gray-50 pb-8">
       {/* Header - CASAFORT Style */}
       <header className="bg-primary py-3 px-4">
         <div className="max-w-lg mx-auto flex items-center justify-between">
-          <button onClick={() => navigate("/")} className="text-white">
+          <button onClick={() => currentStep > 1 ? handlePrevStep() : navigate("/")} className="text-white">
             <ArrowLeft className="h-5 w-5" />
           </button>
           <Link to="/">
@@ -891,6 +1032,9 @@ const Checkout = () => {
         </div>
       </header>
 
+      {/* Step Indicator */}
+      <StepIndicator />
+
       {/* Offer Timer Bar */}
       <div className="bg-accent py-3 px-4">
         <div className="max-w-lg mx-auto flex items-center justify-center gap-3">
@@ -905,567 +1049,592 @@ const Checkout = () => {
       </div>
 
       <main className="max-w-lg mx-auto px-4 py-4 space-y-4">
-        {/* Product Card */}
-        {items.length > 0 && items.map((item) => {
-          const quantityLabel = item.size === 1 ? "1 Câmera" : `Kit ${item.size} Câmeras`;
-          
-          return (
-            <div key={item.id} className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
-              <div className="flex gap-3">
-                {/* Product Image with PROMOÇÃO badge */}
-                <div className="relative flex-shrink-0">
-                  <div className="absolute -top-2 -left-2 z-10">
-                    <span className="bg-accent text-white text-[10px] font-bold px-2 py-1 rounded">
-                      PROMOÇÃO
-                    </span>
-                  </div>
-                  <img
-                    src={cameraMain}
-                    alt={quantityLabel}
-                    className="w-20 h-20 object-cover rounded-xl border border-gray-200"
+        
+        {/* STEP 1: Customer Data */}
+        {currentStep === 1 && (
+          <>
+            {/* Mini Product Card */}
+            <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+              <div className="flex gap-3 items-center">
+                <img
+                  src={cameraMain}
+                  alt="Produto"
+                  className="w-16 h-16 object-cover rounded-xl border border-gray-200"
+                />
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-gray-900">
+                    {items[0]?.size === 1 ? "1 Câmera" : `Kit ${items[0]?.size} Câmeras`} Wi-Fi
+                  </p>
+                  <p className="text-lg font-bold text-primary">
+                    R$ {totalPrice.toFixed(2).replace(".", ",")}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Customer Form */}
+            <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+              <div className="flex items-center gap-2 mb-4">
+                <User className="h-5 w-5 text-primary" />
+                <h2 className="font-semibold text-gray-900">Seus Dados</h2>
+              </div>
+              
+              <div className="space-y-4">
+                <div>
+                  <Label className="text-sm text-gray-700 flex items-center gap-1">
+                    Nome completo <span className="text-red-500">*</span>
+                    {touchedFields.name && isNameValid && <CheckCircle className="h-3.5 w-3.5 text-green-500" />}
+                  </Label>
+                  <Input
+                    placeholder="Digite seu nome completo"
+                    value={customerData.name}
+                    onChange={(e) => handleCustomerChange("name", e.target.value)}
+                    onBlur={() => handleFieldBlur("name")}
+                    className={getInputClass(isNameValid, touchedFields.name || false, !!customerData.name)}
                   />
+                  {getNameError() && (
+                    <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
+                      <AlertCircle className="h-3 w-3" />
+                      {getNameError()}
+                    </p>
+                  )}
                 </div>
                 
-                {/* Product Info */}
-                <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold text-gray-900 text-sm leading-tight">
-                    {quantityLabel} - Câmera Wi-Fi com Sensor de Movimento
-                  </h3>
-                  <div className="flex items-center gap-1 mt-1">
-                    <div className="flex">
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <Star key={star} className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-                      ))}
-                    </div>
-                    <span className="text-xs text-gray-500">(127 avaliações)</span>
+                <div>
+                  <Label className="text-sm text-gray-700 flex items-center gap-1">
+                    E-mail <span className="text-red-500">*</span>
+                    {touchedFields.email && isEmailValid && <CheckCircle className="h-3.5 w-3.5 text-green-500" />}
+                  </Label>
+                  <Input
+                    type="email"
+                    placeholder="seu@email.com"
+                    value={customerData.email}
+                    onChange={(e) => handleCustomerChange("email", e.target.value)}
+                    onBlur={() => handleFieldBlur("email")}
+                    className={getInputClass(isEmailValid, touchedFields.email || false, !!customerData.email)}
+                  />
+                  {getEmailError() && (
+                    <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
+                      <AlertCircle className="h-3 w-3" />
+                      {getEmailError()}
+                    </p>
+                  )}
+                </div>
+                
+                <div>
+                  <Label className="text-sm text-gray-700 flex items-center gap-1">
+                    Telefone/WhatsApp <span className="text-red-500">*</span>
+                    {touchedFields.phone && isPhoneValid && <CheckCircle className="h-3.5 w-3.5 text-green-500" />}
+                  </Label>
+                  <Input
+                    placeholder="(00) 00000-0000"
+                    value={customerData.phone}
+                    onChange={(e) => handleCustomerChange("phone", e.target.value)}
+                    onBlur={() => handleFieldBlur("phone")}
+                    maxLength={15}
+                    inputMode="tel"
+                    className={getInputClass(isPhoneValid, touchedFields.phone || false, !!customerData.phone)}
+                  />
+                  {getPhoneError() && (
+                    <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
+                      <AlertCircle className="h-3 w-3" />
+                      {getPhoneError()}
+                    </p>
+                  )}
+                </div>
+                
+                <div>
+                  <Label className="text-sm text-gray-700 flex items-center gap-1">
+                    CPF <span className="text-red-500">*</span>
+                    {touchedFields.document && isCpfValid && <CheckCircle className="h-3.5 w-3.5 text-green-500" />}
+                  </Label>
+                  <Input
+                    placeholder="000.000.000-00"
+                    value={customerData.document}
+                    onChange={(e) => handleCustomerChange("document", e.target.value)}
+                    onBlur={() => handleFieldBlur("document")}
+                    maxLength={14}
+                    inputMode="numeric"
+                    className={getInputClass(isCpfValid, touchedFields.document || false, !!customerData.document)}
+                  />
+                  {getCpfError() && (
+                    <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
+                      <AlertCircle className="h-3 w-3" />
+                      {getCpfError()}
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              {/* Next Button */}
+              <Button
+                onClick={handleNextStep}
+                disabled={!isCustomerDataComplete}
+                className={`w-full h-14 font-bold text-lg rounded-xl mt-6 gap-2 ${
+                  isCustomerDataComplete
+                    ? 'bg-accent hover:bg-accent/90 text-white'
+                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                }`}
+              >
+                Continuar para Endereço
+                <ArrowRight className="h-5 w-5" />
+              </Button>
+            </div>
+          </>
+        )}
+
+        {/* STEP 2: Address */}
+        {currentStep === 2 && (
+          <>
+            {/* Address Form */}
+            <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+              <div className="flex items-center gap-2 mb-4">
+                <MapPin className="h-5 w-5 text-primary" />
+                <h2 className="font-semibold text-gray-900">Endereço de Entrega</h2>
+              </div>
+              
+              <div className="space-y-4">
+                <div className="relative">
+                  <Label className="text-sm text-gray-700 flex items-center gap-1">
+                    CEP <span className="text-red-500">*</span>
+                    {touchedFields.zipCode && isCepValid && <CheckCircle className="h-3.5 w-3.5 text-green-500" />}
+                  </Label>
+                  <Input
+                    placeholder="00000-000"
+                    value={addressData.zipCode}
+                    onChange={(e) => handleAddressChange("zipCode", e.target.value)}
+                    onBlur={() => handleFieldBlur("zipCode")}
+                    maxLength={9}
+                    inputMode="numeric"
+                    className={getInputClass(isCepValid, touchedFields.zipCode || false, !!addressData.zipCode)}
+                  />
+                  {isLoadingCep && (
+                    <Loader2 className="absolute right-3 top-9 h-4 w-4 animate-spin text-gray-400" />
+                  )}
+                  {getCepError() && (
+                    <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
+                      <AlertCircle className="h-3 w-3" />
+                      {getCepError()}
+                    </p>
+                  )}
+                </div>
+                
+                <div>
+                  <Label className="text-sm text-gray-700 flex items-center gap-1">
+                    Endereço <span className="text-red-500">*</span>
+                    {touchedFields.street && isStreetValid && <CheckCircle className="h-3.5 w-3.5 text-green-500" />}
+                  </Label>
+                  <Input
+                    placeholder="Rua, avenida..."
+                    value={addressData.street}
+                    onChange={(e) => handleAddressChange("street", e.target.value)}
+                    onBlur={() => handleFieldBlur("street")}
+                    className={getInputClass(isStreetValid, touchedFields.street || false, !!addressData.street)}
+                  />
+                  {getStreetError() && (
+                    <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
+                      <AlertCircle className="h-3 w-3" />
+                      {getStreetError()}
+                    </p>
+                  )}
+                </div>
+                
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <Label className="text-sm text-gray-700 flex items-center gap-1">
+                      Nº <span className="text-red-500">*</span>
+                    </Label>
+                    <Input
+                      placeholder="123"
+                      value={addressData.number}
+                      onChange={(e) => handleAddressChange("number", e.target.value)}
+                      onBlur={() => handleFieldBlur("number")}
+                      inputMode="numeric"
+                      className={getInputClass(isNumberValid, touchedFields.number || false, !!addressData.number)}
+                    />
+                    {getNumberError() && (
+                      <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
+                        <AlertCircle className="h-3 w-3" />
+                        {getNumberError()}
+                      </p>
+                    )}
                   </div>
-                  <div className="flex items-center gap-2 mt-2">
-                    <span className="text-xl font-bold text-primary">
-                      R$ {item.price.toFixed(2).replace(".", ",")}
-                    </span>
-                    <span className="text-sm text-gray-400 line-through">
-                      R$ {displayOriginalPrice.toFixed(2).replace(".", ",")}
-                    </span>
+                  <div>
+                    <Label className="text-sm text-gray-700">Complemento</Label>
+                    <Input
+                      placeholder="Apto, bloco..."
+                      value={addressData.complement}
+                      onChange={(e) => handleAddressChange("complement", e.target.value)}
+                      className="mt-1 h-12 rounded-xl border-gray-200 bg-gray-50 focus:bg-white"
+                    />
+                  </div>
+                </div>
+                
+                <div>
+                  <Label className="text-sm text-gray-700 flex items-center gap-1">
+                    Bairro <span className="text-red-500">*</span>
+                    {touchedFields.neighborhood && isNeighborhoodValid && <CheckCircle className="h-3.5 w-3.5 text-green-500" />}
+                  </Label>
+                  <Input
+                    placeholder="Seu bairro"
+                    value={addressData.neighborhood}
+                    onChange={(e) => handleAddressChange("neighborhood", e.target.value)}
+                    onBlur={() => handleFieldBlur("neighborhood")}
+                    className={getInputClass(isNeighborhoodValid, touchedFields.neighborhood || false, !!addressData.neighborhood)}
+                  />
+                  {getNeighborhoodError() && (
+                    <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
+                      <AlertCircle className="h-3 w-3" />
+                      {getNeighborhoodError()}
+                    </p>
+                  )}
+                </div>
+                
+                <div className="grid grid-cols-4 gap-3">
+                  <div className="col-span-3">
+                    <Label className="text-sm text-gray-700 flex items-center gap-1">
+                      Cidade <span className="text-red-500">*</span>
+                      {touchedFields.city && isCityValid && <CheckCircle className="h-3.5 w-3.5 text-green-500" />}
+                    </Label>
+                    <Input
+                      placeholder="Sua cidade"
+                      value={addressData.city}
+                      onChange={(e) => handleAddressChange("city", e.target.value)}
+                      onBlur={() => handleFieldBlur("city")}
+                      className={getInputClass(isCityValid, touchedFields.city || false, !!addressData.city)}
+                    />
+                    {getCityError() && (
+                      <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
+                        <AlertCircle className="h-3 w-3" />
+                        {getCityError()}
+                      </p>
+                    )}
+                  </div>
+                  <div>
+                    <Label className="text-sm text-gray-700 flex items-center gap-1">
+                      UF <span className="text-red-500">*</span>
+                    </Label>
+                    <Input
+                      placeholder="UF"
+                      value={addressData.state}
+                      onChange={(e) => handleAddressChange("state", e.target.value)}
+                      onBlur={() => handleFieldBlur("state")}
+                      maxLength={2}
+                      className={`${getInputClass(isStateValid, touchedFields.state || false, !!addressData.state)} text-center`}
+                    />
+                    {getStateError() && (
+                      <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
+                        <AlertCircle className="h-3 w-3" />
+                        {getStateError()}
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>
-            
-            {/* Trust Badges Row */}
-            <div className="flex items-center justify-between mt-4 pt-3 border-t border-gray-100">
-              <div className="flex flex-col items-center">
-                <ShieldCheck className="h-5 w-5 text-[#28af60]" />
-                <span className="text-[9px] text-gray-500 mt-1">Compra Segura</span>
-              </div>
-              <div className="flex flex-col items-center">
-                <Truck className="h-5 w-5 text-[#28af60]" />
-                <span className="text-[9px] text-gray-500 mt-1">Frete Grátis</span>
-              </div>
-              <div className="flex flex-col items-center">
-                <Award className="h-5 w-5 text-[#28af60]" />
-                <span className="text-[9px] text-gray-500 mt-1">Garantia 12m</span>
-              </div>
-              <div className="flex flex-col items-center">
-                <PixIcon className="h-5 w-5 text-[#28af60]" />
-                <span className="text-[9px] text-gray-500 mt-1">PIX Seguro</span>
-              </div>
-            </div>
-          </div>
-        );
-        })}
 
-
-        {/* Customer Data Section */}
-        <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
-          <div className="flex items-center gap-2 mb-4">
-            <User className="h-5 w-5 text-primary" />
-            <h2 className="font-semibold text-gray-900">Dados Pessoais</h2>
-            {isCustomerDataComplete && (
-              <span className="ml-auto text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full flex items-center gap-1">
-                <CheckCircle className="h-3 w-3" /> Completo
-              </span>
-            )}
-          </div>
-          
-          <div className="space-y-4">
-            <div>
-              <Label className="text-sm text-gray-700 flex items-center gap-1">
-                Nome completo <span className="text-red-500">*</span>
-                {touchedFields.name && isNameValid && <CheckCircle className="h-3.5 w-3.5 text-green-500" />}
-              </Label>
-              <Input
-                placeholder="Seu nome completo"
-                value={customerData.name}
-                onChange={(e) => handleCustomerChange("name", e.target.value)}
-                onBlur={() => handleFieldBlur("name")}
-                className={getInputClass(isNameValid, touchedFields.name || false, !!customerData.name)}
-              />
-              {getNameError() && (
-                <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
-                  <AlertCircle className="h-3 w-3" />
-                  {getNameError()}
-                </p>
-              )}
-            </div>
-            
-            <div>
-              <Label className="text-sm text-gray-700 flex items-center gap-1">
-                E-mail <span className="text-red-500">*</span>
-                {touchedFields.email && isEmailValid && <CheckCircle className="h-3.5 w-3.5 text-green-500" />}
-              </Label>
-              <Input
-                type="email"
-                placeholder="seu@email.com"
-                value={customerData.email}
-                onChange={(e) => handleCustomerChange("email", e.target.value)}
-                onBlur={() => handleFieldBlur("email")}
-                className={getInputClass(isEmailValid, touchedFields.email || false, !!customerData.email)}
-              />
-              {getEmailError() && (
-                <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
-                  <AlertCircle className="h-3 w-3" />
-                  {getEmailError()}
-                </p>
-              )}
-            </div>
-            
-            <div>
-              <Label className="text-sm text-gray-700 flex items-center gap-1">
-                Telefone/WhatsApp <span className="text-red-500">*</span>
-                {touchedFields.phone && isPhoneValid && <CheckCircle className="h-3.5 w-3.5 text-green-500" />}
-              </Label>
-              <Input
-                placeholder="(00) 00000-0000"
-                value={customerData.phone}
-                onChange={(e) => handleCustomerChange("phone", e.target.value)}
-                onBlur={() => handleFieldBlur("phone")}
-                maxLength={15}
-                inputMode="tel"
-                className={getInputClass(isPhoneValid, touchedFields.phone || false, !!customerData.phone)}
-              />
-              {getPhoneError() && (
-                <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
-                  <AlertCircle className="h-3 w-3" />
-                  {getPhoneError()}
-                </p>
-              )}
-            </div>
-            
-            <div>
-              <Label className="text-sm text-gray-700 flex items-center gap-1">
-                CPF <span className="text-red-500">*</span>
-                {touchedFields.document && isCpfValid && <CheckCircle className="h-3.5 w-3.5 text-green-500" />}
-              </Label>
-              <Input
-                placeholder="000.000.000-00"
-                value={customerData.document}
-                onChange={(e) => handleCustomerChange("document", e.target.value)}
-                onBlur={() => handleFieldBlur("document")}
-                maxLength={14}
-                inputMode="numeric"
-                className={getInputClass(isCpfValid, touchedFields.document || false, !!customerData.document)}
-              />
-              {getCpfError() && (
-                <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
-                  <AlertCircle className="h-3 w-3" />
-                  {getCpfError()}
-                </p>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Address Section */}
-        <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
-          <div className="flex items-center gap-2 mb-4">
-            <MapPin className="h-5 w-5 text-primary" />
-            <h2 className="font-semibold text-gray-900">Endereço de Entrega</h2>
-            {isAddressComplete && (
-              <span className="ml-auto text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full flex items-center gap-1">
-                <CheckCircle className="h-3 w-3" /> Completo
-              </span>
-            )}
-          </div>
-          
-          <div className="space-y-4">
-            <div className="relative">
-              <Label className="text-sm text-gray-700 flex items-center gap-1">
-                CEP <span className="text-red-500">*</span>
-                {touchedFields.zipCode && isCepValid && <CheckCircle className="h-3.5 w-3.5 text-green-500" />}
-              </Label>
-              <Input
-                placeholder="00000-000"
-                value={addressData.zipCode}
-                onChange={(e) => handleAddressChange("zipCode", e.target.value)}
-                onBlur={() => handleFieldBlur("zipCode")}
-                maxLength={9}
-                inputMode="numeric"
-                className={getInputClass(isCepValid, touchedFields.zipCode || false, !!addressData.zipCode)}
-              />
-              {isLoadingCep && (
-                <Loader2 className="absolute right-3 top-9 h-4 w-4 animate-spin text-gray-400" />
-              )}
-              {getCepError() && (
-                <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
-                  <AlertCircle className="h-3 w-3" />
-                  {getCepError()}
-                </p>
-              )}
-            </div>
-            
-            <div>
-              <Label className="text-sm text-gray-700 flex items-center gap-1">
-                Endereço <span className="text-red-500">*</span>
-                {touchedFields.street && isStreetValid && <CheckCircle className="h-3.5 w-3.5 text-green-500" />}
-              </Label>
-              <Input
-                placeholder="Rua, avenida..."
-                value={addressData.street}
-                onChange={(e) => handleAddressChange("street", e.target.value)}
-                onBlur={() => handleFieldBlur("street")}
-                className={getInputClass(isStreetValid, touchedFields.street || false, !!addressData.street)}
-              />
-              {getStreetError() && (
-                <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
-                  <AlertCircle className="h-3 w-3" />
-                  {getStreetError()}
-                </p>
-              )}
-            </div>
-            
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <Label className="text-sm text-gray-700 flex items-center gap-1">
-                  Nº <span className="text-red-500">*</span>
-                </Label>
-                <Input
-                  placeholder="123"
-                  value={addressData.number}
-                  onChange={(e) => handleAddressChange("number", e.target.value)}
-                  onBlur={() => handleFieldBlur("number")}
-                  inputMode="numeric"
-                  className={getInputClass(isNumberValid, touchedFields.number || false, !!addressData.number)}
-                />
-                {getNumberError() && (
-                  <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
-                    <AlertCircle className="h-3 w-3" />
-                    {getNumberError()}
-                  </p>
-                )}
-              </div>
-              <div>
-                <Label className="text-sm text-gray-700">Complemento</Label>
-                <Input
-                  placeholder="Apto, bloco..."
-                  value={addressData.complement}
-                  onChange={(e) => handleAddressChange("complement", e.target.value)}
-                  className="mt-1 h-12 rounded-xl border-gray-200 bg-gray-50 focus:bg-white"
-                />
-              </div>
-            </div>
-            
-            <div>
-              <Label className="text-sm text-gray-700 flex items-center gap-1">
-                Bairro <span className="text-red-500">*</span>
-                {touchedFields.neighborhood && isNeighborhoodValid && <CheckCircle className="h-3.5 w-3.5 text-green-500" />}
-              </Label>
-              <Input
-                placeholder="Seu bairro"
-                value={addressData.neighborhood}
-                onChange={(e) => handleAddressChange("neighborhood", e.target.value)}
-                onBlur={() => handleFieldBlur("neighborhood")}
-                className={getInputClass(isNeighborhoodValid, touchedFields.neighborhood || false, !!addressData.neighborhood)}
-              />
-              {getNeighborhoodError() && (
-                <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
-                  <AlertCircle className="h-3 w-3" />
-                  {getNeighborhoodError()}
-                </p>
-              )}
-            </div>
-            
-            <div className="grid grid-cols-4 gap-3">
-              <div className="col-span-3">
-                <Label className="text-sm text-gray-700 flex items-center gap-1">
-                  Cidade <span className="text-red-500">*</span>
-                  {touchedFields.city && isCityValid && <CheckCircle className="h-3.5 w-3.5 text-green-500" />}
-                </Label>
-                <Input
-                  placeholder="Sua cidade"
-                  value={addressData.city}
-                  onChange={(e) => handleAddressChange("city", e.target.value)}
-                  onBlur={() => handleFieldBlur("city")}
-                  className={getInputClass(isCityValid, touchedFields.city || false, !!addressData.city)}
-                />
-                {getCityError() && (
-                  <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
-                    <AlertCircle className="h-3 w-3" />
-                    {getCityError()}
-                  </p>
-                )}
-              </div>
-              <div>
-                <Label className="text-sm text-gray-700 flex items-center gap-1">
-                  UF <span className="text-red-500">*</span>
-                </Label>
-                <Input
-                  placeholder="UF"
-                  value={addressData.state}
-                  onChange={(e) => handleAddressChange("state", e.target.value)}
-                  onBlur={() => handleFieldBlur("state")}
-                  maxLength={2}
-                  className={`${getInputClass(isStateValid, touchedFields.state || false, !!addressData.state)} text-center`}
-                />
-                {getStateError() && (
-                  <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
-                    <AlertCircle className="h-3 w-3" />
-                    {getStateError()}
-                  </p>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Shipping Options */}
-        <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
-          <div className="flex items-center gap-2 mb-4">
-            <Truck className="h-5 w-5 text-primary" />
-            <h2 className="font-semibold text-gray-900">Opções de Envio</h2>
-          </div>
-          
-          <div className="space-y-3">
-            {shippingOptions.map((option) => {
-              const isSelected = selectedShipping === option.id;
-              
-              return (
-                <button
-                  key={option.id}
-                  onClick={() => setSelectedShipping(option.id)}
-                  className={`w-full flex items-center justify-between p-4 rounded-xl border-2 transition-all text-left ${
-                    isSelected 
-                      ? "border-primary bg-primary/5" 
-                      : "border-gray-200 hover:border-gray-300"
+              {/* Navigation Buttons */}
+              <div className="flex gap-3 mt-6">
+                <Button
+                  onClick={handlePrevStep}
+                  variant="outline"
+                  className="flex-1 h-12 rounded-xl gap-2"
+                >
+                  <ArrowLeft className="h-4 w-4" />
+                  Voltar
+                </Button>
+                <Button
+                  onClick={handleNextStep}
+                  disabled={!isAddressComplete}
+                  className={`flex-1 h-12 font-bold rounded-xl gap-2 ${
+                    isAddressComplete
+                      ? 'bg-accent hover:bg-accent/90 text-white'
+                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                   }`}
                 >
-                  <div className="flex items-center gap-3">
-                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                      isSelected ? "border-primary" : "border-gray-300"
-                    }`}>
-                      {isSelected && <div className="w-2.5 h-2.5 rounded-full bg-primary" />}
-                    </div>
-                    <div>
-                      {option.id === "sedex" ? (
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs font-bold text-yellow-600 bg-yellow-100 px-2 py-0.5 rounded">SEDEX</span>
-                        </div>
-                      ) : (
-                        <span className="font-medium text-gray-900">{option.name}</span>
-                      )}
-                      <p className="text-xs text-gray-500">{option.description}</p>
-                      {option.note && (
-                        <p className="text-[10px] text-accent">{option.note}</p>
-                      )}
-                    </div>
-                  </div>
-                  <span className={`font-bold ${option.price === 0 ? "text-[#28af60]" : "text-gray-900"}`}>
-                    {option.badge || `R$ ${option.price.toFixed(2).replace(".", ",")}`}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Order Summary */}
-        <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
-          <h2 className="font-semibold text-gray-900 mb-4">Resumo do Pedido</h2>
-          
-          <div className="space-y-2">
-            <div className="flex justify-between text-sm">
-              <span className="text-gray-600">Subtotal</span>
-              <span className="text-gray-900">R$ {displayOriginalPrice.toFixed(2).replace(".", ",")}</span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-[#28af60]">Desconto PIX (64%)</span>
-              <span className="text-[#28af60] font-medium">- R$ {totalPixDiscount.toFixed(2).replace(".", ",")}</span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-gray-600">Frete ({shippingOptions.find(s => s.id === selectedShipping)?.name})</span>
-              <span className={shippingPrice === 0 ? "text-[#28af60] font-medium" : "text-gray-900"}>
-                {shippingPrice === 0 ? "Grátis" : `R$ ${shippingPrice.toFixed(2).replace(".", ",")}`}
-              </span>
-            </div>
-            <div className="border-t border-gray-100 pt-3 mt-3">
-              <div className="flex justify-between items-center">
-                <span className="font-semibold text-gray-900">Total</span>
-                <div className="text-right">
-                  <span className="font-bold text-2xl text-accent">
-                    R$ {finalTotal.toFixed(2).replace(".", ",")}
-                  </span>
-                  <p className="text-xs text-gray-500">à vista no PIX</p>
-                </div>
+                  Continuar
+                  <ArrowRight className="h-4 w-4" />
+                </Button>
               </div>
             </div>
-          </div>
+          </>
+        )}
 
-          {/* CTA Button */}
-
-          <Button
-            onClick={handleCreatePixPayment}
-            disabled={isLoading || !isFormComplete}
-            className={`w-full h-14 font-bold text-lg rounded-xl transition-colors gap-2 ${
-              isFormComplete && !isLoading
-                ? 'bg-accent hover:bg-accent/90 text-white'
-                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-            }`}
-          >
-            {isLoading ? (
-              <>
-                <Loader2 className="h-5 w-5 animate-spin" />
-                Processando...
-              </>
-            ) : isFormComplete ? (
-              <>
-                <PixIcon className="h-5 w-5" />
-                Pagar com PIX
-              </>
-            ) : (
-              "Preencha os dados acima"
-            )}
-          </Button>
-          
-          {/* Security message */}
-          <div className="flex items-center justify-center gap-2 text-xs text-gray-500 mt-3">
-            <Lock className="h-3 w-3" />
-            <span>Pagamento 100% seguro e criptografado</span>
-          </div>
-
-          {/* Site Blindado Badge */}
-          <div className="flex flex-col items-center mt-4 pt-4 border-t border-gray-100">
-            <img 
-              src={seloSiteBlindado} 
-              alt="Site Blindado" 
-              className="h-10 object-contain"
-            />
-            <p className="text-xs text-gray-500 text-center mt-2">
-              Sua navegação é protegida com criptografia de ponta a ponta
-            </p>
-          </div>
-
-          {/* Reclame Aqui Badge */}
-          <div className="flex flex-col items-center mt-4 pt-4 border-t border-gray-100">
-            <img 
-              src={seloReclameAqui} 
-              alt="RA1000 Reclame Aqui" 
-              className="h-16 object-contain"
-            />
-            <p className="text-xs text-gray-500 text-center mt-2">
-              Nota máxima no Reclame Aqui por excelência no atendimento
-            </p>
-          </div>
-        </div>
-
-        {/* Customers Reviews Carousel */}
-        <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
-          <h2 className="font-semibold text-gray-900 mb-4">Clientes satisfeitos</h2>
-          
-          <div className="overflow-x-auto scrollbar-hide -mx-2 px-2">
-            <div className="flex gap-3" style={{ width: 'max-content' }}>
-              {customerReviews.map((review) => (
-                <div key={review.id} className="w-64 flex-shrink-0 bg-gray-50 rounded-xl p-3">
-                  {/* Review Images */}
-                  {review.images.length > 0 && (
-                    <div className="relative mb-3">
-                      <img 
-                        src={review.images[0]} 
-                        alt={`Avaliação de ${review.name}`}
-                        className="w-full h-40 object-cover rounded-lg"
-                      />
-                      {review.images.length > 1 && (
-                        <div className="absolute bottom-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded">
-                          +{review.images.length - 1}
-                        </div>
-                      )}
-                    </div>
-                  )}
-                  
-                  {/* Reviewer Info */}
-                  <div className="flex items-center gap-2 mb-2">
-                    <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white font-bold text-sm">
-                      {review.name.charAt(0)}
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-1">
-                        <span className="font-medium text-sm text-gray-900">{review.name}</span>
-                        <CheckCircle className="h-3.5 w-3.5 text-[#28af60]" />
+        {/* STEP 3: Summary & Payment */}
+        {currentStep === 3 && (
+          <>
+            {/* Product Summary */}
+            <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+              {items.map((item) => {
+                const quantityLabel = item.size === 1 ? "1 Câmera" : `Kit ${item.size} Câmeras`;
+                
+                return (
+                  <div key={item.id} className="flex gap-3">
+                    <div className="relative flex-shrink-0">
+                      <div className="absolute -top-2 -left-2 z-10">
+                        <span className="bg-accent text-white text-[10px] font-bold px-2 py-1 rounded">
+                          PROMOÇÃO
+                        </span>
                       </div>
-                      <span className="text-[10px] text-gray-500">{review.location}</span>
+                      <img
+                        src={cameraMain}
+                        alt={quantityLabel}
+                        className="w-20 h-20 object-cover rounded-xl border border-gray-200"
+                      />
+                    </div>
+                    
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-semibold text-gray-900 text-sm leading-tight">
+                        {quantityLabel} - Câmera Wi-Fi
+                      </h3>
+                      <div className="flex items-center gap-1 mt-1">
+                        <div className="flex">
+                          {[1, 2, 3, 4, 5].map((star) => (
+                            <Star key={star} className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                          ))}
+                        </div>
+                        <span className="text-xs text-gray-500">(127)</span>
+                      </div>
+                      <div className="flex items-center gap-2 mt-2">
+                        <span className="text-xl font-bold text-primary">
+                          R$ {item.price.toFixed(2).replace(".", ",")}
+                        </span>
+                        <span className="text-sm text-gray-400 line-through">
+                          R$ {displayOriginalPrice.toFixed(2).replace(".", ",")}
+                        </span>
+                      </div>
                     </div>
                   </div>
-                  
-                  {/* Stars */}
-                  <div className="flex mb-2">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <Star
-                        key={star}
-                        className={`h-3.5 w-3.5 ${
-                          star <= review.rating
-                            ? "fill-yellow-400 text-yellow-400"
-                            : "text-gray-300"
-                        }`}
-                      />
-                    ))}
-                  </div>
-                  
-                  {/* Comment */}
-                  <p className="text-xs text-gray-600 line-clamp-3">{review.comment}</p>
-                </div>
-              ))}
+                );
+              })}
             </div>
-          </div>
-        </div>
 
-        {/* Security Section */}
-        <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
-          <div className="flex items-center gap-2 mb-3">
-            <ShieldCheck className="h-5 w-5 text-[#28af60]" />
-            <h2 className="font-semibold text-gray-900">Compra 100% Segura</h2>
-          </div>
-          <p className="text-sm text-gray-500 mb-4">
-            Site protegido com certificado SSL. Seus dados estão criptografados e seguros.
-          </p>
-          
-          <div className="flex justify-center gap-8">
-            <div className="flex flex-col items-center gap-1">
-              <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center">
-                <Lock className="h-5 w-5 text-gray-600" />
+            {/* Customer Data Summary */}
+            <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <User className="h-4 w-4 text-primary" />
+                  <h3 className="font-medium text-gray-900 text-sm">Seus Dados</h3>
+                </div>
+                <button onClick={() => setCurrentStep(1)} className="text-xs text-primary font-medium">
+                  Editar
+                </button>
               </div>
-              <span className="text-xs text-gray-500">SSL</span>
-            </div>
-            <div className="flex flex-col items-center gap-1">
-              <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center">
-                <Shield className="h-5 w-5 text-gray-600" />
+              <div className="text-sm text-gray-600 space-y-1">
+                <p>{customerData.name}</p>
+                <p>{customerData.email}</p>
+                <p>{customerData.phone}</p>
               </div>
-              <span className="text-xs text-gray-500">PCI-DSS</span>
             </div>
-            <div className="flex flex-col items-center gap-1">
-              <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center">
-                <CheckCircle className="h-5 w-5 text-gray-600" />
+
+            {/* Address Summary */}
+            <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <MapPin className="h-4 w-4 text-primary" />
+                  <h3 className="font-medium text-gray-900 text-sm">Endereço de Entrega</h3>
+                </div>
+                <button onClick={() => setCurrentStep(2)} className="text-xs text-primary font-medium">
+                  Editar
+                </button>
               </div>
-              <span className="text-xs text-gray-500">Antifraude</span>
+              <div className="text-sm text-gray-600">
+                <p>{addressData.street}, {addressData.number}</p>
+                {addressData.complement && <p>{addressData.complement}</p>}
+                <p>{addressData.neighborhood}</p>
+                <p>{addressData.city} - {addressData.state}</p>
+                <p>CEP: {addressData.zipCode}</p>
+              </div>
             </div>
-          </div>
-        </div>
+
+            {/* Shipping Options */}
+            <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+              <div className="flex items-center gap-2 mb-4">
+                <Truck className="h-5 w-5 text-primary" />
+                <h2 className="font-semibold text-gray-900">Opções de Envio</h2>
+              </div>
+              
+              <div className="space-y-3">
+                {shippingOptions.map((option) => {
+                  const isSelected = selectedShipping === option.id;
+                  
+                  return (
+                    <button
+                      key={option.id}
+                      onClick={() => setSelectedShipping(option.id)}
+                      className={`w-full flex items-center justify-between p-4 rounded-xl border-2 transition-all text-left ${
+                        isSelected 
+                          ? "border-primary bg-primary/5" 
+                          : "border-gray-200 hover:border-gray-300"
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                          isSelected ? "border-primary" : "border-gray-300"
+                        }`}>
+                          {isSelected && <div className="w-2.5 h-2.5 rounded-full bg-primary" />}
+                        </div>
+                        <div>
+                          {option.id === "sedex" ? (
+                            <span className="text-xs font-bold text-yellow-600 bg-yellow-100 px-2 py-0.5 rounded">SEDEX</span>
+                          ) : (
+                            <span className="font-medium text-gray-900">{option.name}</span>
+                          )}
+                          <p className="text-xs text-gray-500">{option.description}</p>
+                          {option.note && (
+                            <p className="text-[10px] text-accent">{option.note}</p>
+                          )}
+                        </div>
+                      </div>
+                      <span className={`font-bold ${option.price === 0 ? "text-[#28af60]" : "text-gray-900"}`}>
+                        {option.badge || `R$ ${option.price.toFixed(2).replace(".", ",")}`}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Order Summary */}
+            <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+              <h2 className="font-semibold text-gray-900 mb-4">Resumo do Pedido</h2>
+              
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600">Subtotal</span>
+                  <span className="text-gray-900">R$ {displayOriginalPrice.toFixed(2).replace(".", ",")}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-[#28af60]">Desconto PIX (64%)</span>
+                  <span className="text-[#28af60] font-medium">- R$ {totalPixDiscount.toFixed(2).replace(".", ",")}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600">Frete ({shippingOptions.find(s => s.id === selectedShipping)?.name})</span>
+                  <span className={shippingPrice === 0 ? "text-[#28af60] font-medium" : "text-gray-900"}>
+                    {shippingPrice === 0 ? "Grátis" : `R$ ${shippingPrice.toFixed(2).replace(".", ",")}`}
+                  </span>
+                </div>
+                <div className="border-t border-gray-100 pt-3 mt-3">
+                  <div className="flex justify-between items-center">
+                    <span className="font-semibold text-gray-900">Total</span>
+                    <div className="text-right">
+                      <span className="font-bold text-2xl text-accent">
+                        R$ {finalTotal.toFixed(2).replace(".", ",")}
+                      </span>
+                      <p className="text-xs text-gray-500">à vista no PIX</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Navigation Buttons */}
+              <div className="flex gap-3 mt-6">
+                <Button
+                  onClick={handlePrevStep}
+                  variant="outline"
+                  className="h-14 px-6 rounded-xl gap-2"
+                >
+                  <ArrowLeft className="h-4 w-4" />
+                  Voltar
+                </Button>
+                <Button
+                  onClick={handleCreatePixPayment}
+                  disabled={isLoading}
+                  className="flex-1 h-14 font-bold text-lg rounded-xl gap-2 bg-accent hover:bg-accent/90 text-white"
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="h-5 w-5 animate-spin" />
+                      Processando...
+                    </>
+                  ) : (
+                    <>
+                      <PixIcon className="h-5 w-5" />
+                      Pagar com PIX
+                    </>
+                  )}
+                </Button>
+              </div>
+              
+              {/* Security message */}
+              <div className="flex items-center justify-center gap-2 text-xs text-gray-500 mt-3">
+                <Lock className="h-3 w-3" />
+                <span>Pagamento 100% seguro e criptografado</span>
+              </div>
+
+              {/* Site Blindado Badge */}
+              <div className="flex flex-col items-center mt-4 pt-4 border-t border-gray-100">
+                <img 
+                  src={seloSiteBlindado} 
+                  alt="Site Blindado" 
+                  className="h-10 object-contain"
+                />
+              </div>
+
+              {/* Reclame Aqui Badge */}
+              <div className="flex flex-col items-center mt-4 pt-4 border-t border-gray-100">
+                <img 
+                  src={seloReclameAqui} 
+                  alt="RA1000 Reclame Aqui" 
+                  className="h-16 object-contain"
+                />
+              </div>
+            </div>
+
+            {/* Customers Reviews Carousel */}
+            <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+              <h2 className="font-semibold text-gray-900 mb-4">Clientes satisfeitos</h2>
+              
+              <div className="overflow-x-auto scrollbar-hide -mx-2 px-2">
+                <div className="flex gap-3" style={{ width: 'max-content' }}>
+                  {customerReviews.map((review) => (
+                    <div key={review.id} className="w-56 flex-shrink-0 bg-gray-50 rounded-xl p-3">
+                      {review.images.length > 0 && (
+                        <div className="relative mb-3">
+                          <img 
+                            src={review.images[0]} 
+                            alt={`Avaliação de ${review.name}`}
+                            className="w-full h-32 object-cover rounded-lg"
+                            loading="lazy"
+                          />
+                          <div className="absolute top-2 right-2 bg-green-500 text-white text-[10px] px-2 py-0.5 rounded-full flex items-center gap-1">
+                            <CheckCircle className="h-3 w-3" />
+                            Verificada
+                          </div>
+                        </div>
+                      )}
+                      
+                      <div className="flex items-center gap-1 mb-1">
+                        {[...Array(review.rating)].map((_, i) => (
+                          <Star key={i} className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                        ))}
+                      </div>
+                      
+                      <p className="text-xs text-gray-600 line-clamp-2 mb-2">{review.comment}</p>
+                      
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-xs font-medium text-gray-900">{review.name}</p>
+                          <p className="text-[10px] text-gray-500">{review.location}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </>
+        )}
 
         {/* Footer */}
-        <div className="text-center pt-4 border-t border-gray-200">
-          <p className="text-sm font-medium text-gray-900">
-            MEGA<span className="text-accent">UTIL</span> - CNPJ: 13.865.865/0001-62
+        <footer className="text-center pt-6">
+          <p className="text-xs text-gray-400">
+            © 2025 MegaUtil - CNPJ: 13.865.865/0001-62
           </p>
-          <p className="text-xs text-gray-500 mt-1">Todos os direitos reservados © 2025</p>
-        </div>
+          <p className="text-[10px] text-gray-400 mt-1">
+            Todos os direitos reservados
+          </p>
+        </footer>
       </main>
-
     </div>
   );
 };
