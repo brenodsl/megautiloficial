@@ -3,6 +3,7 @@ import { ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/CartContext";
 import { trackPixelEvent } from "@/hooks/usePixels";
+import { trackFunnelEvent } from "@/hooks/useFunnelTracking";
 
 interface FloatingBuyButtonProps {
   selectedQuantity: number;
@@ -27,6 +28,13 @@ const FloatingBuyButton = ({ selectedQuantity, currentPrice, currentOriginalPric
       quantity: selectedQuantity,
       value: currentPrice,
       currency: 'BRL',
+    });
+    
+    // Track funnel event
+    trackFunnelEvent('add_to_cart', '/', { 
+      quantity: selectedQuantity, 
+      price: currentPrice,
+      kit: selectedQuantity === 1 ? '1 Câmera' : `Kit ${selectedQuantity} Câmeras`
     });
     
     // Clear cart and add new selection

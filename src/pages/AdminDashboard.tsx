@@ -34,12 +34,14 @@ import {
   ExternalLink,
   CalendarIcon,
   X,
-  Tag
+  Tag,
+  BarChart3
 } from "lucide-react";
 import { toast } from "sonner";
 import { format, startOfDay, endOfDay, isWithinInterval } from "date-fns";
 import { usePresenceCleanup } from "@/hooks/usePresence";
 import { ptBR } from "date-fns/locale";
+import FunnelAnalytics from "@/components/admin/FunnelAnalytics";
 
 interface Order {
   id: string;
@@ -614,6 +616,10 @@ const AdminDashboard = () => {
               <ShoppingCart className="w-4 h-4 mr-2" />
               Pedidos
             </TabsTrigger>
+            <TabsTrigger value="analytics" className="data-[state=active]:bg-slate-700">
+              <BarChart3 className="w-4 h-4 mr-2" />
+              Funil
+            </TabsTrigger>
             <TabsTrigger value="pixels" className="data-[state=active]:bg-slate-700">
               <Eye className="w-4 h-4 mr-2" />
               Pixels
@@ -631,6 +637,11 @@ const AdminDashboard = () => {
               Upsell
             </TabsTrigger>
           </TabsList>
+
+          {/* Funnel Analytics Tab */}
+          <TabsContent value="analytics">
+            <FunnelAnalytics />
+          </TabsContent>
 
           {/* Orders Tab */}
           <TabsContent value="orders">
