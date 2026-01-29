@@ -15,6 +15,7 @@ import RefundPolicy from "./pages/RefundPolicy";
 import ExchangePolicy from "./pages/ExchangePolicy";
 import Upsell from "./pages/Upsell";
 import ThankYou from "./pages/ThankYou";
+import Store from "./pages/Store";
 import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
 
@@ -30,6 +31,7 @@ const App = () => (
           <BrowserRouter>
             <Routes>
               <Route path="/" element={<Index />} />
+              <Route path="/loja" element={<Store />} />
               <Route path="/checkout" element={<Checkout />} />
               <Route path="/upsell" element={<Upsell />} />
               <Route path="/politica-de-privacidade" element={<PrivacyPolicy />} />
