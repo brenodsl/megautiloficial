@@ -8,6 +8,14 @@ import reviewCamera2 from "@/assets/review-camera-2.webp";
 import reviewCamera3 from "@/assets/review-camera-3.webp";
 import reviewCamera4 from "@/assets/review-camera-4.webp";
 import reviewCamera5 from "@/assets/review-camera-5.webp";
+import reviewNew1 from "@/assets/review-new-1.webp";
+import reviewNew2 from "@/assets/review-new-2.webp";
+import reviewNew3 from "@/assets/review-new-3.webp";
+import reviewNew4 from "@/assets/review-new-4.webp";
+import reviewNew5 from "@/assets/review-new-5.webp";
+import reviewNew6 from "@/assets/review-new-6.webp";
+import reviewNew7 from "@/assets/review-new-7.webp";
+import reviewNew8 from "@/assets/review-new-8.webp";
 
 const getDynamicDate = (daysAgo: number): string => {
   const date = new Date();
@@ -81,6 +89,86 @@ const reviewsData: Review[] = [
     comment: "Kit completo com câmera e todos os acessórios! Visão noturna incrível, recomendo!",
     helpful: 52,
     media: [{ type: 'image', src: reviewCamera5 }],
+  },
+  {
+    id: 6,
+    name: "João Pedro R.",
+    location: "Brasília, DF",
+    daysAgo: 6,
+    rating: 5,
+    comment: "Instalei na porta da frente, imagem cristalina! Consigo ver tudo pelo celular. Excelente!",
+    helpful: 89,
+    media: [{ type: 'image', src: reviewNew1 }],
+  },
+  {
+    id: 7,
+    name: "Luciana A.",
+    location: "Porto Alegre, RS",
+    daysAgo: 7,
+    rating: 5,
+    comment: "Produto chegou bem embalado com manual em português. Qualidade surpreendente pelo preço!",
+    helpful: 73,
+    media: [{ type: 'image', src: reviewNew2 }],
+  },
+  {
+    id: 8,
+    name: "Marcos T.",
+    location: "Recife, PE",
+    daysAgo: 8,
+    rating: 5,
+    comment: "Câmera com ótimo acabamento! LEDs potentes e visão noturna colorida. Vale muito a pena!",
+    helpful: 67,
+    media: [{ type: 'image', src: reviewNew3 }],
+  },
+  {
+    id: 9,
+    name: "Patricia O.",
+    location: "Fortaleza, CE",
+    daysAgo: 9,
+    rating: 5,
+    comment: "Produto top! Chegou lacrado e funciona perfeitamente. Imagem muito nítida dia e noite!",
+    helpful: 58,
+    media: [{ type: 'image', src: reviewNew4 }],
+  },
+  {
+    id: 10,
+    name: "Eduardo C.",
+    location: "Manaus, AM",
+    daysAgo: 10,
+    rating: 5,
+    comment: "Kit completo com suporte e acessórios! Instalação rápida e app funciona perfeito. Recomendo!",
+    helpful: 45,
+    media: [{ type: 'image', src: reviewNew5 }],
+  },
+  {
+    id: 11,
+    name: "Camila B.",
+    location: "Goiânia, GO",
+    daysAgo: 11,
+    rating: 5,
+    comment: "Embalagem original Leboss! Produto de qualidade premium. Muito feliz com a compra!",
+    helpful: 41,
+    media: [{ type: 'image', src: reviewNew6 }],
+  },
+  {
+    id: 12,
+    name: "Thiago N.",
+    location: "Florianópolis, SC",
+    daysAgo: 12,
+    rating: 5,
+    comment: "Câmera excelente! Veio na caixa original e funciona perfeitamente. Entrega super rápida!",
+    helpful: 38,
+    media: [{ type: 'image', src: reviewNew7 }],
+  },
+  {
+    id: 13,
+    name: "Beatriz M.",
+    location: "Vitória, ES",
+    daysAgo: 13,
+    rating: 5,
+    comment: "Produto incrível! Qualidade de imagem impressionante. Melhor custo-benefício do mercado!",
+    helpful: 35,
+    media: [{ type: 'image', src: reviewNew8 }],
   },
 ];
 

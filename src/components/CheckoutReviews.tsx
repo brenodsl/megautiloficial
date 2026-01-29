@@ -14,6 +14,14 @@ import avaliacao03Img from "@/assets/avaliacao03-img.webp";
 import avaliacao04Img1 from "@/assets/avaliacao04-img1.webp";
 import avaliacao05Video from "@/assets/avaliacao05-video.mp4";
 import avaliacao05Img from "@/assets/avaliacao05-img.webp";
+import reviewNew1 from "@/assets/review-new-1.webp";
+import reviewNew2 from "@/assets/review-new-2.webp";
+import reviewNew3 from "@/assets/review-new-3.webp";
+import reviewNew4 from "@/assets/review-new-4.webp";
+import reviewNew5 from "@/assets/review-new-5.webp";
+import reviewNew6 from "@/assets/review-new-6.webp";
+import reviewNew7 from "@/assets/review-new-7.webp";
+import reviewNew8 from "@/assets/review-new-8.webp";
 
 interface ReviewMedia {
   type: 'image' | 'video';
@@ -34,70 +42,70 @@ const reviewsData: Review[] = [
     id: 1,
     name: "Mariana L.",
     rating: 5,
-    comment: "Um custo x benefício maravilhoso! Já usei para correr e está mais que aprovado!!",
-    media: { type: 'video', src: avaliacao01Video, thumbnail: avaliacao01Img },
+    comment: "Câmera de excelente qualidade! Instalei na porta e a imagem é perfeita!",
+    media: { type: 'image', src: reviewNew1 },
   },
   {
     id: 2,
     name: "Bruno R.",
     rating: 5,
-    comment: "Tênis leve, material resistente, respirável, bom acabamento. Chegou no primeiro dia do prazo!",
-    media: { type: 'image', src: avaliacao02Img1 },
+    comment: "Produto chegou bem embalado com manual. Qualidade surpreendente!",
+    media: { type: 'image', src: reviewNew2 },
   },
   {
     id: 3,
     name: "Juliana M.",
     rating: 5,
-    comment: "Surpreendeu minhas expectativas, chegou rápido, numeração bate, é leve e confortável!",
-    media: { type: 'video', src: avaliacao03Video, thumbnail: avaliacao03Img },
+    comment: "LEDs potentes e visão noturna colorida. Vale muito a pena!",
+    media: { type: 'image', src: reviewNew3 },
   },
   {
     id: 4,
     name: "Carlos E.",
     rating: 5,
-    comment: "Chegou rapidão, dentro do prazo. Material de alta qualidade. Podem comprar sem medo!!",
-    media: { type: 'image', src: avaliacao04Img1 },
+    comment: "Chegou lacrado e funciona perfeitamente. Imagem muito nítida!",
+    media: { type: 'image', src: reviewNew4 },
   },
   {
     id: 5,
     name: "Rafael S.",
     rating: 5,
-    comment: "Excepcional! Melhor do que pagar R$1000 em marca famosa. Tênis leve, confortável e com placa!",
-    media: { type: 'video', src: avaliacao05Video, thumbnail: avaliacao05Img },
+    comment: "Kit completo com suporte e acessórios! Instalação rápida. Recomendo!",
+    media: { type: 'image', src: reviewNew5 },
   },
   {
     id: 6,
     name: "Sabrina V.",
     rating: 5,
-    comment: "Tênis incrível! A placa de carbono realmente faz diferença na corrida. Super leve e confortável.",
-    media: { type: 'image', src: reviewSabrina1 },
+    comment: "Embalagem original Leboss! Produto de qualidade premium!",
+    media: { type: 'image', src: reviewNew6 },
   },
   {
     id: 7,
     name: "Fernando M.",
     rating: 5,
-    comment: "Excelente qualidade! O amortecimento é perfeito para corridas longas. Recomendo muito!",
-    media: { type: 'image', src: reviewCamila1 },
+    comment: "Câmera excelente! Veio na caixa original. Entrega super rápida!",
+    media: { type: 'image', src: reviewNew7 },
   },
   {
     id: 8,
     name: "Carla S.",
     rating: 5,
-    comment: "Melhor tênis de corrida que já tive. Muito leve e o design é lindo. Chegou rápido!",
-    media: { type: 'image', src: reviewSabrina2 },
+    comment: "Qualidade de imagem impressionante. Melhor custo-benefício!",
+    media: { type: 'image', src: reviewNew8 },
   },
   {
     id: 9,
     name: "Ricardo P.",
     rating: 5,
-    comment: "Superou minhas expectativas! Qualidade premium por um preço justo. Vale cada centavo.",
+    comment: "Superou minhas expectativas! Qualidade premium por um preço justo.",
     media: { type: 'image', src: reviewCamila2 },
   },
   {
     id: 10,
     name: "Ana L.",
     rating: 5,
-    comment: "Perfeito para treinos intensos. A placa de carbono dá um impulso extra. Amei!",
+    comment: "Produto incrível! A visão noturna é excelente. Amei!",
     media: { type: 'image', src: review1 },
   },
 ];
