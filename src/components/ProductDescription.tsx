@@ -33,6 +33,23 @@ const ProductDescription = () => {
                 />
               </div>
 
+              {/* YouTube Review Video */}
+              <div className="bg-secondary/30 rounded-xl p-3">
+                <h4 className="font-bold text-foreground text-sm mb-2 flex items-center gap-2">
+                  🎬 Veja o Review de um Cliente
+                </h4>
+                <div className="rounded-xl overflow-hidden">
+                  <iframe
+                    src="https://www.youtube-nocookie.com/embed/tWdqbBKi-ak?rel=0&modestbranding=1&playsinline=1"
+                    title="Review da Câmera Wi-Fi"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    className="w-full aspect-video"
+                    loading="lazy"
+                  />
+                </div>
+              </div>
+
               <p>
                 O <strong className="text-foreground">Kit 3 Câmeras Wi-Fi Full HD com Lente Dupla</strong> é a solução completa para a segurança da sua casa ou empresa. Com tecnologia avançada de <strong className="text-foreground">lente dupla (3,6mm + 6mm)</strong>, oferece imagens de alta qualidade tanto de perto quanto de longe.
               </p>
