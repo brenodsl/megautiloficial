@@ -6,6 +6,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import videoCameraDemo from "@/assets/video-camera-demo.mp4";
+import videoReviewCamera from "@/assets/video-review-camera.mp4";
 
 const ProductDescription = () => {
   return (
@@ -82,19 +83,19 @@ const ProductDescription = () => {
                 </div>
               </div>
 
-              {/* YouTube Review Video */}
+              {/* Video Review */}
               <div className="bg-secondary/30 rounded-xl p-3">
                 <h4 className="font-bold text-foreground text-sm mb-2 flex items-center gap-2">
                   🎬 Veja o Review da Câmera
                 </h4>
-                <div className="rounded-xl overflow-hidden">
-                  <iframe
-                    src="https://www.youtube-nocookie.com/embed/tWdqbBKi-ak?rel=0&modestbranding=1&playsinline=1"
-                    title="Review da Câmera Wi-Fi"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                    className="w-full aspect-video"
-                    loading="lazy"
+                <div className="rounded-xl overflow-hidden bg-black">
+                  <video
+                    src={videoReviewCamera}
+                    controls
+                    playsInline
+                    preload="metadata"
+                    className="w-full aspect-video object-contain"
+                    poster=""
                   />
                 </div>
               </div>
