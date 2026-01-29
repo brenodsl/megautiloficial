@@ -1,10 +1,11 @@
-import { Package, Check } from "lucide-react";
+import { Package, Check, Play, Headphones } from "lucide-react";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import videoCameraDemo from "@/assets/video-camera-demo.mp4";
 
 const ProductDescription = () => {
   return (
@@ -20,6 +21,18 @@ const ProductDescription = () => {
           </AccordionTrigger>
           <AccordionContent className="pb-4">
             <div className="space-y-4 text-sm text-muted-foreground leading-relaxed">
+              {/* Video Demo */}
+              <div className="rounded-xl overflow-hidden bg-black">
+                <video
+                  src={videoCameraDemo}
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  className="w-full aspect-video object-cover"
+                />
+              </div>
+
               <p>
                 O <strong className="text-foreground">Kit 3 Câmeras Wi-Fi Full HD com Lente Dupla</strong> é a solução completa para a segurança da sua casa ou empresa. Com tecnologia avançada de <strong className="text-foreground">lente dupla (3,6mm + 6mm)</strong>, oferece imagens de alta qualidade tanto de perto quanto de longe.
               </p>
@@ -35,6 +48,39 @@ const ProductDescription = () => {
               <p>
                 Configure facilmente através do app <strong className="text-foreground">iCSee</strong>, disponível para iOS e Android. Armazene suas gravações em cartão SD (até 128GB) ou utilize o armazenamento em nuvem.
               </p>
+
+              {/* Installation Support Section */}
+              <div className="bg-success/10 border border-success/30 rounded-xl p-4 mt-4">
+                <div className="flex items-start gap-3">
+                  <div className="bg-success/20 rounded-full p-2 flex-shrink-0">
+                    <Play className="h-5 w-5 text-success" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-foreground text-sm mb-1">
+                      📹 Vídeo Tutorial de Instalação Incluso!
+                    </h4>
+                    <p className="text-xs text-muted-foreground">
+                      Após a compra, você receberá um <strong className="text-foreground">vídeo tutorial completo</strong> mostrando o passo a passo da instalação. <strong className="text-success">Você mesmo consegue instalar sem precisar pagar instalador!</strong>
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-primary/10 border border-primary/30 rounded-xl p-4">
+                <div className="flex items-start gap-3">
+                  <div className="bg-primary/20 rounded-full p-2 flex-shrink-0">
+                    <Headphones className="h-5 w-5 text-primary" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-foreground text-sm mb-1">
+                      📞 Suporte Exclusivo para Instalação
+                    </h4>
+                    <p className="text-xs text-muted-foreground">
+                      Ficou com alguma dúvida? Nossa equipe de suporte está disponível para ajudar você durante toda a instalação. <strong className="text-foreground">Não precisa de técnico!</strong>
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
           </AccordionContent>
         </AccordionItem>
