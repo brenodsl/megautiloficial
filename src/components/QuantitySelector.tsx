@@ -1,4 +1,8 @@
 import { Check, Tag } from "lucide-react";
+import kit1und from "@/assets/kit-1und.jpg";
+import kit2und from "@/assets/kit-2und.jpg";
+import kit3und from "@/assets/kit-3und.jpg";
+import kit4und from "@/assets/kit-4und.jpg";
 
 interface QuantityOption {
   quantity: number;
@@ -7,13 +11,14 @@ interface QuantityOption {
   salePrice: number;
   savings: number;
   isPopular?: boolean;
+  image: string;
 }
 
 const QUANTITY_OPTIONS: QuantityOption[] = [
-  { quantity: 1, label: "1 Und", originalPrice: 157.00, salePrice: 65.80, savings: 0 },
-  { quantity: 2, label: "Kit 2 Und", originalPrice: 314.00, salePrice: 119.90, savings: 194.10 },
-  { quantity: 3, label: "Kit 3 Und", originalPrice: 471.00, salePrice: 159.90, savings: 311.10, isPopular: true },
-  { quantity: 4, label: "Kit 4 Und", originalPrice: 628.00, salePrice: 199.90, savings: 428.10 },
+  { quantity: 1, label: "1 Und", originalPrice: 157.00, salePrice: 65.80, savings: 0, image: kit1und },
+  { quantity: 2, label: "Kit 2 Und", originalPrice: 314.00, salePrice: 119.90, savings: 194.10, image: kit2und },
+  { quantity: 3, label: "Kit 3 Und", originalPrice: 471.00, salePrice: 159.90, savings: 311.10, isPopular: true, image: kit3und },
+  { quantity: 4, label: "Kit 4 Und", originalPrice: 628.00, salePrice: 199.90, savings: 428.10, image: kit4und },
 ];
 
 interface QuantitySelectorProps {
@@ -56,6 +61,13 @@ const QuantitySelector = ({ selectedQuantity, onQuantityChange }: QuantitySelect
                   }`}>
                     {isSelected && <Check className="h-3 w-3 text-white" />}
                   </div>
+                  
+                  {/* Kit Image */}
+                  <img 
+                    src={option.image} 
+                    alt={option.label}
+                    className="w-14 h-14 object-cover rounded-lg border border-border"
+                  />
                   
                   <div>
                     <p className="font-bold text-foreground">{option.label}</p>

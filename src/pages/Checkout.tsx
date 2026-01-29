@@ -37,6 +37,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { QRCodeSVG } from "qrcode.react";
 import logo from "@/assets/logo.jpg";
 import cameraMain from "@/assets/camera-main.png";
+import kit1und from "@/assets/kit-1und.jpg";
+import kit2und from "@/assets/kit-2und.jpg";
+import kit3und from "@/assets/kit-3und.jpg";
+import kit4und from "@/assets/kit-4und.jpg";
 import reviewCamera1 from "@/assets/review-camera-1.webp";
 import reviewCamera2 from "@/assets/review-camera-2.webp";
 import reviewCamera3 from "@/assets/review-camera-3.webp";
@@ -52,6 +56,14 @@ import reviewNew7 from "@/assets/review-new-7.webp";
 import reviewNew8 from "@/assets/review-new-8.webp";
 import seloSiteBlindado from "@/assets/selo-site-blindado.png";
 import seloReclameAqui from "@/assets/selo-reclame-aqui.png";
+
+// Map quantity to kit images
+const KIT_IMAGES: Record<number, string> = {
+  1: kit1und,
+  2: kit2und,
+  3: kit3und,
+  4: kit4und,
+};
 import { usePresence } from "@/hooks/usePresence";
 import { trackPixelEvent } from "@/hooks/usePixels";
 import PaymentProgressBar from "@/components/PaymentProgressBar";
@@ -1064,9 +1076,9 @@ const Checkout = () => {
               <div className="flex gap-3 items-start">
                 <div className="relative">
                   <img
-                    src={cameraMain}
-                    alt="Produto"
-                    className="w-20 h-20 object-cover rounded-xl border border-gray-200"
+                    src={KIT_IMAGES[items[0]?.size] || kit1und}
+                    alt={items[0]?.size === 1 ? "1 Câmera" : `Kit ${items[0]?.size} Câmeras`}
+                    className="w-24 h-24 object-cover rounded-xl border border-gray-200"
                   />
                   <span className="absolute -top-1 -right-1 bg-accent text-white text-[10px] font-bold px-1.5 py-0.5 rounded">
                     OFERTA!
