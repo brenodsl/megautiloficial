@@ -66,6 +66,7 @@ const KIT_IMAGES: Record<number, string> = {
 };
 import { usePresence } from "@/hooks/usePresence";
 import { trackPixelEvent } from "@/hooks/usePixels";
+import { useFunnelTracking, trackFunnelEvent } from "@/hooks/useFunnelTracking";
 import PaymentProgressBar from "@/components/PaymentProgressBar";
 
 // PIX Icon Component
@@ -231,15 +232,30 @@ const Checkout = () => {
 
   // Track presence on checkout
   usePresence("/checkout");
+  const { trackEvent } = useFunnelTracking("/checkout");
+
+  // Track checkout started on mount
+  useEffect(() => {
+    trackEvent('checkout_started', { step: 1 });
+  }, []);
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
-  // Scroll to top when step changes
+  // Scroll to top and track step changes
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, [currentStep]);
+    
+    // Track step changes
+    if (currentStep === 1) {
+      trackEvent('checkout_step_1');
+    } else if (currentStep === 2) {
+      trackEvent('checkout_step_2');
+    } else if (currentStep === 3) {
+      trackEvent('checkout_step_3');
+    }
+  }, [currentStep, trackEvent]);
 
   // Offer timer countdown
   useEffect(() => {
@@ -308,6 +324,13 @@ const Checkout = () => {
 
         if (data?.isPaid) {
           setPaymentStatus('paid');
+          
+          // Track payment confirmed for funnel analytics
+          trackFunnelEvent('payment_confirmed', '/checkout', { 
+            value: finalTotal, 
+            transactionId: pixData.transactionId 
+          });
+          
           toast.success("Pagamento confirmado!");
           
           const { data: settingsData } = await supabase
@@ -594,6 +617,12 @@ const Checkout = () => {
           qrCode: data.qrCode || null,
           qrCodeText: data.qrCodeText || null,
           transactionId: data.transactionId,
+        });
+        
+        // Track PIX generated for funnel analytics
+        trackEvent('pix_generated', { 
+          value: finalTotal, 
+          quantity: totalQuantity 
         });
         
         trackPixelEvent('Purchase', {

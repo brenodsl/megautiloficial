@@ -14,6 +14,7 @@ import Footer from "@/components/Footer";
 import { useCart } from "@/contexts/CartContext";
 import { usePresence } from "@/hooks/usePresence";
 import { trackPixelEvent } from "@/hooks/usePixels";
+import { useFunnelTracking } from "@/hooks/useFunnelTracking";
 
 
 import QuantitySelector, { QUANTITY_OPTIONS } from "@/components/QuantitySelector";
@@ -35,6 +36,12 @@ const Index = () => {
   const [currentOriginalPrice, setCurrentOriginalPrice] = useState(QUANTITY_OPTIONS[0].originalPrice);
 
   usePresence("/");
+  const { trackEvent } = useFunnelTracking("/");
+
+  // Track product view on mount
+  useEffect(() => {
+    trackEvent('product_view', { product: 'camera-wifi' });
+  }, [trackEvent]);
 
   // Calculate delivery date (3-5 days from now)
   const getDeliveryDateRange = () => {
@@ -92,6 +99,13 @@ const Index = () => {
       quantity: selectedQuantity,
       value: currentPrice,
       currency: 'BRL',
+    });
+    
+    // Track funnel event
+    trackEvent('add_to_cart', { 
+      quantity: selectedQuantity, 
+      price: currentPrice,
+      kit: selectedQuantity === 1 ? '1 Câmera' : `Kit ${selectedQuantity} Câmeras`
     });
     
     // Clear cart and add new selection
