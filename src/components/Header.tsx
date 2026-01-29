@@ -9,9 +9,8 @@ import CartDrawer from "@/components/CartDrawer";
 
 const menuItems = [
   { label: "Início", href: "/", icon: Home, isRoute: true },
-  { label: "Produto", href: "#produto", icon: Package, isRoute: false },
+  { label: "Loja", href: "/loja", icon: Package, isRoute: true },
   { label: "Avaliações", href: "#avaliacoes", icon: MessageSquare, isRoute: false },
-  { label: "Garantias", href: "#garantias", icon: Shield, isRoute: false },
 ];
 
 const policyItems = [
@@ -197,7 +196,7 @@ const Header = () => {
                 </Sheet>
 
                 {/* Logo */}
-                <Link to="/" className="flex-shrink-0">
+                <Link to="/loja" className="flex-shrink-0">
                   <img src="/logo-megautil.png" alt="MegaUtil" className="h-8 w-auto" />
                 </Link>
 
