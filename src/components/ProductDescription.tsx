@@ -87,14 +87,19 @@ const ProductDescription = () => {
                 <h4 className="font-bold text-foreground text-sm mb-2 flex items-center gap-2">
                   🎬 Veja o Review da Câmera
                 </h4>
-                <div className="rounded-xl overflow-hidden">
+                <div className="rounded-xl overflow-hidden relative" style={{ paddingTop: '56.25%' }}>
                   <iframe
-                    src="https://www.youtube-nocookie.com/embed/tWdqbBKi-ak?rel=0&modestbranding=1&playsinline=1"
+                    src="https://www.youtube-nocookie.com/embed/tWdqbBKi-ak?rel=0&modestbranding=1&playsinline=1&controls=1&showinfo=0&iv_load_policy=3"
                     title="Review da Câmera Wi-Fi"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen
-                    className="w-full aspect-video"
+                    className="absolute inset-0 w-full h-full"
                     loading="lazy"
+                    style={{ 
+                      clipPath: 'inset(12% 0 10% 0)',
+                      transform: 'scale(1.25)',
+                      transformOrigin: 'center center'
+                    }}
                   />
                 </div>
               </div>
