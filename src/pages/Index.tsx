@@ -14,7 +14,7 @@ import { useCart } from "@/contexts/CartContext";
 import { usePresence } from "@/hooks/usePresence";
 import { trackPixelEvent } from "@/hooks/usePixels";
 
-import PurchaseNotifications from "@/components/PurchaseNotifications";
+
 import QuantitySelector, { QUANTITY_OPTIONS } from "@/components/QuantitySelector";
 import FloatingBuyButton from "@/components/FloatingBuyButton";
 
@@ -227,7 +227,7 @@ const Index = () => {
         currentPrice={currentPrice}
         currentOriginalPrice={currentOriginalPrice}
       />
-      <PurchaseNotifications />
+      
     </div>
   );
 };
