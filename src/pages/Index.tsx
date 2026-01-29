@@ -8,7 +8,7 @@ import ProductGallery from "@/components/ProductGallery";
 import ScarcityBanner from "@/components/ScarcityBanner";
 import Reviews from "@/components/Reviews";
 import Benefits from "@/components/Benefits";
-
+import FAQ from "@/components/FAQ";
 import ProductDescription from "@/components/ProductDescription";
 import Footer from "@/components/Footer";
 import { useCart } from "@/contexts/CartContext";
@@ -251,6 +251,11 @@ const Index = () => {
         {/* Reviews */}
         <div className="bg-white mt-2 px-4 py-6">
           <Reviews />
+        </div>
+
+        {/* FAQ */}
+        <div className="bg-white mt-2 px-4 py-6">
+          <FAQ />
         </div>
       </main>
 
