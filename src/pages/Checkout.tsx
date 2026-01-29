@@ -1053,21 +1053,49 @@ const Checkout = () => {
         {/* STEP 1: Customer Data */}
         {currentStep === 1 && (
           <>
-            {/* Mini Product Card */}
+            {/* Enhanced Product Card */}
             <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
-              <div className="flex gap-3 items-center">
-                <img
-                  src={cameraMain}
-                  alt="Produto"
-                  className="w-16 h-16 object-cover rounded-xl border border-gray-200"
-                />
+              {/* Low Stock Warning */}
+              <div className="flex items-center gap-2 bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded-lg mb-3">
+                <AlertCircle className="h-4 w-4 flex-shrink-0" />
+                <span className="text-xs font-semibold">⚠️ Últimas unidades em estoque!</span>
+              </div>
+              
+              <div className="flex gap-3 items-start">
+                <div className="relative">
+                  <img
+                    src={cameraMain}
+                    alt="Produto"
+                    className="w-20 h-20 object-cover rounded-xl border border-gray-200"
+                  />
+                  <span className="absolute -top-1 -right-1 bg-accent text-white text-[10px] font-bold px-1.5 py-0.5 rounded">
+                    OFERTA!
+                  </span>
+                </div>
                 <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-900">
+                  <p className="text-sm font-semibold text-gray-900">
                     {items[0]?.size === 1 ? "1 Câmera" : `Kit ${items[0]?.size} Câmeras`} Wi-Fi
                   </p>
-                  <p className="text-lg font-bold text-primary">
-                    R$ {totalPrice.toFixed(2).replace(".", ",")}
-                  </p>
+                  
+                  {/* Price with original and savings */}
+                  <div className="mt-1">
+                    <p className="text-xs text-gray-400 line-through">
+                      De R$ {displayOriginalPrice.toFixed(2).replace(".", ",")}
+                    </p>
+                    <p className="text-xl font-bold text-primary">
+                      R$ {totalPrice.toFixed(2).replace(".", ",")}
+                    </p>
+                  </div>
+                  
+                  {/* Savings Badge */}
+                  <div className="flex items-center gap-1.5 mt-2">
+                    <div className="flex items-center gap-1 bg-green-100 text-green-700 px-2 py-1 rounded-full">
+                      <Gift className="h-3 w-3" />
+                      <span className="text-xs font-bold">
+                        Economia de R$ {(displayOriginalPrice - unitPrice).toFixed(2).replace(".", ",")}
+                      </span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
