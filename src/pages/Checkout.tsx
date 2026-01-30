@@ -861,36 +861,36 @@ const Checkout = () => {
       </header>
 
       {/* Security Bar */}
-      <div className="bg-muted py-2 px-4 border-b border-border">
-        <div className="max-w-lg mx-auto flex items-center justify-center gap-6 text-muted-foreground text-sm">
+      <div className="bg-primary/90 py-1.5 px-4">
+        <div className="max-w-lg mx-auto flex items-center justify-center gap-6 text-white/80 text-xs">
           <div className="flex items-center gap-1.5">
-            <Lock className="h-4 w-4" />
+            <Lock className="h-3.5 w-3.5" />
             <span>SSL 256-bit</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <ShieldCheck className="h-4 w-4" />
+            <ShieldCheck className="h-3.5 w-3.5" />
             <span>Compra Protegida</span>
           </div>
         </div>
       </div>
 
       {/* Offer Timer Banner */}
-      <div className="bg-accent py-3 px-4">
-        <div className="max-w-lg mx-auto flex items-center justify-center gap-3">
-          <div className="flex items-center gap-2 text-white">
-            <Clock className="h-5 w-5" />
-            <span className="font-medium">Últimas horas de oferta:</span>
+      <div className="bg-accent py-2 px-4">
+        <div className="max-w-lg mx-auto flex items-center justify-center gap-2">
+          <div className="flex items-center gap-1.5 text-white">
+            <Clock className="h-4 w-4" />
+            <span className="text-sm font-medium">Últimas horas de oferta:</span>
           </div>
-          <div className="flex items-center gap-1 bg-white/20 rounded-lg px-3 py-1">
-            <span className="text-white font-bold text-lg min-w-[28px] text-center">
+          <div className="flex items-center gap-0.5 bg-white/20 rounded-md px-2 py-0.5">
+            <span className="text-white font-bold text-sm min-w-[20px] text-center">
               {String(timeLeft.hours).padStart(2, '0')}
             </span>
-            <span className="text-white font-bold">:</span>
-            <span className="text-white font-bold text-lg min-w-[28px] text-center">
+            <span className="text-white font-bold text-sm">:</span>
+            <span className="text-white font-bold text-sm min-w-[20px] text-center">
               {String(timeLeft.minutes).padStart(2, '0')}
             </span>
-            <span className="text-white font-bold">:</span>
-            <span className="text-white font-bold text-lg min-w-[28px] text-center">
+            <span className="text-white font-bold text-sm">:</span>
+            <span className="text-white font-bold text-sm min-w-[20px] text-center">
               {String(timeLeft.seconds).padStart(2, '0')}
             </span>
           </div>
