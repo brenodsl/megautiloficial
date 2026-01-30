@@ -272,12 +272,12 @@ const Reviews = () => {
                   <button
                     key={index}
                     onClick={() => setSelectedMedia(media)}
-                    className="relative w-full rounded-xl overflow-hidden group cursor-pointer border border-border"
+                    className="relative w-full h-48 rounded-xl overflow-hidden group cursor-pointer border border-border"
                   >
                     <img
                       src={media.src}
                       alt={`Mídia do cliente ${review.name}`}
-                      className="w-full h-auto object-cover group-hover:scale-[1.02] transition-transform duration-300"
+                      className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-300"
                       loading="lazy"
                       decoding="async"
                     />
