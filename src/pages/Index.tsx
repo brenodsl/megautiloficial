@@ -43,13 +43,13 @@ const Index = () => {
     trackEvent('product_view', { product: 'camera-wifi' });
   }, [trackEvent]);
 
-  // Calculate delivery date (3-5 days from now)
+  // Calculate delivery date (5-8 days from now)
   const getDeliveryDateRange = () => {
     const today = new Date();
     const minDate = new Date(today);
     const maxDate = new Date(today);
-    minDate.setDate(today.getDate() + 3);
-    maxDate.setDate(today.getDate() + 5);
+    minDate.setDate(today.getDate() + 5);
+    maxDate.setDate(today.getDate() + 8);
     
     const formatDate = (date: Date) => {
       return date.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' }).replace('.', '');
