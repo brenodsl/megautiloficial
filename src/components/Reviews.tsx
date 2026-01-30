@@ -267,17 +267,17 @@ const Reviews = () => {
 
             {/* Review Media */}
             {review.media && review.media.length > 0 && (
-              <div className="flex gap-2">
+              <div className="mt-2">
                 {review.media.map((media, index) => (
                   <button
                     key={index}
                     onClick={() => setSelectedMedia(media)}
-                    className="relative h-20 w-20 rounded-lg overflow-hidden group cursor-pointer border border-border"
+                    className="relative w-full rounded-xl overflow-hidden group cursor-pointer border border-border"
                   >
                     <img
                       src={media.src}
                       alt={`Mídia do cliente ${review.name}`}
-                      className="h-full w-full object-cover group-hover:scale-105 transition-transform"
+                      className="w-full h-auto object-cover group-hover:scale-[1.02] transition-transform duration-300"
                       loading="lazy"
                       decoding="async"
                     />
