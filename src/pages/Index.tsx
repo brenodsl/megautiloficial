@@ -256,10 +256,6 @@ const Index = () => {
           <ProductDescription />
         </div>
 
-        {/* Features/Benefits */}
-        <div className="bg-white mt-2 px-4 py-6">
-          <Benefits />
-        </div>
 
 
         {/* Reviews */}
