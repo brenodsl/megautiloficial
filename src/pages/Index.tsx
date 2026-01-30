@@ -274,12 +274,8 @@ const Index = () => {
       </main>
 
       <Footer />
-      <FloatingBuyButton 
-        selectedQuantity={selectedQuantity}
-        currentPrice={currentPrice}
-        currentOriginalPrice={currentOriginalPrice}
-      />
       <AIChatBot />
+      
       
     </div>
   );
