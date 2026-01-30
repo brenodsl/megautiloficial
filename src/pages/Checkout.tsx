@@ -26,7 +26,6 @@ import {
   CreditCard,
   Check
 } from "lucide-react";
-import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -213,6 +212,30 @@ const Checkout = () => {
   const [expirationTime, setExpirationTime] = useState(7 * 60);
   const [paymentStatus, setPaymentStatus] = useState<'pending' | 'paid' | 'checking'>('pending');
   const [isCheckingPayment, setIsCheckingPayment] = useState(false);
+
+  // Timer countdown state - ends at 23:59 of current day
+  const [timeLeft, setTimeLeft] = useState({ hours: 0, minutes: 0, seconds: 0 });
+
+  useEffect(() => {
+    const calculateTimeLeft = () => {
+      const now = new Date();
+      const endOfDay = new Date();
+      endOfDay.setHours(23, 59, 59, 999);
+      
+      const diff = endOfDay.getTime() - now.getTime();
+      
+      if (diff > 0) {
+        const hours = Math.floor(diff / (1000 * 60 * 60));
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+        setTimeLeft({ hours, minutes, seconds });
+      }
+    };
+
+    calculateTimeLeft();
+    const timer = setInterval(calculateTimeLeft, 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   // Calculate total with shipping
   const shippingPrice = getShippingPrice(selectedShipping);
@@ -821,8 +844,58 @@ const Checkout = () => {
 
   return (
     <div className="min-h-screen bg-muted pb-8">
-      {/* Header */}
-      <Header />
+      {/* Checkout Header */}
+      <header className="bg-primary py-3 px-4">
+        <div className="max-w-lg mx-auto flex items-center justify-between">
+          <button onClick={() => navigate("/")} className="text-white">
+            <ArrowLeft className="h-5 w-5" />
+          </button>
+          <Link to="/">
+            <img src="/logo-megautil.png" alt="MegaUtil" className="h-8 w-auto" />
+          </Link>
+          <div className="flex items-center gap-1 text-white text-sm">
+            <Lock className="h-4 w-4" />
+            <span>Seguro</span>
+          </div>
+        </div>
+      </header>
+
+      {/* Security Bar */}
+      <div className="bg-muted py-2 px-4 border-b border-border">
+        <div className="max-w-lg mx-auto flex items-center justify-center gap-6 text-muted-foreground text-sm">
+          <div className="flex items-center gap-1.5">
+            <Lock className="h-4 w-4" />
+            <span>SSL 256-bit</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <ShieldCheck className="h-4 w-4" />
+            <span>Compra Protegida</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Offer Timer Banner */}
+      <div className="bg-accent py-3 px-4">
+        <div className="max-w-lg mx-auto flex items-center justify-center gap-3">
+          <div className="flex items-center gap-2 text-white">
+            <Clock className="h-5 w-5" />
+            <span className="font-medium">Últimas horas de oferta:</span>
+          </div>
+          <div className="flex items-center gap-1 bg-white/20 rounded-lg px-3 py-1">
+            <span className="text-white font-bold text-lg min-w-[28px] text-center">
+              {String(timeLeft.hours).padStart(2, '0')}
+            </span>
+            <span className="text-white font-bold">:</span>
+            <span className="text-white font-bold text-lg min-w-[28px] text-center">
+              {String(timeLeft.minutes).padStart(2, '0')}
+            </span>
+            <span className="text-white font-bold">:</span>
+            <span className="text-white font-bold text-lg min-w-[28px] text-center">
+              {String(timeLeft.seconds).padStart(2, '0')}
+            </span>
+          </div>
+        </div>
+      </div>
 
       <main className="max-w-lg mx-auto px-4 py-4 space-y-4">
         
