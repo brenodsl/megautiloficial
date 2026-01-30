@@ -15,7 +15,7 @@ import { useCart } from "@/contexts/CartContext";
 import { usePresence } from "@/hooks/usePresence";
 import { trackPixelEvent } from "@/hooks/usePixels";
 import { useFunnelTracking } from "@/hooks/useFunnelTracking";
-
+import AIChatBot from "@/components/AIChatBot";
 
 import QuantitySelector, { QUANTITY_OPTIONS } from "@/components/QuantitySelector";
 import FloatingBuyButton from "@/components/FloatingBuyButton";
@@ -279,6 +279,7 @@ const Index = () => {
         currentPrice={currentPrice}
         currentOriginalPrice={currentOriginalPrice}
       />
+      <AIChatBot />
       
     </div>
   );

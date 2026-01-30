@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { MessageCircle, X, Send, Loader2 } from "lucide-react";
+import { X, Send, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
@@ -76,25 +76,37 @@ const AIChatBot = () => {
 
   return (
     <>
-      {/* Floating Button */}
+      {/* Floating Button with Avatar */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-4 right-4 z-50 w-16 h-16 rounded-full bg-primary hover:bg-primary/90 flex items-center justify-center text-white shadow-lg hover:scale-110 transition-all duration-200 overflow-hidden border-2 border-white"
+        className="fixed bottom-4 right-4 z-50 w-16 h-16 rounded-full bg-primary hover:bg-primary/90 flex items-center justify-center shadow-lg hover:scale-110 transition-all duration-200 overflow-hidden border-3 border-white"
         aria-label="Abrir chat de suporte"
       >
         {isOpen ? (
-          <X className="w-6 h-6" />
+          <X className="w-6 h-6 text-white" />
         ) : (
-          <MessageCircle className="w-7 h-7" />
+          <img 
+            src={perfilAtendente} 
+            alt="Ana - Atendente" 
+            className="w-full h-full object-cover"
+          />
         )}
       </button>
 
+      {/* Online indicator */}
+      {!isOpen && (
+        <span className="fixed bottom-4 right-4 z-[51] w-4 h-4 bg-green-500 border-2 border-white rounded-full translate-x-1 -translate-y-1 animate-pulse" />
+      )}
+
       {/* Floating Label */}
       {!isOpen && showBalloon && (
-        <div className="fixed bottom-[88px] right-4 z-40 bg-white rounded-lg shadow-lg px-3 py-2 text-sm font-medium text-foreground animate-bounce">
-          👋 Dúvidas sobre as câmeras?
-          <br />
-          <span className="text-muted-foreground text-xs">Fale com nossa especialista!</span>
+        <div className="fixed bottom-[88px] right-4 z-40 bg-white rounded-xl shadow-lg px-4 py-3 text-sm font-medium text-foreground animate-bounce max-w-[200px]">
+          <div className="flex items-center gap-2 mb-1">
+            <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+            <span className="font-semibold text-primary">Ana está online</span>
+          </div>
+          <span className="text-muted-foreground text-xs">Tire suas dúvidas sobre as câmeras!</span>
+          <div className="absolute bottom-0 right-6 w-3 h-3 bg-white transform rotate-45 translate-y-1.5" />
         </div>
       )}
 
@@ -103,12 +115,20 @@ const AIChatBot = () => {
         <div className="fixed bottom-[88px] right-4 z-50 w-[350px] max-w-[calc(100vw-32px)] h-[480px] max-h-[calc(100vh-120px)] bg-white border border-gray-200 rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-bottom-5 duration-300">
           {/* Header */}
           <div className="bg-primary p-4 text-white flex items-center gap-3">
-            <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-2xl">
-              📹
+            <div className="relative">
+              <img 
+                src={perfilAtendente} 
+                alt="Ana - Atendente" 
+                className="w-12 h-12 rounded-full object-cover border-2 border-white/30"
+              />
+              <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-primary rounded-full" />
             </div>
             <div>
-              <h3 className="font-bold text-lg">Suporte MegaUtil</h3>
-              <p className="text-sm text-white/80">Especialista em segurança</p>
+              <h3 className="font-bold text-lg">Ana</h3>
+              <p className="text-sm text-white/80 flex items-center gap-1">
+                <span className="w-2 h-2 bg-green-400 rounded-full" />
+                Online agora
+              </p>
             </div>
           </div>
 
@@ -119,8 +139,15 @@ const AIChatBot = () => {
                 key={index}
                 className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
               >
+                {message.role === 'assistant' && (
+                  <img 
+                    src={perfilAtendente} 
+                    alt="Ana" 
+                    className="w-8 h-8 rounded-full object-cover mr-2 flex-shrink-0"
+                  />
+                )}
                 <div
-                  className={`max-w-[80%] p-3 rounded-2xl text-sm ${
+                  className={`max-w-[75%] p-3 rounded-2xl text-sm ${
                     message.role === 'user'
                       ? 'bg-primary text-white rounded-br-md'
                       : 'bg-white text-gray-800 border border-gray-200 rounded-bl-md shadow-sm'
@@ -132,8 +159,17 @@ const AIChatBot = () => {
             ))}
             {isLoading && (
               <div className="flex justify-start">
+                <img 
+                  src={perfilAtendente} 
+                  alt="Ana" 
+                  className="w-8 h-8 rounded-full object-cover mr-2 flex-shrink-0"
+                />
                 <div className="bg-white text-gray-800 border border-gray-200 p-3 rounded-2xl rounded-bl-md shadow-sm">
-                  <Loader2 className="w-5 h-5 animate-spin text-gray-400" />
+                  <div className="flex gap-1">
+                    <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                    <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                    <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                  </div>
                 </div>
               </div>
             )}
