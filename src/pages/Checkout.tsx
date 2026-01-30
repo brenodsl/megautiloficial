@@ -908,26 +908,20 @@ const Checkout = () => {
                 alt={items[0]?.size === 1 ? "1 Câmera" : `Kit ${items[0]?.size} Câmeras`}
                 className="w-24 h-24 object-cover rounded-xl border border-gray-200"
               />
-              <span className="absolute -top-2 -left-2 bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded">
+              <span className="absolute -top-2 -left-2 bg-accent text-white text-[10px] font-bold px-2 py-0.5 rounded">
                 PROMOÇÃO!
               </span>
             </div>
             <div className="flex-1">
-              <h1 className="text-sm font-semibold text-gray-900 leading-tight">
+              <h1 className="text-sm font-semibold text-foreground leading-tight">
                 {items[0]?.size === 1 ? "Câmera" : `Kit ${items[0]?.size} Câmeras`} Wi-Fi Full HD - Leboss
               </h1>
-              <div className="flex items-center gap-1 mt-1">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <Star key={star} className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-                ))}
-                <span className="text-xs text-gray-500 ml-1">(578 avaliações)</span>
-              </div>
-              <div className="mt-2">
+              <div className="mt-3">
                 <div className="flex items-baseline gap-2">
                   <span className="text-xl font-bold text-primary">
                     R$ {totalPrice.toFixed(2).replace(".", ",")}
                   </span>
-                  <span className="text-sm text-gray-400 line-through">
+                  <span className="text-sm text-muted-foreground line-through">
                     R$ {displayOriginalPrice.toFixed(2).replace(".", ",")}
                   </span>
                 </div>
@@ -936,22 +930,22 @@ const Checkout = () => {
           </div>
           
           {/* Trust Badges */}
-          <div className="flex justify-between mt-4 pt-4 border-t border-gray-100">
+          <div className="flex justify-between mt-4 pt-4 border-t border-border">
             <div className="flex flex-col items-center text-center">
-              <ShieldCheck className="h-6 w-6 text-gray-500" />
-              <span className="text-[10px] text-gray-500 mt-1">Compra<br/>Segura</span>
+              <ShieldCheck className="h-6 w-6 text-muted-foreground" />
+              <span className="text-[10px] text-muted-foreground mt-1">Compra<br/>Segura</span>
             </div>
             <div className="flex flex-col items-center text-center">
-              <Truck className="h-6 w-6 text-gray-500" />
-              <span className="text-[10px] text-gray-500 mt-1">Frete Grátis</span>
+              <Truck className="h-6 w-6 text-muted-foreground" />
+              <span className="text-[10px] text-muted-foreground mt-1">Frete Grátis</span>
             </div>
             <div className="flex flex-col items-center text-center">
-              <Clock className="h-6 w-6 text-gray-500" />
-              <span className="text-[10px] text-gray-500 mt-1">Garantia 12m</span>
+              <Clock className="h-6 w-6 text-muted-foreground" />
+              <span className="text-[10px] text-muted-foreground mt-1">Garantia 12m</span>
             </div>
             <div className="flex flex-col items-center text-center">
-              <CreditCard className="h-6 w-6 text-gray-500" />
-              <span className="text-[10px] text-gray-500 mt-1">PIX Seguro</span>
+              <CreditCard className="h-6 w-6 text-muted-foreground" />
+              <span className="text-[10px] text-muted-foreground mt-1">PIX Seguro</span>
             </div>
           </div>
         </div>
