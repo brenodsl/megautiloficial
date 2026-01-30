@@ -26,6 +26,7 @@ import {
   CreditCard,
   Check
 } from "lucide-react";
+import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -819,22 +820,9 @@ const Checkout = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-8">
+    <div className="min-h-screen bg-muted pb-8">
       {/* Header */}
-      <header className="bg-primary py-3 px-4">
-        <div className="max-w-lg mx-auto flex items-center justify-between">
-          <button onClick={() => navigate("/")} className="text-white">
-            <ArrowLeft className="h-5 w-5" />
-          </button>
-          <Link to="/">
-            <img src="/logo-megautil.png" alt="MegaUtil" className="h-8 w-auto" />
-          </Link>
-          <div className="flex items-center gap-1 text-white text-sm">
-            <Lock className="h-4 w-4" />
-            <span>Seguro</span>
-          </div>
-        </div>
-      </header>
+      <Header />
 
       <main className="max-w-lg mx-auto px-4 py-4 space-y-4">
         
