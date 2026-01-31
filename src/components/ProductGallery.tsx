@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import useEmblaCarousel from "embla-carousel-react";
-import cameraMain from "@/assets/camera-main.png";
+import { Play } from "lucide-react";
+import videoCameraGallery from "@/assets/video-camera-gallery.mp4";
 import camera2 from "@/assets/camera-2.jpg";
 import camera3 from "@/assets/camera-3.jpg";
 import camera4 from "@/assets/camera-4.jpg";
@@ -12,13 +13,14 @@ import camera9 from "@/assets/camera-9.jpg";
 
 interface MediaItem {
   id: number;
-  type: "image";
+  type: "image" | "video";
   src: string;
   alt: string;
+  poster?: string;
 }
 
 const mediaItems: MediaItem[] = [
-  { id: 1, type: "image", src: cameraMain, alt: "Kit 3 Câmeras Wi-Fi - Vista Principal" },
+  { id: 1, type: "video", src: videoCameraGallery, alt: "Vídeo demonstração da Câmera Wi-Fi", poster: camera2 },
   { id: 2, type: "image", src: camera2, alt: "Kit 3 Câmeras Wi-Fi - Detalhe" },
   { id: 3, type: "image", src: camera3, alt: "Kit 3 Câmeras Wi-Fi - Instalação" },
   { id: 4, type: "image", src: camera4, alt: "Kit 3 Câmeras Wi-Fi - App" },
@@ -59,14 +61,25 @@ const ProductGallery = () => {
           <div className="flex h-full">
             {mediaItems.map((item) => (
               <div key={item.id} className="flex-[0_0_100%] min-w-0 h-full">
-                <img
-                  src={item.src}
-                  alt={item.alt}
-                  className="h-full w-full object-contain bg-gradient-to-b from-gray-50 to-white"
-                  loading={item.id === 1 ? "eager" : "lazy"}
-                  decoding="async"
-                  fetchPriority={item.id === 1 ? "high" : "auto"}
-                />
+                {item.type === "video" ? (
+                  <video
+                    src={item.src}
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    className="h-full w-full object-contain bg-gradient-to-b from-gray-50 to-white"
+                  />
+                ) : (
+                  <img
+                    src={item.src}
+                    alt={item.alt}
+                    className="h-full w-full object-contain bg-gradient-to-b from-gray-50 to-white"
+                    loading={item.id === 1 ? "eager" : "lazy"}
+                    decoding="async"
+                    fetchPriority={item.id === 1 ? "high" : "auto"}
+                  />
+                )}
               </div>
             ))}
           </div>
@@ -87,13 +100,28 @@ const ProductGallery = () => {
               }
             `}
           >
-            <img
-              src={item.src}
-              alt={item.alt}
-              className="h-full w-full object-cover"
-              loading="lazy"
-              decoding="async"
-            />
+            {item.type === "video" ? (
+              <>
+                <img
+                  src={item.poster || camera2}
+                  alt={item.alt}
+                  className="h-full w-full object-cover"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+                  <Play className="h-4 w-4 text-white fill-white" />
+                </div>
+              </>
+            ) : (
+              <img
+                src={item.src}
+                alt={item.alt}
+                className="h-full w-full object-cover"
+                loading="lazy"
+                decoding="async"
+              />
+            )}
           </button>
         ))}
       </div>
