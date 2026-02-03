@@ -16,6 +16,7 @@ import { usePresence } from "@/hooks/usePresence";
 import { trackPixelEvent } from "@/hooks/usePixels";
 import { useFunnelTracking } from "@/hooks/useFunnelTracking";
 import AIChatBot from "@/components/AIChatBot";
+import PurchaseNotifications from "@/components/PurchaseNotifications";
 
 import QuantitySelector, { QUANTITY_OPTIONS } from "@/components/QuantitySelector";
 import FloatingBuyButton from "@/components/FloatingBuyButton";
@@ -271,8 +272,7 @@ const Index = () => {
 
       <Footer />
       <AIChatBot />
-      
-      
+      <PurchaseNotifications />
     </div>
   );
 };
