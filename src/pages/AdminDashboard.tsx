@@ -42,6 +42,7 @@ import { format, startOfDay, endOfDay, isWithinInterval } from "date-fns";
 import { usePresenceCleanup } from "@/hooks/usePresence";
 import { ptBR } from "date-fns/locale";
 import FunnelAnalytics from "@/components/admin/FunnelAnalytics";
+import { KitPriceOption, DEFAULT_KIT_PRICES, updateKitPricing } from "@/hooks/useKitPricing";
 
 interface Order {
   id: string;
@@ -112,6 +113,8 @@ const AdminDashboard = () => {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   const [productPrice, setProductPrice] = useState<ProductPriceConfig>({ unit_price: 77.98, original_price: 239.80 });
   const [isSavingPrice, setIsSavingPrice] = useState(false);
+  const [kitPrices, setKitPrices] = useState<KitPriceOption[]>(DEFAULT_KIT_PRICES);
+  const [isSavingKitPrices, setIsSavingKitPrices] = useState(false);
 
   // Cleanup old presence entries
   usePresenceCleanup();
@@ -162,8 +165,49 @@ const AdminDashboard = () => {
 
   const fetchData = async () => {
     setIsLoading(true);
-    await Promise.all([fetchOrders(), fetchPixels(), fetchLiveVisitors(), fetchGatewaySettings(), fetchUpsellConfig(), fetchProductPrice()]);
+    await Promise.all([fetchOrders(), fetchPixels(), fetchLiveVisitors(), fetchGatewaySettings(), fetchUpsellConfig(), fetchProductPrice(), fetchKitPrices()]);
     setIsLoading(false);
+  };
+
+  const fetchKitPrices = async () => {
+    const { data, error } = await supabase
+      .from('app_settings')
+      .select('setting_value')
+      .eq('setting_key', 'kit_pricing')
+      .maybeSingle();
+
+    if (!error && data?.setting_value) {
+      const config = data.setting_value as unknown as { kits: KitPriceOption[] };
+      if (config.kits && Array.isArray(config.kits)) {
+        const kitsWithSavings = config.kits.map(kit => ({
+          ...kit,
+          savings: kit.originalPrice - kit.salePrice
+        }));
+        setKitPrices(kitsWithSavings);
+      }
+    }
+  };
+
+  const handleSaveKitPrices = async () => {
+    setIsSavingKitPrices(true);
+    const success = await updateKitPricing(kitPrices);
+    if (success) {
+      toast.success("Preços dos kits atualizados! Recarregue a página para ver as alterações.");
+    } else {
+      toast.error("Erro ao salvar preços dos kits");
+    }
+    setIsSavingKitPrices(false);
+  };
+
+  const handleUpdateKitPrice = (index: number, field: 'originalPrice' | 'salePrice', value: number) => {
+    setKitPrices(prev => prev.map((kit, i) => {
+      if (i === index) {
+        const updated = { ...kit, [field]: value };
+        updated.savings = updated.originalPrice - updated.salePrice;
+        return updated;
+      }
+      return kit;
+    }));
   };
 
   const fetchProductPrice = async () => {
@@ -1103,90 +1147,109 @@ const AdminDashboard = () => {
               <CardHeader>
                 <CardTitle className="text-white flex items-center gap-2">
                   <Tag className="w-5 h-5" />
-                  Configuração de Preço do Produto
+                  Configuração de Preços dos Kits
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
                 <p className="text-slate-400 text-sm">
-                  Configure o preço do tênis que será exibido em todo o site. O preço será atualizado automaticamente na página do produto, checkout, PIX gerado e todos os cálculos.
+                  Configure o preço de cada kit que será exibido em todo o site. Os preços serão atualizados automaticamente na página do produto, checkout e PIX gerado.
                 </p>
 
-                <div className={`p-6 rounded-xl border-2 transition-all bg-emerald-500/10 border-emerald-500`}>
-                  <div className="flex items-center justify-between mb-6">
-                    <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-emerald-500/20">
-                        <DollarSign className="w-6 h-6 text-emerald-400" />
-                      </div>
-                      <div>
-                        <h3 className="text-white font-bold text-lg">
-                          Tênis Carbon 3.0
-                        </h3>
-                        <p className="text-slate-400 text-sm">
-                          Preço atual: R$ {productPrice.unit_price.toFixed(2).replace(".", ",")}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="grid md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <Label className="text-slate-400 text-sm">Preço de Venda (R$)</Label>
-                      <Input
-                        type="number"
-                        step="0.01"
-                        min="0"
-                        value={productPrice.unit_price}
-                        onChange={(e) => setProductPrice(prev => ({ ...prev, unit_price: parseFloat(e.target.value) || 0 }))}
-                        placeholder="77.98"
-                        className="bg-slate-700/50 border-slate-600 text-white text-lg font-bold"
-                      />
-                      <p className="text-slate-500 text-xs">
-                        Este é o valor que o cliente pagará no PIX
-                      </p>
-                    </div>
-                    <div className="space-y-2">
-                      <Label className="text-slate-400 text-sm">Preço Original / Riscado (R$)</Label>
-                      <Input
-                        type="number"
-                        step="0.01"
-                        min="0"
-                        value={productPrice.original_price}
-                        onChange={(e) => setProductPrice(prev => ({ ...prev, original_price: parseFloat(e.target.value) || 0 }))}
-                        placeholder="239.80"
-                        className="bg-slate-700/50 border-slate-600 text-white"
-                      />
-                      <p className="text-slate-500 text-xs">
-                        Valor de referência para mostrar o desconto (preço riscado)
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Preview */}
-                  <div className="mt-6 p-4 bg-slate-900/50 rounded-xl">
-                    <p className="text-slate-400 text-sm mb-2">Prévia:</p>
-                    <div className="flex items-baseline gap-3">
-                      <span className="text-slate-500 line-through">
-                        R$ {productPrice.original_price.toFixed(2).replace(".", ",")}
-                      </span>
-                      <span className="text-2xl font-bold text-emerald-400">
-                        R$ {productPrice.unit_price.toFixed(2).replace(".", ",")}
-                      </span>
-                      <span className="text-xs font-semibold text-emerald-400 bg-emerald-500/20 px-2 py-0.5 rounded-full">
-                        -{productPrice.original_price > 0 ? Math.round(((productPrice.original_price - productPrice.unit_price) / productPrice.original_price) * 100) : 0}%
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="mt-6 flex justify-end">
-                    <Button
-                      onClick={handleSaveProductPrice}
-                      disabled={isSavingPrice}
-                      className="bg-emerald-500 hover:bg-emerald-600 text-white"
+                {/* Kit Prices */}
+                <div className="space-y-4">
+                  {kitPrices.map((kit, index) => (
+                    <div
+                      key={kit.quantity}
+                      className={`p-5 rounded-xl border-2 transition-all ${
+                        kit.isPopular 
+                          ? 'bg-emerald-500/10 border-emerald-500' 
+                          : 'bg-slate-700/30 border-slate-600'
+                      }`}
                     >
-                      <Save className="w-4 h-4 mr-2" />
-                      {isSavingPrice ? 'Salvando...' : 'Salvar Preço'}
-                    </Button>
-                  </div>
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-3">
+                          <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+                            kit.isPopular ? 'bg-emerald-500/20' : 'bg-slate-600/50'
+                          }`}>
+                            <Package className={`w-5 h-5 ${
+                              kit.isPopular ? 'text-emerald-400' : 'text-slate-400'
+                            }`} />
+                          </div>
+                          <div>
+                            <h3 className="text-white font-bold">
+                              {kit.label}
+                              {kit.isPopular && (
+                                <Badge className="ml-2 bg-emerald-500/20 text-emerald-400 border-emerald-500/30">
+                                  MAIS VENDIDO
+                                </Badge>
+                              )}
+                            </h3>
+                            <p className="text-slate-400 text-xs">
+                              {kit.quantity} {kit.quantity === 1 ? 'unidade' : 'unidades'}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-xs text-slate-400">Economia</p>
+                          <p className={`font-bold ${kit.savings > 0 ? 'text-emerald-400' : 'text-slate-500'}`}>
+                            {kit.savings > 0 ? `R$ ${kit.savings.toFixed(2).replace(".", ",")}` : '-'}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-1.5">
+                          <Label className="text-slate-400 text-xs">Preço Original (R$)</Label>
+                          <Input
+                            type="number"
+                            step="0.01"
+                            min="0"
+                            value={kit.originalPrice}
+                            onChange={(e) => handleUpdateKitPrice(index, 'originalPrice', parseFloat(e.target.value) || 0)}
+                            className="bg-slate-700/50 border-slate-600 text-white"
+                          />
+                        </div>
+                        <div className="space-y-1.5">
+                          <Label className="text-slate-400 text-xs">Preço de Venda (R$)</Label>
+                          <Input
+                            type="number"
+                            step="0.01"
+                            min="0"
+                            value={kit.salePrice}
+                            onChange={(e) => handleUpdateKitPrice(index, 'salePrice', parseFloat(e.target.value) || 0)}
+                            className="bg-slate-700/50 border-slate-600 text-white font-bold"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Preview */}
+                      <div className="mt-3 flex items-center gap-3 text-sm">
+                        <span className="text-slate-500">Prévia:</span>
+                        <span className="text-slate-500 line-through">
+                          R$ {kit.originalPrice.toFixed(2).replace(".", ",")}
+                        </span>
+                        <span className="font-bold text-emerald-400">
+                          R$ {kit.salePrice.toFixed(2).replace(".", ",")}
+                        </span>
+                        {kit.originalPrice > 0 && (
+                          <Badge className="bg-emerald-500/20 text-emerald-400 text-xs">
+                            -{Math.round(((kit.originalPrice - kit.salePrice) / kit.originalPrice) * 100)}%
+                          </Badge>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="flex justify-end">
+                  <Button
+                    onClick={handleSaveKitPrices}
+                    disabled={isSavingKitPrices}
+                    className="bg-emerald-500 hover:bg-emerald-600 text-white"
+                  >
+                    <Save className="w-4 h-4 mr-2" />
+                    {isSavingKitPrices ? 'Salvando...' : 'Salvar Preços dos Kits'}
+                  </Button>
                 </div>
 
                 {/* Info box */}
@@ -1196,7 +1259,7 @@ const AdminDashboard = () => {
                     Alterações Automáticas
                   </h4>
                   <p className="text-slate-400 text-sm">
-                    Ao salvar, o novo preço será aplicado automaticamente em toda a loja: página do produto, carrinho, checkout, valor do PIX gerado e rastreamento de pixels. 
+                    Ao salvar, os novos preços serão aplicados automaticamente em toda a loja: página do produto, carrinho, checkout, valor do PIX gerado e rastreamento de pixels. 
                     Recarregue a página após salvar para ver as alterações.
                   </p>
                 </div>

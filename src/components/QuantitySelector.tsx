@@ -3,23 +3,14 @@ import kit1und from "@/assets/kit-1und.jpg";
 import kit2und from "@/assets/kit-2und.jpg";
 import kit3und from "@/assets/kit-3und.jpg";
 import kit4und from "@/assets/kit-4und.jpg";
+import { useKitPricing, KitPriceOption, DEFAULT_KIT_PRICES } from "@/hooks/useKitPricing";
 
-interface QuantityOption {
-  quantity: number;
-  label: string;
-  originalPrice: number;
-  salePrice: number;
-  savings: number;
-  isPopular?: boolean;
-  image: string;
-}
-
-const QUANTITY_OPTIONS: QuantityOption[] = [
-  { quantity: 1, label: "1 Und", originalPrice: 157.00, salePrice: 65.80, savings: 0, image: kit1und },
-  { quantity: 2, label: "Kit 2 Und", originalPrice: 314.00, salePrice: 119.90, savings: 194.10, image: kit2und },
-  { quantity: 3, label: "Kit 3 Und", originalPrice: 471.00, salePrice: 159.90, savings: 311.10, isPopular: true, image: kit3und },
-  { quantity: 4, label: "Kit 4 Und", originalPrice: 628.00, salePrice: 199.90, savings: 428.10, image: kit4und },
-];
+const KIT_IMAGES: Record<number, string> = {
+  1: kit1und,
+  2: kit2und,
+  3: kit3und,
+  4: kit4und,
+};
 
 interface QuantitySelectorProps {
   selectedQuantity: number;
@@ -27,12 +18,17 @@ interface QuantitySelectorProps {
 }
 
 const QuantitySelector = ({ selectedQuantity, onQuantityChange }: QuantitySelectorProps) => {
+  const { kitPrices, isLoading } = useKitPricing();
+
+  const options = isLoading ? DEFAULT_KIT_PRICES : kitPrices;
+
   return (
     <div className="space-y-2">
       <p className="text-sm font-semibold text-foreground mb-3">Selecione a quantidade:</p>
       <div className="space-y-2">
-        {QUANTITY_OPTIONS.map((option) => {
+        {options.map((option) => {
           const isSelected = selectedQuantity === option.quantity;
+          const image = KIT_IMAGES[option.quantity] || kit1und;
           
           return (
             <button
@@ -55,7 +51,7 @@ const QuantitySelector = ({ selectedQuantity, onQuantityChange }: QuantitySelect
                 <div className="flex items-center gap-2 sm:gap-3 min-w-0">
                   {/* Kit Image */}
                   <img 
-                    src={option.image} 
+                    src={image} 
                     alt={option.label}
                     className="w-12 h-12 sm:w-14 sm:h-14 object-cover rounded-lg border border-border flex-shrink-0"
                   />
@@ -92,5 +88,5 @@ const QuantitySelector = ({ selectedQuantity, onQuantityChange }: QuantitySelect
 };
 
 export default QuantitySelector;
-export { QUANTITY_OPTIONS };
-export type { QuantityOption };
+export { DEFAULT_KIT_PRICES as QUANTITY_OPTIONS };
+export type { KitPriceOption as QuantityOption };
