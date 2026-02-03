@@ -74,29 +74,24 @@ const PurchaseNotifications = () => {
 
   return (
     <div
-      className={`fixed bottom-20 left-4 z-50 max-w-[280px] transition-all duration-500 ease-out ${
+      className={`fixed bottom-20 left-3 z-40 transition-all duration-300 ease-out ${
         isVisible 
-          ? "translate-x-0 opacity-100" 
+          ? "translate-x-0 opacity-90" 
           : "-translate-x-full opacity-0"
       }`}
     >
-      <div className="bg-white rounded-xl shadow-lg border border-border p-3 flex items-start gap-3">
-        <div className="w-10 h-10 rounded-full bg-success/10 flex items-center justify-center flex-shrink-0">
-          <ShoppingBag className="h-5 w-5 text-success" />
+      <div className="bg-foreground/90 backdrop-blur-sm rounded-full shadow-sm px-3 py-1.5 flex items-center gap-2">
+        <div className="w-5 h-5 rounded-full bg-success/20 flex items-center justify-center flex-shrink-0">
+          <ShoppingBag className="h-3 w-3 text-success" />
         </div>
-        <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium text-foreground leading-tight">
-            <span className="font-bold">{notification.name}</span> comprou {quantityText}
-          </p>
-          <p className="text-xs text-muted-foreground mt-0.5">
-            {notification.city} • {notification.timeAgo}
-          </p>
-        </div>
+        <p className="text-xs text-white/90">
+          <span className="font-medium">{notification.name}</span> comprou {quantityText}
+        </p>
         <button 
           onClick={() => setIsVisible(false)}
-          className="text-muted-foreground hover:text-foreground p-1 -mr-1 -mt-1"
+          className="text-white/50 hover:text-white/80 ml-1"
         >
-          <X className="h-3.5 w-3.5" />
+          <X className="h-3 w-3" />
         </button>
       </div>
     </div>
