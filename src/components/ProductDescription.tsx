@@ -1,4 +1,4 @@
-import { Package, Check, Play, Headphones } from "lucide-react";
+import { Play, Headphones } from "lucide-react";
 import {
   Accordion,
   AccordionContent,
@@ -91,35 +91,6 @@ const ProductDescription = () => {
         </AccordionItem>
       </Accordion>
 
-      {/* Kit Contents Accordion */}
-      <Accordion type="single" collapsible className="w-full">
-        <AccordionItem value="kit" className="border rounded-xl px-4">
-          <AccordionTrigger className="text-base font-bold text-foreground hover:no-underline py-4">
-            <div className="flex items-center gap-2">
-              <Package className="h-5 w-5 text-accent" />
-              Conteúdo do Kit
-            </div>
-          </AccordionTrigger>
-          <AccordionContent className="pb-4">
-            <ul className="space-y-2.5">
-              {[
-                "3x Câmeras Wi-Fi Full HD 1080P",
-                "3x Suportes de parede com parafusos",
-                "3x Cabos USB de alimentação (2m)",
-                "3x Fontes de energia 5V/2A",
-                "1x Manual de instalação em português",
-                "1x Adesivo de aviso de vigilância",
-                "Garantia de 12 meses",
-              ].map((item, index) => (
-                <li key={index} className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Check className="h-4 w-4 text-success flex-shrink-0" />
-                  {item}
-                </li>
-              ))}
-            </ul>
-          </AccordionContent>
-        </AccordionItem>
-      </Accordion>
 
       {/* Technical Specs Accordion */}
       <Accordion type="single" collapsible className="w-full">
