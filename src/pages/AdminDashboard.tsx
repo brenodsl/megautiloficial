@@ -451,6 +451,8 @@ const AdminDashboard = () => {
     }
   };
 
+  const [checkingPaymentId, setCheckingPaymentId] = useState<string | null>(null);
+
   const handleUpdateOrderStatus = async (orderId: string, status: string) => {
     const updateData: any = { payment_status: status };
     if (status === 'paid') {
@@ -468,6 +470,43 @@ const AdminDashboard = () => {
       toast.success("Status atualizado!");
       fetchOrders();
       setSelectedOrder(null);
+    }
+  };
+
+  const handleCheckPaymentStatus = async (order: Order) => {
+    if (!order.transaction_id) {
+      toast.error("Pedido sem ID de transação");
+      return;
+    }
+
+    setCheckingPaymentId(order.id);
+    try {
+      const { data, error } = await supabase.functions.invoke("check-payment-status", {
+        body: { transactionId: order.transaction_id }
+      });
+
+      if (error) {
+        console.error("Error checking payment:", error);
+        toast.error("Erro ao verificar pagamento");
+        return;
+      }
+
+      console.log("Payment check response:", data);
+
+      if (data?.isPaid) {
+        toast.success(`✅ Pagamento confirmado! Status: ${data.status}`);
+      } else if (data?.isFailed) {
+        toast.error(`❌ Pagamento falhou: ${data.status}`);
+      } else {
+        toast.info(`⏳ Status: ${data?.status || 'aguardando pagamento'}`);
+      }
+
+      fetchOrders();
+    } catch (err) {
+      console.error("Error:", err);
+      toast.error("Erro ao verificar status");
+    } finally {
+      setCheckingPaymentId(null);
     }
   };
 
@@ -789,6 +828,23 @@ const AdminDashboard = () => {
                               {format(new Date(order.created_at), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
                             </td>
                             <td className="py-4 px-4 text-right">
+                              <div className="flex items-center justify-end gap-2">
+                                {order.payment_status === 'pending' && order.transaction_id && (
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => handleCheckPaymentStatus(order)}
+                                    disabled={checkingPaymentId === order.id}
+                                    className="text-blue-400 hover:text-blue-300 hover:bg-blue-500/20"
+                                    title="Verificar status do pagamento"
+                                  >
+                                    {checkingPaymentId === order.id ? (
+                                      <RefreshCw className="w-4 h-4 animate-spin" />
+                                    ) : (
+                                      <RefreshCw className="w-4 h-4" />
+                                    )}
+                                  </Button>
+                                )}
                               <Dialog>
                                 <DialogTrigger asChild>
                                   <Button
@@ -905,6 +961,7 @@ const AdminDashboard = () => {
                                   )}
                                 </DialogContent>
                               </Dialog>
+                              </div>
                             </td>
                           </tr>
                         ))}

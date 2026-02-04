@@ -13,6 +13,18 @@ interface GatewaySettings {
   is_active: boolean;
 }
 
+// Status mapping for all gateways
+const PAID_STATUSES = ['paid', 'approved', 'completed', 'confirmed', 'aprovado'];
+const FAILED_STATUSES = ['failed', 'refused', 'expired', 'chargedback', 'cancelled', 'canceled', 'recusado', 'expirado'];
+
+function normalizeStatus(status: string): { isPaid: boolean; isFailed: boolean } {
+  const statusLower = status.toLowerCase().trim();
+  return {
+    isPaid: PAID_STATUSES.includes(statusLower),
+    isFailed: FAILED_STATUSES.includes(statusLower)
+  };
+}
+
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
@@ -46,7 +58,8 @@ serve(async (req) => {
       );
     }
 
-    console.log("Checking payment status for transaction:", transactionId);
+    console.log("=== Checking payment status ===");
+    console.log("Transaction ID:", transactionId);
 
     // First, check order in database to get gateway_used
     const { data: orderData, error: orderError } = await supabase
@@ -80,7 +93,6 @@ serve(async (req) => {
     let gateway: GatewaySettings | null = null;
 
     if (gatewayName) {
-      // Use the gateway that was used to create this order
       console.log(`Order was created with gateway: ${gatewayName}`);
       const { data: gatewayData, error: gatewayError } = await supabase
         .from('gateway_settings')
@@ -143,6 +155,7 @@ serve(async (req) => {
     }
 
     // Determine API URL based on gateway
+    // Format: https://api.{gateway}.com.br/api/public/v1/transactions/{hash}?api_token=TOKEN
     let CHECK_URL: string;
     if (gateway.gateway_name === 'sigmapay') {
       CHECK_URL = `https://api.sigmapay.com.br/api/public/v1/transactions/${transactionId}?api_token=${gateway.api_token}`;
@@ -162,7 +175,8 @@ serve(async (req) => {
       );
     }
 
-    console.log(`Calling ${gateway.gateway_name} API:`, CHECK_URL.replace(gateway.api_token, "***"));
+    console.log(`Calling ${gateway.gateway_name} API...`);
+    console.log(`URL: ${CHECK_URL.replace(gateway.api_token, "***")}`);
 
     const response = await fetch(CHECK_URL, {
       method: 'GET',
@@ -173,7 +187,7 @@ serve(async (req) => {
     });
 
     const responseText = await response.text();
-    console.log(`${gateway.gateway_name} raw response status:`, response.status);
+    console.log(`${gateway.gateway_name} response status:`, response.status);
     console.log(`${gateway.gateway_name} raw response:`, responseText);
 
     let responseData;
@@ -204,37 +218,44 @@ serve(async (req) => {
       );
     }
 
-    // Extract data from response
+    // Extract data from response - handle both { data: {...} } and direct response formats
     const gatewayResponseData = responseData.data || responseData;
     
-    // Get payment status from response - check multiple possible field names
-    const status = gatewayResponseData.payment_status || gatewayResponseData.status || 'unknown';
-    
-    console.log('Raw status from gateway:', status);
-    console.log(`Full ${gateway.gateway_name} data:`, JSON.stringify(gatewayResponseData, null, 2));
+    console.log('Gateway response data:', JSON.stringify(gatewayResponseData, null, 2));
 
-    // Status mapping for both gateways
-    // Paid statuses: paid, approved, completed, confirmed
-    // Failed statuses: failed, refused, expired, chargedback, cancelled, canceled
-    // Pending statuses: pending, waiting_payment, processing, waiting
-    const paidStatuses = ['paid', 'approved', 'completed', 'confirmed'];
-    const failedStatuses = ['failed', 'refused', 'expired', 'chargedback', 'cancelled', 'canceled'];
+    // Get payment status - check multiple possible field names
+    // Based on user's example: { "success": true, "data": { "status": "paid", ... } }
+    // Also handle: { "payment_status": "paid", ... }
+    let status = 'unknown';
     
-    const statusLower = status.toLowerCase();
-    const isPaid = paidStatuses.includes(statusLower);
-    const isFailed = failedStatuses.includes(statusLower);
+    // Priority order for status field lookup
+    if (gatewayResponseData.status) {
+      status = gatewayResponseData.status;
+    } else if (gatewayResponseData.payment_status) {
+      status = gatewayResponseData.payment_status;
+    } else if (responseData.status) {
+      status = responseData.status;
+    } else if (responseData.payment_status) {
+      status = responseData.payment_status;
+    }
     
-    console.log('Payment status:', status, 'isPaid:', isPaid, 'isFailed:', isFailed);
+    console.log('Extracted status:', status);
+
+    const { isPaid, isFailed } = normalizeStatus(status);
+    
+    console.log('Payment analysis:', { status, isPaid, isFailed });
 
     // If paid, update the order in the database
     if (isPaid) {
-      console.log('Payment confirmed! Updating order in database...');
+      console.log('✅ Payment confirmed! Updating order in database...');
+
+      const paidAt = gatewayResponseData.paid_at || new Date().toISOString();
 
       const { data: updateData, error: updateError } = await supabase
         .from('orders')
         .update({ 
           payment_status: 'paid',
-          paid_at: new Date().toISOString(),
+          paid_at: paidAt,
           gateway_used: gateway.gateway_name
         })
         .eq('transaction_id', transactionId)
@@ -243,13 +264,13 @@ serve(async (req) => {
       if (updateError) {
         console.error('Error updating order:', updateError);
       } else {
-        console.log('Order updated successfully to paid status:', updateData);
+        console.log('Order updated successfully:', updateData);
       }
     }
 
     // If failed, update the order status to failed
     if (isFailed) {
-      console.log('Payment failed! Updating order in database...');
+      console.log('❌ Payment failed! Updating order in database...');
 
       const { error: updateError } = await supabase
         .from('orders')
@@ -262,20 +283,24 @@ serve(async (req) => {
       if (updateError) {
         console.error('Error updating order to failed:', updateError);
       } else {
-        console.log('Order updated successfully to failed status');
+        console.log('Order updated to failed status');
       }
     }
 
+    const result = {
+      success: true,
+      transactionId: transactionId,
+      status: status,
+      isPaid: isPaid,
+      isFailed: isFailed,
+      paidAt: isPaid ? (gatewayResponseData.paid_at || new Date().toISOString()) : null,
+      gateway: gateway.gateway_name
+    };
+
+    console.log('=== Check complete ===', result);
+
     return new Response(
-      JSON.stringify({
-        success: true,
-        transactionId: transactionId,
-        status: status,
-        isPaid: isPaid,
-        isFailed: isFailed,
-        paidAt: isPaid ? (gatewayResponseData.paid_at || new Date().toISOString()) : null,
-        gateway: gateway.gateway_name
-      }),
+      JSON.stringify(result),
       { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
 
