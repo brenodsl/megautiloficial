@@ -154,15 +154,28 @@ serve(async (req) => {
       );
     }
 
-    // Determine API URL based on gateway
+    // Determine API URL and auth headers based on gateway
     // Format: https://api.{gateway}.com.br/api/public/v1/transactions/{hash}?api_token=TOKEN
     let CHECK_URL: string;
+    let requestHeaders: Record<string, string> = {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    };
+
     if (gateway.gateway_name === 'sigmapay') {
       CHECK_URL = `https://api.sigmapay.com.br/api/public/v1/transactions/${transactionId}?api_token=${gateway.api_token}`;
     } else if (gateway.gateway_name === 'goatpay') {
       CHECK_URL = `https://api.goatpayments.com.br/api/public/v1/transactions/${transactionId}?api_token=${gateway.api_token}`;
     } else if (gateway.gateway_name === 'visionpay') {
       CHECK_URL = `https://api.visionpayments.com.br/api/public/v1/transactions/${transactionId}?api_token=${gateway.api_token}`;
+    } else if (gateway.gateway_name === 'payevo') {
+      CHECK_URL = `https://apiv2.payevo.com.br/functions/v1/transactions/${transactionId}`;
+      // Payevo uses Basic Auth with secret key encoded in base64
+      const base64Credentials = btoa(`${gateway.api_token}:x`);
+      requestHeaders = {
+        ...requestHeaders,
+        'Authorization': `Basic ${base64Credentials}`
+      };
     } else {
       console.error('Unknown gateway:', gateway.gateway_name);
       return new Response(
@@ -180,10 +193,7 @@ serve(async (req) => {
 
     const response = await fetch(CHECK_URL, {
       method: 'GET',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      }
+      headers: requestHeaders
     });
 
     const responseText = await response.text();
