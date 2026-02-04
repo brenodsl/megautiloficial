@@ -1,8 +1,9 @@
 import { useState, useRef, useEffect } from "react";
-import { MessageCircle, X, Send } from "lucide-react";
+import { X, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
+import alexPhoto from "@/assets/suporte-alex.png";
 
 interface Message {
   role: 'user' | 'assistant';
@@ -12,7 +13,7 @@ interface Message {
 const AIChatBot = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'assistant', content: 'Olá! 👋 Sou a Ana, especialista em câmeras de segurança da MegaUtil. Como posso ajudar você hoje?' }
+    { role: 'assistant', content: 'Olá! 👋 Sou o Alex, especialista em câmeras de segurança da MegaUtil. Como posso ajudar você hoje?' }
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -68,13 +69,15 @@ const AIChatBot = () => {
       {/* Floating Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-4 right-4 z-50 w-14 h-14 rounded-full bg-primary hover:bg-primary/90 flex items-center justify-center shadow-lg hover:scale-110 transition-all duration-200"
+        className="fixed bottom-4 right-4 z-50 w-14 h-14 rounded-full overflow-hidden shadow-lg hover:scale-110 transition-all duration-200 border-2 border-primary"
         aria-label="Abrir chat de suporte"
       >
         {isOpen ? (
-          <X className="w-6 h-6 text-white" />
+          <div className="w-full h-full bg-primary flex items-center justify-center">
+            <X className="w-6 h-6 text-white" />
+          </div>
         ) : (
-          <MessageCircle className="w-6 h-6 text-white" />
+          <img src={alexPhoto} alt="Alex - Suporte" className="w-full h-full object-cover" />
         )}
       </button>
 
@@ -83,11 +86,9 @@ const AIChatBot = () => {
         <div className="fixed bottom-[80px] right-4 z-50 w-[350px] max-w-[calc(100vw-32px)] h-[450px] max-h-[calc(100vh-120px)] bg-white border border-gray-200 rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-bottom-5 duration-300">
           {/* Header */}
           <div className="bg-primary p-4 text-white flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
-              <MessageCircle className="w-5 h-5" />
-            </div>
+            <img src={alexPhoto} alt="Alex" className="w-10 h-10 rounded-full object-cover border-2 border-white/30" />
             <div>
-              <h3 className="font-bold text-lg">Suporte MegaUtil</h3>
+              <h3 className="font-bold text-lg">Alex - Suporte</h3>
               <p className="text-sm text-white/80">Tire suas dúvidas</p>
             </div>
           </div>
