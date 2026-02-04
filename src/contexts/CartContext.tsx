@@ -1,5 +1,16 @@
 import React, { createContext, useContext, useState, ReactNode } from "react";
-import cameraMain from "@/assets/camera-main.png";
+import kit1und from "@/assets/kit-1und.jpg";
+import kit2und from "@/assets/kit-2und.jpg";
+import kit3und from "@/assets/kit-3und.jpg";
+import kit4und from "@/assets/kit-4und.jpg";
+
+// Map quantity to kit images
+const KIT_IMAGES: Record<number, string> = {
+  1: kit1und,
+  2: kit2und,
+  3: kit3und,
+  4: kit4und,
+};
 
 export interface CartItem {
   id: string;
@@ -47,11 +58,14 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       return `Kit ${cameraCount} Câmeras`;
     };
 
+    // Get the correct kit image based on camera count
+    const kitImage = KIT_IMAGES[size] || kit1und;
+
     const newItem: CartItem = {
       id: `camera-${Date.now()}`,
       colorId,
       colorName: getQuantityLabel(size),
-      colorImage: cameraMain,
+      colorImage: kitImage,
       size, // This now represents camera count
       quantity,
       price: priceToUse,
