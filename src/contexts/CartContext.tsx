@@ -1,5 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
-import { fetchProductPrice } from "@/hooks/useProductPrice";
+import React, { createContext, useContext, useState, ReactNode } from "react";
 import cameraMain from "@/assets/camera-main.png";
 
 export interface CartItem {
@@ -10,6 +9,7 @@ export interface CartItem {
   size: number;
   quantity: number;
   price: number;
+  originalPrice: number;
 }
 
 interface CartContextType {
@@ -29,27 +29,17 @@ interface CartContextType {
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
-const DEFAULT_UNIT_PRICE = 99.00;
-const DEFAULT_ORIGINAL_PRICE = 279.80;
+const DEFAULT_UNIT_PRICE = 39.90;
+const DEFAULT_ORIGINAL_PRICE = 79.80;
 
 export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [items, setItems] = useState<CartItem[]>([]);
   const [unitPrice, setUnitPrice] = useState(DEFAULT_UNIT_PRICE);
   const [displayOriginalPrice, setDisplayOriginalPrice] = useState(DEFAULT_ORIGINAL_PRICE);
 
-  // Fetch price from database on mount
-  useEffect(() => {
-    const loadPrice = async () => {
-      const priceData = await fetchProductPrice();
-      setUnitPrice(priceData.unitPrice);
-      setDisplayOriginalPrice(priceData.originalPrice);
-    };
-    loadPrice();
-  }, []);
-
   const addItem = (colorId: string, size: number, quantity: number = 1, customPrice?: number, customOriginalPrice?: number) => {
-    const priceToUse = customPrice ?? unitPrice;
-    const originalPriceToUse = customOriginalPrice ?? displayOriginalPrice;
+    const priceToUse = customPrice ?? DEFAULT_UNIT_PRICE;
+    const originalPriceToUse = customOriginalPrice ?? DEFAULT_ORIGINAL_PRICE;
     
     // Get quantity label based on size parameter (which now represents camera count)
     const getQuantityLabel = (cameraCount: number) => {
@@ -65,9 +55,10 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       size, // This now represents camera count
       quantity,
       price: priceToUse,
+      originalPrice: originalPriceToUse,
     };
     
-    // Update prices for display
+    // Update prices for display (these are the kit prices)
     setUnitPrice(priceToUse);
     setDisplayOriginalPrice(originalPriceToUse);
     
@@ -93,11 +84,13 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
-  const originalPrice = displayOriginalPrice;
   
-  // Discount is already calculated in the price options
-  const discount = displayOriginalPrice - unitPrice;
+  // Calculate originalPrice from items (sum of original prices)
+  const originalPrice = items.reduce((sum, item) => sum + ((item.originalPrice || displayOriginalPrice) * item.quantity), 0);
+  
+  // Discount is the difference between original and sale price
   const totalPrice = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  const discount = originalPrice - totalPrice;
   const discountPercentage = originalPrice > 0 ? (discount / originalPrice) * 100 : 0;
 
   return (

@@ -18,8 +18,9 @@ import { useFunnelTracking } from "@/hooks/useFunnelTracking";
 import AIChatBot from "@/components/AIChatBot";
 import PurchaseNotifications from "@/components/PurchaseNotifications";
 
-import QuantitySelector, { QUANTITY_OPTIONS } from "@/components/QuantitySelector";
+import QuantitySelector from "@/components/QuantitySelector";
 import FloatingBuyButton from "@/components/FloatingBuyButton";
+import { useKitPricing } from "@/hooks/useKitPricing";
 
 // PIX Icon Component
 const PixIcon = ({ className = "h-4 w-4" }: { className?: string }) => (
@@ -32,10 +33,19 @@ const Index = () => {
   const navigate = useNavigate();
   const { addItem, totalItems, clearCart } = useCart();
   const { city, state, loading: locationLoading } = useUserLocation();
+  const { kitPrices, isLoading: isLoadingPrices } = useKitPricing();
   const [selectedQuantity, setSelectedQuantity] = useState(1);
-  const [currentPrice, setCurrentPrice] = useState(QUANTITY_OPTIONS[0].salePrice);
-  const [currentOriginalPrice, setCurrentOriginalPrice] = useState(QUANTITY_OPTIONS[0].originalPrice);
+  const [currentPrice, setCurrentPrice] = useState(0);
+  const [currentOriginalPrice, setCurrentOriginalPrice] = useState(0);
 
+  // Update prices when kit prices load from database
+  useEffect(() => {
+    if (!isLoadingPrices && kitPrices.length > 0) {
+      const selectedKit = kitPrices.find(k => k.quantity === selectedQuantity) || kitPrices[0];
+      setCurrentPrice(selectedKit.salePrice);
+      setCurrentOriginalPrice(selectedKit.originalPrice);
+    }
+  }, [kitPrices, isLoadingPrices, selectedQuantity]);
   usePresence("/");
   const { trackEvent } = useFunnelTracking("/");
 
@@ -59,11 +69,12 @@ const Index = () => {
     return `${formatDate(minDate)} - ${formatDate(maxDate)}`;
   };
 
-  const discountPercent = currentOriginalPrice > 0 
+  // Only calculate if prices are loaded
+  const discountPercent = currentOriginalPrice > 0 && currentPrice > 0
     ? Math.round(((currentOriginalPrice - currentPrice) / currentOriginalPrice) * 100) 
     : 0;
 
-  const currentSavings = currentOriginalPrice - currentPrice;
+  const currentSavings = currentOriginalPrice > 0 ? currentOriginalPrice - currentPrice : 0;
 
   useEffect(() => {
     trackPixelEvent('ViewContent', {
@@ -179,25 +190,35 @@ const Index = () => {
 
           {/* Price Section */}
           <div className="mt-5 bg-secondary/40 rounded-2xl p-5 border border-primary/10">
-            <div className="flex items-center gap-2 mb-1">
-              <span className="text-sm text-muted-foreground line-through">
-                De: R$ {currentOriginalPrice.toFixed(2).replace(".", ",")}
-              </span>
-              <span className="bg-accent text-white text-xs font-bold px-2.5 py-1 rounded-lg">
-                {discountPercent}% OFF
-              </span>
-            </div>
-            <div className="text-4xl font-black text-primary">
-              R$ {currentPrice.toFixed(2).replace(".", ",")}
-            </div>
-            <div className="flex items-center gap-1.5 text-sm text-success mt-1.5">
-              <PixIcon className="h-4 w-4" />
-              <span className="font-semibold">à vista no PIX</span>
-            </div>
-            {currentSavings > 0 && (
-              <p className="text-sm text-success font-bold mt-2">
-                💰 Você economiza R$ {currentSavings.toFixed(2).replace(".", ",")}
-              </p>
+            {isLoadingPrices || currentPrice === 0 ? (
+              <div className="animate-pulse">
+                <div className="h-4 w-32 bg-muted rounded mb-2"></div>
+                <div className="h-10 w-40 bg-muted rounded mb-2"></div>
+                <div className="h-4 w-28 bg-muted rounded"></div>
+              </div>
+            ) : (
+              <>
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-sm text-muted-foreground line-through">
+                    De: R$ {currentOriginalPrice.toFixed(2).replace(".", ",")}
+                  </span>
+                  <span className="bg-accent text-white text-xs font-bold px-2.5 py-1 rounded-lg">
+                    {discountPercent}% OFF
+                  </span>
+                </div>
+                <div className="text-4xl font-black text-primary">
+                  R$ {currentPrice.toFixed(2).replace(".", ",")}
+                </div>
+                <div className="flex items-center gap-1.5 text-sm text-success mt-1.5">
+                  <PixIcon className="h-4 w-4" />
+                  <span className="font-semibold">à vista no PIX</span>
+                </div>
+                {currentSavings > 0 && (
+                  <p className="text-sm text-success font-bold mt-2">
+                    💰 Você economiza R$ {currentSavings.toFixed(2).replace(".", ",")}
+                  </p>
+                )}
+              </>
             )}
           </div>
 
