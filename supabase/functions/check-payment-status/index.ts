@@ -14,14 +14,16 @@ interface GatewaySettings {
 }
 
 // Status mapping for all gateways
-const PAID_STATUSES = ['paid', 'approved', 'completed', 'confirmed', 'aprovado'];
-const FAILED_STATUSES = ['failed', 'refused', 'expired', 'chargedback', 'cancelled', 'canceled', 'recusado', 'expirado'];
+const PAID_STATUSES = ['paid', 'approved', 'completed', 'confirmed', 'aprovado', 'pago'];
+const FAILED_STATUSES = ['failed', 'refused', 'expired', 'chargedback', 'cancelled', 'canceled', 'recusado', 'expirado', 'refused'];
+const PENDING_STATUSES = ['waiting_payment', 'pending', 'processing', 'waiting', 'pendente', 'aguardando'];
 
-function normalizeStatus(status: string): { isPaid: boolean; isFailed: boolean } {
+function normalizeStatus(status: string): { isPaid: boolean; isFailed: boolean; isPending: boolean } {
   const statusLower = status.toLowerCase().trim();
   return {
     isPaid: PAID_STATUSES.includes(statusLower),
-    isFailed: FAILED_STATUSES.includes(statusLower)
+    isFailed: FAILED_STATUSES.includes(statusLower),
+    isPending: PENDING_STATUSES.includes(statusLower)
   };
 }
 
