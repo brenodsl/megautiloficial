@@ -17,6 +17,7 @@ import { trackPixelEvent } from "@/hooks/usePixels";
 import { useFunnelTracking } from "@/hooks/useFunnelTracking";
 import AIChatBot from "@/components/AIChatBot";
 import PurchaseNotifications from "@/components/PurchaseNotifications";
+import { supabase } from "@/integrations/supabase/client";
 
 import QuantitySelector from "@/components/QuantitySelector";
 import FloatingBuyButton from "@/components/FloatingBuyButton";
@@ -34,13 +35,34 @@ const Index = () => {
   const { addItem, totalItems, clearCart } = useCart();
   const { city, state, loading: locationLoading } = useUserLocation();
   const { kitPrices, isLoading: isLoadingPrices } = useKitPricing();
-  const [selectedQuantity, setSelectedQuantity] = useState(1);
+  const [selectedQuantity, setSelectedQuantity] = useState<number | null>(null);
   const [currentPrice, setCurrentPrice] = useState(0);
   const [currentOriginalPrice, setCurrentOriginalPrice] = useState(0);
+  const [defaultKitLoaded, setDefaultKitLoaded] = useState(false);
 
-  // Update prices when kit prices load from database
+  // Fetch default kit setting
   useEffect(() => {
-    if (!isLoadingPrices && kitPrices.length > 0) {
+    const fetchDefaultKit = async () => {
+      const { data, error } = await supabase
+        .from('app_settings')
+        .select('setting_value')
+        .eq('setting_key', 'default_kit')
+        .maybeSingle();
+
+      if (!error && data?.setting_value) {
+        const value = data.setting_value as { quantity: number };
+        setSelectedQuantity(value.quantity || 1);
+      } else {
+        setSelectedQuantity(1); // Default to kit 1 if not configured
+      }
+      setDefaultKitLoaded(true);
+    };
+    fetchDefaultKit();
+  }, []);
+
+  // Update prices when kit prices load or selection changes
+  useEffect(() => {
+    if (!isLoadingPrices && kitPrices.length > 0 && selectedQuantity !== null) {
       const selectedKit = kitPrices.find(k => k.quantity === selectedQuantity) || kitPrices[0];
       setCurrentPrice(selectedKit.salePrice);
       setCurrentOriginalPrice(selectedKit.originalPrice);
