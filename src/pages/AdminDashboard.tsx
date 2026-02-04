@@ -119,7 +119,7 @@ const AdminDashboard = () => {
   const [defaultKit, setDefaultKit] = useState<number>(1);
   
   // Notification sounds
-  const { playPaymentConfirmed } = useNotificationSound();
+  const { playPaymentConfirmed, playPixGenerated } = useNotificationSound();
 
   // Cleanup old presence entries
   usePresenceCleanup();
@@ -137,13 +137,38 @@ const AdminDashboard = () => {
     // Refresh live visitors every 10 seconds
     const visitorInterval = setInterval(fetchLiveVisitors, 10000);
     
-    // Subscribe to realtime updates for orders
+    // Subscribe to realtime updates for orders - with notifications
     const ordersChannel = supabase
       .channel('orders-changes')
       .on(
         'postgres_changes',
-        { event: '*', schema: 'public', table: 'orders' },
-        () => {
+        { event: 'INSERT', schema: 'public', table: 'orders' },
+        (payload) => {
+          // New order created - play notification sound
+          playPixGenerated();
+          const newOrder = payload.new as Order;
+          toast.success(`🛒 Novo pedido de ${newOrder.customer_name}!`, {
+            description: `Valor: R$ ${Number(newOrder.total_amount).toFixed(2).replace('.', ',')}`,
+            duration: 8000,
+          });
+          fetchOrders();
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'orders' },
+        (payload) => {
+          const updatedOrder = payload.new as Order;
+          const oldOrder = payload.old as Partial<Order>;
+          
+          // Check if payment status changed to 'paid'
+          if (updatedOrder.payment_status === 'paid' && oldOrder.payment_status !== 'paid') {
+            playPaymentConfirmed();
+            toast.success(`💰 Pagamento confirmado!`, {
+              description: `${updatedOrder.customer_name} - R$ ${Number(updatedOrder.total_amount).toFixed(2).replace('.', ',')}`,
+              duration: 10000,
+            });
+          }
           fetchOrders();
         }
       )
