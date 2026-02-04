@@ -106,14 +106,24 @@ serve(async (req) => {
       );
     }
 
-    // Determine API URL based on gateway
+    // Determine API URL and auth headers based on gateway
     let API_URL: string;
+    let authHeaders: Record<string, string> = {};
+    const isPayevo = gateway.gateway_name === 'payevo';
+
     if (gateway.gateway_name === 'sigmapay') {
       API_URL = `https://api.sigmapay.com.br/api/public/v1/transactions?api_token=${gateway.api_token}`;
     } else if (gateway.gateway_name === 'goatpay') {
       API_URL = `https://api.goatpayments.com.br/api/public/v1/transactions?api_token=${gateway.api_token}`;
     } else if (gateway.gateway_name === 'visionpay') {
       API_URL = `https://api.visionpayments.com.br/api/public/v1/transactions?api_token=${gateway.api_token}`;
+    } else if (gateway.gateway_name === 'payevo') {
+      API_URL = 'https://apiv2.payevo.com.br/functions/v1/transactions';
+      // Payevo uses Basic Auth with secret key encoded in base64
+      const base64Credentials = btoa(`${gateway.api_token}:x`);
+      authHeaders = {
+        'Authorization': `Basic ${base64Credentials}`
+      };
     } else {
       console.error('Unknown gateway:', gateway.gateway_name);
       return new Response(
@@ -198,7 +208,7 @@ serve(async (req) => {
     // Build cart items using product_id from gateway settings
     const cartItems = items.map(item => ({
       product_hash: gateway.product_id,
-      title: `Tênis Carbon 3.0 - ${item.colorName} - Tam ${item.size}`,
+      title: `Câmera Wi-Fi MegaUtil - ${item.colorName} - Tam ${item.size}`,
       price: Math.round(item.price * 100),
       quantity: item.quantity,
       operation_type: 1,
@@ -206,39 +216,74 @@ serve(async (req) => {
       cover: null
     }));
 
-    // Build payload according to API structure
-    const payload = {
-      amount: Math.round(totalAmount * 100), // Convert to cents
-      offer_hash: gateway.product_id,
-      payment_method: 'pix',
-      installments: 1,
-      customer: {
-        name: sanitizeString(customer.name, 100),
-        email: sanitizeString(customer.email, 255),
-        phone_number: customer.phone.replace(/\D/g, ''),
-        document: customer.document.replace(/\D/g, ''),
-        street_name: sanitizeString(address.street, 200),
-        number: sanitizeString(address.number, 20),
-        complement: sanitizeString(address.complement || '', 100),
-        neighborhood: sanitizeString(address.neighborhood, 100),
-        city: sanitizeString(address.city, 100),
-        state: sanitizeString(address.state, 2).toUpperCase(),
-        zip_code: address.zipCode.replace(/\D/g, '')
-      },
-      cart: cartItems,
-      expire_in_days: 1,
-      transaction_origin: 'api'
-    };
+    // Build payload based on gateway type
+    let payload: Record<string, unknown>;
+
+    if (isPayevo) {
+      // Payevo specific payload structure
+      payload = {
+        amount: Math.round(totalAmount * 100), // Convert to cents
+        payment_method: 'pix',
+        customer: {
+          name: sanitizeString(customer.name, 100),
+          email: sanitizeString(customer.email, 255),
+          phone: customer.phone.replace(/\D/g, ''),
+          document: customer.document.replace(/\D/g, ''),
+        },
+        address: {
+          street: sanitizeString(address.street, 200),
+          number: sanitizeString(address.number, 20),
+          complement: sanitizeString(address.complement || '', 100),
+          neighborhood: sanitizeString(address.neighborhood, 100),
+          city: sanitizeString(address.city, 100),
+          state: sanitizeString(address.state, 2).toUpperCase(),
+          zip_code: address.zipCode.replace(/\D/g, '')
+        },
+        items: cartItems.map(item => ({
+          name: item.title,
+          amount: item.price,
+          quantity: item.quantity
+        })),
+        pix_expiration_date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString() // 24h expiration
+      };
+    } else {
+      // Standard payload for other gateways (SigmaPay, GoatPay, VisionPay)
+      payload = {
+        amount: Math.round(totalAmount * 100), // Convert to cents
+        offer_hash: gateway.product_id,
+        payment_method: 'pix',
+        installments: 1,
+        customer: {
+          name: sanitizeString(customer.name, 100),
+          email: sanitizeString(customer.email, 255),
+          phone_number: customer.phone.replace(/\D/g, ''),
+          document: customer.document.replace(/\D/g, ''),
+          street_name: sanitizeString(address.street, 200),
+          number: sanitizeString(address.number, 20),
+          complement: sanitizeString(address.complement || '', 100),
+          neighborhood: sanitizeString(address.neighborhood, 100),
+          city: sanitizeString(address.city, 100),
+          state: sanitizeString(address.state, 2).toUpperCase(),
+          zip_code: address.zipCode.replace(/\D/g, '')
+        },
+        cart: cartItems,
+        expire_in_days: 1,
+        transaction_origin: 'api'
+      };
+    }
 
     console.log(`Payload enviado para ${gateway.gateway_name}:`, JSON.stringify(payload, null, 2));
 
-    // Call Gateway API
+    // Call Gateway API with appropriate headers
+    const requestHeaders: Record<string, string> = {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      ...authHeaders
+    };
+
     const response = await fetch(API_URL, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      },
+      headers: requestHeaders,
       body: JSON.stringify(payload),
     });
 
@@ -271,22 +316,24 @@ serve(async (req) => {
       );
     }
 
-    // Extract data from response
+    // Extract data from response - handle different response formats
     const gatewayResponseData = responseData.data || responseData;
     
-    // Extract PIX data from nested pix object
+    // Extract PIX data from nested pix object or root level (Payevo uses different structure)
     const pixInfo = gatewayResponseData.pix || {};
     
-    const pixCode = pixInfo.pix_qr_code || gatewayResponseData.pix_code || null;
-    const qrCodeImage = pixInfo.qr_code_base64 || gatewayResponseData.qr_code || null;
+    // Payevo returns: qr_code (base64) and qr_code_text (copia e cola)
+    // Other gateways return: pix.pix_qr_code and pix.qr_code_base64
+    const pixCode = pixInfo.pix_qr_code || gatewayResponseData.qr_code_text || gatewayResponseData.pix_code || gatewayResponseData.copy_paste || null;
+    const qrCodeImage = pixInfo.qr_code_base64 || gatewayResponseData.qr_code || gatewayResponseData.qr_code_base64 || null;
     
     const formattedResponse = {
       success: true,
-      transactionId: gatewayResponseData.hash || gatewayResponseData.id,
+      transactionId: gatewayResponseData.hash || gatewayResponseData.id || gatewayResponseData.transaction_id,
       qrCode: qrCodeImage,
       qrCodeText: pixCode,
-      pixUrl: pixInfo.pix_url || null,
-      expiresAt: gatewayResponseData.expires_at,
+      pixUrl: pixInfo.pix_url || gatewayResponseData.pix_url || null,
+      expiresAt: gatewayResponseData.expires_at || gatewayResponseData.expiration_date,
       status: gatewayResponseData.status || gatewayResponseData.payment_status,
       gateway: gateway.gateway_name
     };

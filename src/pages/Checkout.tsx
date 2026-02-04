@@ -65,6 +65,7 @@ const KIT_IMAGES: Record<number, string> = {
 import { usePresence } from "@/hooks/usePresence";
 import { trackPixelEvent } from "@/hooks/usePixels";
 import { useFunnelTracking, trackFunnelEvent } from "@/hooks/useFunnelTracking";
+import { useNotificationSound } from "@/hooks/useNotificationSound";
 import PaymentProgressBar from "@/components/PaymentProgressBar";
 
 // PIX Icon Component
@@ -212,6 +213,9 @@ const Checkout = () => {
   const [expirationTime, setExpirationTime] = useState(7 * 60);
   const [paymentStatus, setPaymentStatus] = useState<'pending' | 'paid' | 'checking'>('pending');
   const [isCheckingPayment, setIsCheckingPayment] = useState(false);
+  
+  // Notification sounds
+  const { playPixGenerated, playPaymentConfirmed } = useNotificationSound();
 
   // Timer countdown state - ends at 23:59 of current day
   const [timeLeft, setTimeLeft] = useState({ hours: 0, minutes: 0, seconds: 0 });
@@ -304,6 +308,9 @@ const Checkout = () => {
 
         if (data?.isPaid) {
           setPaymentStatus('paid');
+          
+          // Play payment confirmed sound
+          playPaymentConfirmed();
           
           // Track payment confirmed for funnel analytics
           trackFunnelEvent('payment_confirmed', '/checkout', { 
@@ -611,6 +618,9 @@ const Checkout = () => {
           value: finalTotal,
           num_items: totalQuantity,
         });
+        
+        // Play PIX generated sound
+        playPixGenerated();
         
         toast.success("PIX gerado com sucesso!");
       } else {

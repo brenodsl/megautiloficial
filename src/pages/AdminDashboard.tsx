@@ -43,6 +43,7 @@ import { usePresenceCleanup } from "@/hooks/usePresence";
 import { ptBR } from "date-fns/locale";
 import FunnelAnalytics from "@/components/admin/FunnelAnalytics";
 import { KitPriceOption, DEFAULT_KIT_PRICES, updateKitPricing } from "@/hooks/useKitPricing";
+import { useNotificationSound } from "@/hooks/useNotificationSound";
 
 interface Order {
   id: string;
@@ -116,6 +117,9 @@ const AdminDashboard = () => {
   const [kitPrices, setKitPrices] = useState<KitPriceOption[]>(DEFAULT_KIT_PRICES);
   const [isSavingKitPrices, setIsSavingKitPrices] = useState(false);
   const [defaultKit, setDefaultKit] = useState<number>(1);
+  
+  // Notification sounds
+  const { playPaymentConfirmed } = useNotificationSound();
 
   // Cleanup old presence entries
   usePresenceCleanup();
@@ -526,6 +530,8 @@ const AdminDashboard = () => {
       console.log("Payment check response:", data);
 
       if (data?.isPaid) {
+        // Play payment confirmed sound
+        playPaymentConfirmed();
         toast.success(`✅ Pagamento confirmado! Status: ${data.status}`);
       } else if (data?.isFailed) {
         toast.error(`❌ Pagamento falhou: ${data.status}`);
@@ -848,6 +854,10 @@ const AdminDashboard = () => {
                                   "text-xs",
                                   order.gateway_used === 'goatpay' 
                                     ? "border-purple-500/50 text-purple-400 bg-purple-500/10"
+                                    : order.gateway_used === 'payevo'
+                                    ? "border-orange-500/50 text-orange-400 bg-orange-500/10"
+                                    : order.gateway_used === 'visionpay'
+                                    ? "border-cyan-500/50 text-cyan-400 bg-cyan-500/10"
                                     : "border-blue-500/50 text-blue-400 bg-blue-500/10"
                                 )}>
                                   {order.gateway_used.toUpperCase()}
@@ -1154,10 +1164,16 @@ const AdminDashboard = () => {
                         <div className="flex items-center justify-between mb-4">
                           <div className="flex items-center gap-3">
                             <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
-                              gateway.gateway_name === 'sigmapay' ? 'bg-blue-500/20' : 'bg-purple-500/20'
+                              gateway.gateway_name === 'sigmapay' ? 'bg-blue-500/20' : 
+                              gateway.gateway_name === 'payevo' ? 'bg-orange-500/20' :
+                              gateway.gateway_name === 'visionpay' ? 'bg-cyan-500/20' :
+                              'bg-purple-500/20'
                             }`}>
                               <CreditCard className={`w-6 h-6 ${
-                                gateway.gateway_name === 'sigmapay' ? 'text-blue-400' : 'text-purple-400'
+                                gateway.gateway_name === 'sigmapay' ? 'text-blue-400' : 
+                                gateway.gateway_name === 'payevo' ? 'text-orange-400' :
+                                gateway.gateway_name === 'visionpay' ? 'text-cyan-400' :
+                                'text-purple-400'
                               }`} />
                             </div>
                             <div>
@@ -1167,6 +1183,10 @@ const AdminDashboard = () => {
                               <p className="text-slate-400 text-sm">
                                 {gateway.gateway_name === 'sigmapay' 
                                   ? 'SigmaPay - Gateway Principal'
+                                  : gateway.gateway_name === 'payevo'
+                                  ? 'Payevo - Gateway PIX (Basic Auth)'
+                                  : gateway.gateway_name === 'visionpay'
+                                  ? 'VisionPay - Gateway Alternativo'
                                   : 'GoatPay - Gateway Alternativo'}
                               </p>
                             </div>
