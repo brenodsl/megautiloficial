@@ -219,32 +219,48 @@ serve(async (req) => {
     // Build payload based on gateway type
     let payload: Record<string, unknown>;
 
+    // Ensure state is valid and uppercase
+    const customerState = address.state ? sanitizeString(address.state, 2).toUpperCase() : 'SP';
+
     if (isPayevo) {
-      // Payevo specific payload structure
+      // Payevo specific payload structure - based on their API v2 documentation
+      // API expects: paymentMethod (uppercase "PIX"), customer, shipping, items, amount
+      const phoneDigits = customer.phone.replace(/\D/g, '');
+      const documentDigits = customer.document.replace(/\D/g, '');
+      const zipCodeDigits = address.zipCode.replace(/\D/g, '');
+      
+      // Format phone - remove country code if present, API may add it
+      const cleanPhone = phoneDigits.startsWith('55') ? phoneDigits.slice(2) : phoneDigits;
+      
       payload = {
-        amount: Math.round(totalAmount * 100), // Convert to cents
-        payment_method: 'pix',
+        amount: Math.round(totalAmount * 100), // Convert to cents (required)
+        paymentMethod: 'PIX', // uppercase as per documentation
         customer: {
           name: sanitizeString(customer.name, 100),
-          email: sanitizeString(customer.email, 255),
-          phone: customer.phone.replace(/\D/g, ''),
-          document: customer.document.replace(/\D/g, ''),
+          email: sanitizeString(customer.email, 255).toLowerCase(),
+          phone: cleanPhone,
+          document: documentDigits
         },
-        address: {
-          street: sanitizeString(address.street, 200),
+        shipping: {
+          name: sanitizeString(customer.name, 100),
+          address: sanitizeString(address.street, 200),
           number: sanitizeString(address.number, 20),
-          complement: sanitizeString(address.complement || '', 100),
+          complement: sanitizeString(address.complement || '', 100) || undefined,
           neighborhood: sanitizeString(address.neighborhood, 100),
           city: sanitizeString(address.city, 100),
-          state: sanitizeString(address.state, 2).toUpperCase(),
-          zip_code: address.zipCode.replace(/\D/g, '')
+          state: customerState,
+          country: 'BR',
+          zipCode: zipCodeDigits
         },
-        items: cartItems.map(item => ({
-          name: item.title,
-          amount: item.price,
-          quantity: item.quantity
+        items: items.map(item => ({
+          title: `Câmera Wi-Fi MegaUtil - ${item.colorName}`,
+          unitPrice: Math.round(item.price * 100),
+          quantity: item.quantity,
+          tangible: true
         })),
-        pix_expiration_date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString() // 24h expiration
+        pix: {
+          expiresInDays: 1
+        }
       };
     } else {
       // Standard payload for other gateways (SigmaPay, GoatPay, VisionPay)
@@ -263,7 +279,7 @@ serve(async (req) => {
           complement: sanitizeString(address.complement || '', 100),
           neighborhood: sanitizeString(address.neighborhood, 100),
           city: sanitizeString(address.city, 100),
-          state: sanitizeString(address.state, 2).toUpperCase(),
+          state: customerState,
           zip_code: address.zipCode.replace(/\D/g, '')
         },
         cart: cartItems,
@@ -319,12 +335,13 @@ serve(async (req) => {
     // Extract data from response - handle different response formats
     const gatewayResponseData = responseData.data || responseData;
     
-    // Extract PIX data from nested pix object or root level (Payevo uses different structure)
+    // Extract PIX data from nested pix object or root level
     const pixInfo = gatewayResponseData.pix || {};
     
-    // Payevo returns: qr_code (base64) and qr_code_text (copia e cola)
-    // Other gateways return: pix.pix_qr_code and pix.qr_code_base64
-    const pixCode = pixInfo.pix_qr_code || gatewayResponseData.qr_code_text || gatewayResponseData.pix_code || gatewayResponseData.copy_paste || null;
+    // Handle different response formats from different gateways:
+    // - Payevo returns: pix.qrcode (text for copy/paste - this is the main PIX code)
+    // - SigmaPay/GoatPay return: pix.pix_qr_code and pix.qr_code_base64
+    const pixCode = pixInfo.qrcode || pixInfo.pix_qr_code || gatewayResponseData.qr_code_text || gatewayResponseData.pix_code || gatewayResponseData.copy_paste || null;
     const qrCodeImage = pixInfo.qr_code_base64 || gatewayResponseData.qr_code || gatewayResponseData.qr_code_base64 || null;
     
     const formattedResponse = {
@@ -333,7 +350,7 @@ serve(async (req) => {
       qrCode: qrCodeImage,
       qrCodeText: pixCode,
       pixUrl: pixInfo.pix_url || gatewayResponseData.pix_url || null,
-      expiresAt: gatewayResponseData.expires_at || gatewayResponseData.expiration_date,
+      expiresAt: pixInfo.expirationDate || gatewayResponseData.expires_at || gatewayResponseData.expiration_date,
       status: gatewayResponseData.status || gatewayResponseData.payment_status,
       gateway: gateway.gateway_name
     };
