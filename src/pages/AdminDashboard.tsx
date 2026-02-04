@@ -115,6 +115,7 @@ const AdminDashboard = () => {
   const [isSavingPrice, setIsSavingPrice] = useState(false);
   const [kitPrices, setKitPrices] = useState<KitPriceOption[]>(DEFAULT_KIT_PRICES);
   const [isSavingKitPrices, setIsSavingKitPrices] = useState(false);
+  const [defaultKit, setDefaultKit] = useState<number>(1);
 
   // Cleanup old presence entries
   usePresenceCleanup();
@@ -165,8 +166,39 @@ const AdminDashboard = () => {
 
   const fetchData = async () => {
     setIsLoading(true);
-    await Promise.all([fetchOrders(), fetchPixels(), fetchLiveVisitors(), fetchGatewaySettings(), fetchUpsellConfig(), fetchProductPrice(), fetchKitPrices()]);
+    await Promise.all([fetchOrders(), fetchPixels(), fetchLiveVisitors(), fetchGatewaySettings(), fetchUpsellConfig(), fetchProductPrice(), fetchKitPrices(), fetchDefaultKit()]);
     setIsLoading(false);
+  };
+
+  const fetchDefaultKit = async () => {
+    const { data, error } = await supabase
+      .from('app_settings')
+      .select('setting_value')
+      .eq('setting_key', 'default_kit')
+      .maybeSingle();
+
+    if (!error && data?.setting_value) {
+      const value = data.setting_value as { quantity: number };
+      setDefaultKit(value.quantity || 1);
+    }
+  };
+
+  const handleSaveDefaultKit = async (quantity: number) => {
+    setDefaultKit(quantity);
+    const { error } = await supabase
+      .from('app_settings')
+      .upsert([{
+        setting_key: 'default_kit',
+        setting_value: JSON.parse(JSON.stringify({ quantity })),
+        updated_at: new Date().toISOString()
+      }], { onConflict: 'setting_key' });
+
+    if (error) {
+      toast.error("Erro ao salvar kit padrão");
+      console.error(error);
+    } else {
+      toast.success(`Kit ${quantity === 1 ? '1 Und' : quantity + ' Und'} definido como padrão!`);
+    }
   };
 
   const fetchKitPrices = async () => {
@@ -1307,6 +1339,33 @@ const AdminDashboard = () => {
                     <Save className="w-4 h-4 mr-2" />
                     {isSavingKitPrices ? 'Salvando...' : 'Salvar Preços dos Kits'}
                   </Button>
+                </div>
+
+                {/* Default Kit Selection */}
+                <div className="bg-slate-700/30 border border-slate-600 rounded-xl p-5">
+                  <h4 className="text-white font-bold flex items-center gap-2 mb-3">
+                    <Package className="w-4 h-4" />
+                    Kit Pré-Selecionado
+                  </h4>
+                  <p className="text-slate-400 text-sm mb-4">
+                    Selecione qual kit ficará marcado automaticamente quando o cliente acessar a página do produto.
+                  </p>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                    {kitPrices.map((kit) => (
+                      <button
+                        key={kit.quantity}
+                        onClick={() => handleSaveDefaultKit(kit.quantity)}
+                        className={`p-3 rounded-lg border-2 transition-all text-center ${
+                          defaultKit === kit.quantity
+                            ? 'bg-emerald-500/20 border-emerald-500 text-emerald-400'
+                            : 'bg-slate-700/50 border-slate-600 text-slate-400 hover:border-slate-500'
+                        }`}
+                      >
+                        <span className="font-bold block">{kit.label}</span>
+                        <span className="text-xs">R$ {kit.salePrice.toFixed(2).replace(".", ",")}</span>
+                      </button>
+                    ))}
+                  </div>
                 </div>
 
                 {/* Info box */}

@@ -13,7 +13,7 @@ const KIT_IMAGES: Record<number, string> = {
 };
 
 interface QuantitySelectorProps {
-  selectedQuantity: number;
+  selectedQuantity: number | null;
   onQuantityChange: (quantity: number, price: number, originalPrice: number) => void;
 }
 
