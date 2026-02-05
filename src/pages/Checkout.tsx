@@ -704,8 +704,12 @@ const Checkout = () => {
 
   // PIX Payment Screen
   if (pixData) {
+    // Calculate urgency percentage based on time left
+    const urgencyPercent = Math.max(0, Math.min(100, (expirationTime / (7 * 60)) * 100));
+    const isUrgent = expirationTime < 180; // Less than 3 minutes
+    
     return (
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
         {/* Header */}
         <header className="bg-primary py-3 px-4">
           <div className="max-w-lg mx-auto flex items-center justify-between">
@@ -725,46 +729,78 @@ const Checkout = () => {
         {/* Payment Progress Bar */}
         <PaymentProgressBar currentStep={1} />
 
-        <main className="max-w-lg mx-auto px-4 py-6 space-y-6">
-          {/* PIX Icon */}
-          <div className="flex justify-center">
-            <div className="w-16 h-16 rounded-full bg-[#28af60]/10 flex items-center justify-center">
-              <QRCodeIcon />
+        <main className="max-w-lg mx-auto px-4 py-4 space-y-4">
+          {/* Urgency Alert Banner */}
+          <div className={`rounded-xl p-4 border-2 ${isUrgent ? 'bg-red-50 border-red-300 animate-pulse' : 'bg-amber-50 border-amber-300'}`}>
+            <div className="flex items-center gap-3">
+              <div className={`p-2 rounded-full ${isUrgent ? 'bg-red-100' : 'bg-amber-100'}`}>
+                <AlertCircle className={`h-6 w-6 ${isUrgent ? 'text-red-600' : 'text-amber-600'}`} />
+              </div>
+              <div className="flex-1">
+                <p className={`font-bold ${isUrgent ? 'text-red-700' : 'text-amber-700'}`}>
+                  {isUrgent ? '⚠️ TEMPO QUASE ESGOTANDO!' : '⏳ Pedido reservado temporariamente'}
+                </p>
+                <p className={`text-sm ${isUrgent ? 'text-red-600' : 'text-amber-600'}`}>
+                  {isUrgent 
+                    ? 'Finalize agora ou seu pedido será cancelado!' 
+                    : 'Complete o pagamento para garantir sua compra'}
+                </p>
+              </div>
             </div>
           </div>
 
-          {/* Title */}
-          <div className="text-center">
-            <h1 className="text-2xl font-bold text-[#28af60] mb-2">Pagamento via PIX</h1>
-            <p className="text-sm text-gray-500">
-              Escaneie o QR Code ou copie o código para pagar
-            </p>
-          </div>
-
-          {/* Expiration Timer */}
-          <div className="flex justify-center">
-            <div className="inline-flex items-center gap-2 bg-[#28af60] text-white px-6 py-3 rounded-full">
-              <Clock className="h-5 w-5" />
-              <span className="font-medium">Expira em: {formatTime(expirationTime)}</span>
+          {/* Timer with Progress Bar */}
+          <div className="bg-white rounded-xl p-4 border border-gray-200 shadow-sm">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm font-medium text-gray-600">Tempo restante</span>
+              <div className={`flex items-center gap-2 font-bold text-lg ${isUrgent ? 'text-red-600' : 'text-gray-900'}`}>
+                <Clock className={`h-5 w-5 ${isUrgent ? 'animate-pulse' : ''}`} />
+                {formatTime(expirationTime)}
+              </div>
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-2.5">
+              <div 
+                className={`h-2.5 rounded-full transition-all duration-1000 ${isUrgent ? 'bg-red-500' : 'bg-primary'}`}
+                style={{ width: `${urgencyPercent}%` }}
+              />
             </div>
           </div>
 
-          {/* Value */}
-          <div className="text-center py-4 border-y border-gray-100">
-            <p className="text-sm text-gray-500 mb-1">Valor a pagar</p>
-            <p className="text-3xl font-bold text-[#28af60]">
-              R$ {finalTotal.toFixed(2).replace(".", ",")}
-            </p>
+          {/* Value Card with Savings Highlight */}
+          <div className="bg-gradient-to-br from-primary to-primary/80 rounded-xl p-4 text-white shadow-lg">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-white/80 text-sm">Valor a pagar</p>
+                <p className="text-3xl font-black">
+                  R$ {finalTotal.toFixed(2).replace(".", ",")}
+                </p>
+              </div>
+              <div className="text-right">
+                <div className="bg-white/20 rounded-lg px-3 py-1.5">
+                  <p className="text-xs font-medium">Você economiza</p>
+                  <p className="text-lg font-bold">R$ {(displayOriginalPrice * totalQuantity - finalTotal + shippingPrice).toFixed(2).replace(".", ",")}</p>
+                </div>
+              </div>
+            </div>
+            <div className="mt-3 flex items-center gap-2 bg-white/10 rounded-lg p-2">
+              <Gift className="h-4 w-4" />
+              <span className="text-sm">+ Frete Grátis + Garantia de 90 dias</span>
+            </div>
           </div>
 
-          {/* QR Code */}
-          <div className="bg-white rounded-2xl p-6 border border-gray-200">
+          {/* QR Code Section */}
+          <div className="bg-white rounded-xl p-4 border border-gray-200 shadow-sm">
+            <div className="text-center mb-4">
+              <h2 className="text-lg font-bold text-gray-900">Escaneie o QR Code</h2>
+              <p className="text-sm text-gray-500">Use o app do seu banco para pagar</p>
+            </div>
+            
             <div className="flex justify-center">
               {pixData.qrCodeText ? (
-                <div className="bg-white p-4 rounded-lg">
+                <div className="bg-white p-3 rounded-lg border-2 border-dashed border-primary/30">
                   <QRCodeSVG
                     value={pixData.qrCodeText}
-                    size={256}
+                    size={200}
                     level="M"
                     includeMargin={true}
                   />
@@ -773,97 +809,151 @@ const Checkout = () => {
                 <img
                   src={pixData.qrCode.startsWith("data:") ? pixData.qrCode : `data:image/png;base64,${pixData.qrCode}`}
                   alt="QR Code PIX"
-                  className="w-64 h-64 rounded-lg"
+                  className="w-52 h-52 rounded-lg"
                 />
               ) : (
-                <div className="w-64 h-64 bg-gray-100 flex flex-col items-center justify-center rounded-lg">
-                  <PixIcon className="h-16 w-16 text-gray-400 mb-2" />
-                  <p className="text-sm text-gray-500 text-center px-4">
-                    QR Code não disponível.<br/>Use o código Copia e Cola abaixo.
+                <div className="w-52 h-52 bg-gray-100 flex flex-col items-center justify-center rounded-lg">
+                  <PixIcon className="h-12 w-12 text-gray-400 mb-2" />
+                  <p className="text-xs text-gray-500 text-center px-4">
+                    Use o código abaixo
                   </p>
                 </div>
               )}
             </div>
           </div>
 
-          {/* PIX Copy and Paste Code */}
+          {/* PIX Copy Button - Prominent */}
           {pixData.qrCodeText && (
-            <div className="space-y-3">
-              <p className="text-sm text-gray-500 text-center">Código PIX Copia e Cola</p>
-              <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
-                <p className="text-xs text-gray-600 font-mono break-all line-clamp-3">
-                  {pixData.qrCodeText}
-                </p>
-              </div>
+            <div className="space-y-2">
               <Button
                 onClick={handleCopyPixCode}
-                className="w-full h-14 bg-gray-900 hover:bg-gray-800 text-white rounded-xl gap-2"
+                className={`w-full h-14 rounded-xl gap-2 text-base font-bold transition-all ${
+                  copied 
+                    ? 'bg-green-600 hover:bg-green-700' 
+                    : 'bg-gray-900 hover:bg-gray-800 animate-pulse'
+                }`}
               >
                 {copied ? (
                   <>
                     <CheckCircle className="h-5 w-5" />
-                    Copiado!
+                    ✅ Código copiado! Agora cole no seu banco
                   </>
                 ) : (
                   <>
                     <Copy className="h-5 w-5" />
-                    Copiar código PIX
+                    📋 Copiar código PIX
                   </>
                 )}
               </Button>
+              <p className="text-xs text-center text-gray-500">
+                Ou copie e cole o código acima no app do seu banco
+              </p>
             </div>
           )}
 
-          {/* How to Pay Instructions */}
+          {/* Quick Steps */}
           <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
-            <p className="font-semibold text-gray-900 mb-3">Como pagar:</p>
-            <ol className="space-y-2 text-sm text-gray-600">
-              <li className="flex items-start gap-2">
-                <span className="text-[#28af60] font-bold">1.</span>
-                Abra o app do seu banco
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-[#28af60] font-bold">2.</span>
-                Escolha pagar com PIX
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-[#28af60] font-bold">3.</span>
-                Escaneie o QR Code ou cole o código
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-[#28af60] font-bold">4.</span>
-                Confirme o pagamento
-              </li>
-            </ol>
+            <p className="font-bold text-gray-900 mb-3 flex items-center gap-2">
+              <span className="bg-primary text-white text-xs px-2 py-0.5 rounded-full">Rápido</span>
+              Pague em 30 segundos:
+            </p>
+            <div className="grid grid-cols-4 gap-2 text-center">
+              <div className="flex flex-col items-center">
+                <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center mb-1">
+                  <span className="text-primary font-bold">1</span>
+                </div>
+                <span className="text-xs text-gray-600">Abra o banco</span>
+              </div>
+              <div className="flex flex-col items-center">
+                <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center mb-1">
+                  <span className="text-primary font-bold">2</span>
+                </div>
+                <span className="text-xs text-gray-600">Clique PIX</span>
+              </div>
+              <div className="flex flex-col items-center">
+                <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center mb-1">
+                  <span className="text-primary font-bold">3</span>
+                </div>
+                <span className="text-xs text-gray-600">Escaneie</span>
+              </div>
+              <div className="flex flex-col items-center">
+                <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mb-1">
+                  <CheckCircle className="h-5 w-5 text-green-600" />
+                </div>
+                <span className="text-xs text-gray-600">Pronto!</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Social Proof - Recent Purchases */}
+          <div className="bg-green-50 rounded-xl p-4 border border-green-200">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="flex -space-x-2">
+                {[reviewCamera1, reviewCamera2, reviewCamera3].map((img, i) => (
+                  <img key={i} src={img} alt="" className="w-8 h-8 rounded-full border-2 border-white object-cover" />
+                ))}
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-semibold text-green-800">
+                  +47 pessoas compraram hoje
+                </p>
+                <p className="text-xs text-green-600">
+                  Última compra há 3 minutos
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 text-sm text-green-700">
+              <CheckCircle className="h-4 w-4" />
+              <span>98% dos pagamentos confirmados em menos de 1 minuto</span>
+            </div>
+          </div>
+
+          {/* Trust Badges */}
+          <div className="flex items-center justify-center gap-4 py-2">
+            <img src={seloSiteBlindado} alt="Site Blindado" className="h-8 opacity-70" />
+            <img src={seloReclameAqui} alt="Reclame Aqui" className="h-8 opacity-70" />
+            <div className="flex items-center gap-1 text-gray-500 text-xs">
+              <Lock className="h-4 w-4" />
+              <span>SSL Seguro</span>
+            </div>
           </div>
 
           {/* Verification Status */}
           {paymentStatus === 'paid' ? (
-            <div className="flex items-center justify-center gap-2 text-sm bg-green-50 text-green-700 p-4 rounded-xl border border-green-200">
-              <CheckCircle className="h-5 w-5" />
-              <span className="font-medium">Pagamento confirmado! Redirecionando...</span>
+            <div className="flex items-center justify-center gap-2 text-sm bg-green-100 text-green-700 p-4 rounded-xl border-2 border-green-300 animate-pulse">
+              <CheckCircle className="h-6 w-6" />
+              <span className="font-bold text-lg">✅ Pagamento confirmado! Redirecionando...</span>
             </div>
           ) : (
-            <div className="flex items-center justify-center gap-2 text-sm text-gray-500">
-              <Loader2 className="h-4 w-4 animate-spin" />
-              <span>Verificando pagamento automaticamente...</span>
+            <div className="flex flex-col items-center gap-2 text-center">
+              <div className="flex items-center gap-2 text-sm text-gray-500">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                <span>Verificando pagamento automaticamente...</span>
+              </div>
+              <p className="text-xs text-gray-400">
+                A confirmação é instantânea após o pagamento
+              </p>
             </div>
           )}
+
+          {/* Help Section */}
+          <div className="bg-blue-50 rounded-xl p-4 border border-blue-200">
+            <div className="flex items-start gap-3">
+              <div className="bg-blue-100 p-2 rounded-full">
+                <Phone className="h-5 w-5 text-blue-600" />
+              </div>
+              <div>
+                <p className="font-semibold text-blue-800">Precisa de ajuda?</p>
+                <p className="text-sm text-blue-600">
+                  Nosso suporte está disponível pelo WhatsApp para ajudar você a completar o pagamento.
+                </p>
+              </div>
+            </div>
+          </div>
 
           <p className="text-center text-xs text-gray-400">
             ID: {pixData.transactionId}
           </p>
-
-          <Button
-            onClick={() => {
-              clearCart();
-              navigate("/");
-            }}
-            variant="outline"
-            className="w-full"
-          >
-            Voltar à loja
-          </Button>
         </main>
       </div>
     );
