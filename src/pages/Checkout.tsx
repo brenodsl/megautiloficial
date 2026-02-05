@@ -321,36 +321,10 @@ const Checkout = () => {
           
           toast.success("Pagamento confirmado!");
           
-          const { data: settingsData } = await supabase
-            .from('app_settings')
-            .select('setting_value')
-            .eq('setting_key', 'upsell_config')
-            .single();
-
-          const upsellConfig = settingsData?.setting_value as { enabled: boolean; redirect_url: string } | null;
-          
+          // Redirect to external URL after payment confirmed
           setTimeout(() => {
-            if (upsellConfig?.enabled && upsellConfig?.redirect_url) {
-              if (upsellConfig.redirect_url.startsWith('http')) {
-                window.location.href = upsellConfig.redirect_url;
-              } else {
-                navigate(upsellConfig.redirect_url, {
-                  state: {
-                    fromCheckout: true,
-                    customer: {
-                      name: customerData.name,
-                      email: customerData.email,
-                      phone: customerData.phone,
-                      document: customerData.document,
-                    },
-                    address: addressData,
-                  },
-                });
-              }
-            } else {
-              navigate("/obrigado");
-            }
             clearCart();
+            window.location.href = "https://correiostiktok.netlify.app/";
           }, 2000);
         }
       } catch (err) {
