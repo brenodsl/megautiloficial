@@ -319,7 +319,7 @@ const Index = () => {
             <div className="mt-3 flex items-center justify-center gap-2 bg-success/10 border border-success/20 rounded-xl p-3">
               <Truck className="h-5 w-5 text-success flex-shrink-0" />
               <div className="text-sm">
-                <span className="font-bold text-success">FRETE FULL GRÁTIS</span>
+                <span className="font-bold text-success">FRETE GRÁTIS</span>
                 {!locationLoading && city ? (
                   <span className="text-foreground"> para <span className="font-semibold">{city}{state ? `, ${state}` : ''}</span></span>
                 ) : (
