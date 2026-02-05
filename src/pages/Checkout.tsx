@@ -214,15 +214,6 @@ const Checkout = () => {
   const [paymentStatus, setPaymentStatus] = useState<'pending' | 'paid' | 'checking'>('pending');
   const [isCheckingPayment, setIsCheckingPayment] = useState(false);
   
-  // Check if coupon is applied
-  const [couponApplied, setCouponApplied] = useState(false);
-  
-  useEffect(() => {
-    const couponStatus = localStorage.getItem('coupon_applied');
-    if (couponStatus === 'true') {
-      setCouponApplied(true);
-    }
-  }, []);
   
   // Notification sounds
   const { playPixGenerated, playPaymentConfirmed } = useNotificationSound();
@@ -251,14 +242,9 @@ const Checkout = () => {
     return () => clearInterval(timer);
   }, []);
 
-  // Calculate coupon discount (35% off)
-  const couponDiscountPercent = 0.35;
-  const couponDiscountAmount = couponApplied ? totalPrice * couponDiscountPercent : 0;
-  const priceAfterCoupon = totalPrice - couponDiscountAmount;
-  
   // Calculate total with shipping
   const shippingPrice = getShippingPrice(selectedShipping);
-  const finalTotal = priceAfterCoupon + shippingPrice;
+  const finalTotal = totalPrice + shippingPrice;
   
   // Calculate PIX discount (65% off from original price)
   const pixDiscount = displayOriginalPrice - unitPrice;
@@ -269,11 +255,9 @@ const Checkout = () => {
   usePresence("/checkout");
   const { trackEvent } = useFunnelTracking("/checkout");
 
-  // Track checkout started on mount and mark checkout as visited for abandonment recovery
+  // Track checkout started on mount
   useEffect(() => {
     trackEvent('checkout_started', { step: 1 });
-    // Mark that user visited checkout - used for abandonment recovery coupon
-    localStorage.setItem('visited_checkout', 'true');
   }, []);
 
   useEffect(() => {
@@ -1016,19 +1000,6 @@ const Checkout = () => {
 
       <main className="max-w-lg mx-auto px-4 py-4 space-y-4">
         
-        {/* Coupon Applied Banner */}
-        {couponApplied && (
-          <div className="bg-gradient-to-r from-primary/10 to-accent/10 border border-primary/30 rounded-xl p-3 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Gift className="h-5 w-5 text-primary" />
-              <div>
-                <p className="text-sm font-bold text-primary">Cupom PRIMEIRA35 aplicado!</p>
-                <p className="text-xs text-muted-foreground">35% de desconto extra na sua compra</p>
-              </div>
-            </div>
-            <span className="text-lg font-black text-primary">-35%</span>
-          </div>
-        )}
         {/* Product Summary Card */}
         <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
           <div className="flex gap-4 items-start">
@@ -1049,22 +1020,12 @@ const Checkout = () => {
               <div className="mt-3">
                 <div className="flex items-baseline gap-2 flex-wrap">
                   <span className="text-xl font-bold text-primary">
-                    R$ {priceAfterCoupon.toFixed(2).replace(".", ",")}
+                    R$ {totalPrice.toFixed(2).replace(".", ",")}
                   </span>
-                  {couponApplied && (
-                    <span className="text-sm text-muted-foreground line-through">
-                      R$ {totalPrice.toFixed(2).replace(".", ",")}
-                    </span>
-                  )}
                   <span className="text-sm text-muted-foreground line-through">
                     R$ {displayOriginalPrice.toFixed(2).replace(".", ",")}
                   </span>
                 </div>
-                {couponApplied && (
-                  <span className="inline-block mt-1 text-[10px] font-bold text-white bg-primary px-2 py-0.5 rounded">
-                    CUPOM -35%
-                  </span>
-                )}
               </div>
             </div>
           </div>
@@ -1325,15 +1286,6 @@ const Checkout = () => {
               <span className="text-[#28af60]">Desconto PIX (65%)</span>
               <span className="text-[#28af60] font-medium">- R$ {totalPixDiscount.toFixed(2).replace(".", ",")}</span>
             </div>
-            {couponApplied && (
-              <div className="flex justify-between text-sm">
-                <span className="text-primary font-medium flex items-center gap-1">
-                  <Gift className="h-3.5 w-3.5" />
-                  Cupom PRIMEIRA35
-                </span>
-                <span className="text-primary font-medium">- R$ {couponDiscountAmount.toFixed(2).replace(".", ",")}</span>
-              </div>
-            )}
             <div className="flex justify-between text-sm">
               <span className="text-gray-600">Frete ({shippingOptions.find(s => s.id === selectedShipping)?.name})</span>
               <span className={shippingPrice === 0 ? "text-[#28af60] font-medium" : "text-gray-900"}>
