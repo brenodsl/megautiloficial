@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { ShoppingCart, Star, Check, Truck } from "lucide-react";
 import { useUserLocation } from "@/hooks/useUserLocation";
 import { Button } from "@/components/ui/button";
@@ -18,6 +18,7 @@ import { useFunnelTracking } from "@/hooks/useFunnelTracking";
 import AIChatBot from "@/components/AIChatBot";
 import PurchaseNotifications from "@/components/PurchaseNotifications";
 import { supabase } from "@/integrations/supabase/client";
+import AbandonmentCouponModal from "@/components/AbandonmentCouponModal";
 
 import QuantitySelector from "@/components/QuantitySelector";
 import FloatingBuyButton from "@/components/FloatingBuyButton";
@@ -32,6 +33,7 @@ const PixIcon = ({ className = "h-4 w-4" }: { className?: string }) => (
 
 const Index = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { addItem, totalItems, clearCart } = useCart();
   const { city, state, loading: locationLoading } = useUserLocation();
   const { kitPrices, isLoading: isLoadingPrices } = useKitPricing();
@@ -39,6 +41,8 @@ const Index = () => {
   const [currentPrice, setCurrentPrice] = useState(0);
   const [currentOriginalPrice, setCurrentOriginalPrice] = useState(0);
   const [defaultKitLoaded, setDefaultKitLoaded] = useState(false);
+  const [showCouponModal, setShowCouponModal] = useState(false);
+  const [couponApplied, setCouponApplied] = useState(false);
 
   // Fetch default kit setting
   useEffect(() => {
@@ -71,6 +75,27 @@ const Index = () => {
   usePresence("/");
   const { trackEvent } = useFunnelTracking("/");
 
+  // Check if user is returning from checkout (abandonment detection)
+  useEffect(() => {
+    const visitedCheckout = localStorage.getItem('visited_checkout');
+    const couponAlreadyApplied = localStorage.getItem('coupon_applied');
+    const couponDismissed = localStorage.getItem('coupon_dismissed');
+    
+    // Show coupon modal if user visited checkout but hasn't applied or dismissed coupon
+    if (visitedCheckout === 'true' && couponAlreadyApplied !== 'true' && couponDismissed !== 'true') {
+      // Small delay for better UX
+      const timer = setTimeout(() => {
+        setShowCouponModal(true);
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+    
+    // Check if coupon is already applied
+    if (couponAlreadyApplied === 'true') {
+      setCouponApplied(true);
+    }
+  }, []);
+
   // Track product view on mount
   useEffect(() => {
     trackEvent('product_view', { product: 'camera-wifi' });
@@ -91,12 +116,27 @@ const Index = () => {
     return `${formatDate(minDate)} - ${formatDate(maxDate)}`;
   };
 
+  // Apply coupon discount if active
+  const couponDiscount = couponApplied ? 0.35 : 0; // 35% discount
+  const finalPrice = couponApplied ? currentPrice * (1 - couponDiscount) : currentPrice;
+  
   // Only calculate if prices are loaded
-  const discountPercent = currentOriginalPrice > 0 && currentPrice > 0
-    ? Math.round(((currentOriginalPrice - currentPrice) / currentOriginalPrice) * 100) 
+  const discountPercent = currentOriginalPrice > 0 && finalPrice > 0
+    ? Math.round(((currentOriginalPrice - finalPrice) / currentOriginalPrice) * 100) 
     : 0;
 
-  const currentSavings = currentOriginalPrice > 0 ? currentOriginalPrice - currentPrice : 0;
+  const currentSavings = currentOriginalPrice > 0 ? currentOriginalPrice - finalPrice : 0;
+
+  const handleApplyCoupon = () => {
+    setCouponApplied(true);
+    setShowCouponModal(false);
+    trackEvent('coupon_applied', { coupon: 'PRIMEIRA35', discount: 35 });
+  };
+
+  const handleCloseCouponModal = () => {
+    setShowCouponModal(false);
+    localStorage.setItem('coupon_dismissed', 'true');
+  };
 
   useEffect(() => {
     trackPixelEvent('ViewContent', {
@@ -121,6 +161,9 @@ const Index = () => {
   };
 
   const handleBuyClick = () => {
+    // Use finalPrice (with coupon if applied) for checkout
+    const priceForCheckout = couponApplied ? finalPrice : currentPrice;
+    
     if (totalItems > 0) {
       navigate("/checkout");
       return;
@@ -131,20 +174,21 @@ const Index = () => {
       content_id: 'camera-wifi-security',
       content_name: 'Câmera Wi-Fi com Sensor de Movimento',
       quantity: selectedQuantity,
-      value: currentPrice,
+      value: priceForCheckout,
       currency: 'BRL',
     });
     
     // Track funnel event
     trackEvent('add_to_cart', { 
       quantity: selectedQuantity, 
-      price: currentPrice,
-      kit: selectedQuantity === 1 ? '1 Câmera' : `Kit ${selectedQuantity} Câmeras`
+      price: priceForCheckout,
+      kit: selectedQuantity === 1 ? '1 Câmera' : `Kit ${selectedQuantity} Câmeras`,
+      coupon_applied: couponApplied
     });
     
-    // Clear cart and add new selection
+    // Clear cart and add new selection with discounted price if coupon applied
     clearCart();
-    addItem("default", selectedQuantity, 1, currentPrice, currentOriginalPrice);
+    addItem("default", selectedQuantity, 1, priceForCheckout, currentOriginalPrice);
     navigate("/checkout");
   };
 
@@ -220,6 +264,11 @@ const Index = () => {
               </div>
             ) : (
               <>
+                {couponApplied && (
+                  <div className="flex items-center gap-2 mb-2 bg-success/10 border border-success/30 rounded-lg px-3 py-2">
+                    <span className="text-xs font-bold text-success">🎉 CUPOM PRIMEIRA35 APLICADO!</span>
+                  </div>
+                )}
                 <div className="flex items-center gap-2 mb-1">
                   <span className="text-sm text-muted-foreground line-through">
                     De: R$ {currentOriginalPrice.toFixed(2).replace(".", ",")}
@@ -228,8 +277,13 @@ const Index = () => {
                     {discountPercent}% OFF
                   </span>
                 </div>
+                {couponApplied && (
+                  <div className="text-sm text-muted-foreground line-through mb-1">
+                    R$ {currentPrice.toFixed(2).replace(".", ",")}
+                  </div>
+                )}
                 <div className="text-4xl font-black text-primary">
-                  R$ {currentPrice.toFixed(2).replace(".", ",")}
+                  R$ {finalPrice.toFixed(2).replace(".", ",")}
                 </div>
                 <div className="flex items-center gap-1.5 text-sm text-success mt-1.5">
                   <PixIcon className="h-4 w-4" />
@@ -316,6 +370,14 @@ const Index = () => {
       <Footer />
       <AIChatBot />
       <PurchaseNotifications />
+      
+      {/* Abandonment Coupon Modal */}
+      {showCouponModal && (
+        <AbandonmentCouponModal 
+          onApplyCoupon={handleApplyCoupon}
+          onClose={handleCloseCouponModal}
+        />
+      )}
     </div>
   );
 };

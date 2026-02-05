@@ -25,7 +25,8 @@ export type FunnelEventType =
   | 'checkout_abandoned'
   | 'scroll_depth'
   | 'time_on_page'
-  | 'button_click';
+  | 'button_click'
+  | 'coupon_applied';
 
 interface FunnelEventData {
   [key: string]: string | number | boolean | undefined;
