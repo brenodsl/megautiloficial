@@ -1507,13 +1507,12 @@ const Checkout = () => {
           </div>
 
           {/* Contact */}
-          <div className="space-y-0.5 text-xs text-muted-foreground">
+          <div className="text-xs text-muted-foreground">
             <p>
               <a href="mailto:contato@megautil.com.br" className="hover:text-foreground transition-colors">
                 contato@megautil.com.br
               </a>
             </p>
-            <p>SAC: (11) 3456-7890</p>
           </div>
 
           {/* Links */}
