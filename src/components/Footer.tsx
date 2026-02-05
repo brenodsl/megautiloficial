@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Shield, Lock, Mail, Clock, MapPin, Phone, CheckCircle } from "lucide-react";
+import { Shield, Lock, Mail, Clock, MapPin, CheckCircle } from "lucide-react";
 
 const Footer = () => {
   return (
@@ -49,10 +49,6 @@ const Footer = () => {
                 <a href="mailto:contato@megautil.com.br" className="text-white/60 hover:text-white text-sm transition-colors">
                   contato@megautil.com.br
                 </a>
-              </div>
-              <div className="flex items-center justify-center md:justify-start gap-2">
-                <Phone className="h-4 w-4 text-accent" />
-                <span className="text-white/60 text-sm">SAC: (11) 3456-7890</span>
               </div>
               <div className="flex items-center justify-center md:justify-start gap-2">
                 <Clock className="h-4 w-4 text-accent" />

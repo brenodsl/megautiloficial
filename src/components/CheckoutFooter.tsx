@@ -29,7 +29,6 @@ const CheckoutFooter = () => {
               contato@megautil.com.br
             </a>
           </p>
-          <p>SAC: (11) 3456-7890</p>
         </div>
 
         {/* Links */}
