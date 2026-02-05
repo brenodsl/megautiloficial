@@ -254,9 +254,11 @@ const Checkout = () => {
   usePresence("/checkout");
   const { trackEvent } = useFunnelTracking("/checkout");
 
-  // Track checkout started on mount
+  // Track checkout started on mount and mark checkout as visited for abandonment recovery
   useEffect(() => {
     trackEvent('checkout_started', { step: 1 });
+    // Mark that user visited checkout - used for abandonment recovery coupon
+    localStorage.setItem('visited_checkout', 'true');
   }, []);
 
   useEffect(() => {
